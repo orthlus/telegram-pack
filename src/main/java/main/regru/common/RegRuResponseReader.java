@@ -1,0 +1,55 @@
+package main.regru.common;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import main.regru.common.dto.AddAndDeleteDomainResponse;
+import main.regru.common.dto.DomainsList;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Slf4j
+@Component
+public class RegRuResponseReader {
+	private ObjectMapper mapper = new ObjectMapper();
+
+	public boolean isDomainAddingOrDeletingSuccess(String jsonStr) {
+		try {
+			return isDomainAddingOrDeletingSuccess0(jsonStr);
+		} catch (JsonProcessingException e) {
+			log.error("error parsing isDomainAddingOrDeletingSuccess: {}", jsonStr);
+			return false;
+		}
+	}
+
+	public boolean isDomainAddingOrDeletingSuccess0(String jsonStr) throws JsonProcessingException {
+		AddAndDeleteDomainResponse response = mapper.readValue(jsonStr, AddAndDeleteDomainResponse.class);
+		if (!response.isResultSuccess()) {
+			log.error("error in isDomainAddingOrDeletingSuccess: {}", jsonStr);
+			return false;
+		}
+		return true;
+	}
+
+	public List<RR> readDomainsList(String jsonStr) {
+		try {
+			return readDomainsList0(jsonStr);
+		} catch (JsonProcessingException e) {
+			log.error("error parsing list domains: {}", jsonStr);
+			return List.of();
+		}
+	}
+
+	private List<RR> readDomainsList0(String jsonStr) throws JsonProcessingException {
+		DomainsList domainsList = mapper.readValue(jsonStr, DomainsList.class);
+		if (!domainsList.isResultSuccess()) {
+			log.error("error during getting list domains: {}", jsonStr);
+			return List.of();
+		}
+		return domainsList.getList().stream()
+				.filter(rrDto -> rrDto.rectype.equals("A"))
+				.map(rrDto -> new RR(rrDto.content, rrDto.subname))
+				.toList();
+	}
+}
