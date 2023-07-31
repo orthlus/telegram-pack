@@ -17,20 +17,16 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import static java.nio.file.Files.walk;
-import static java.nio.file.Files.writeString;
+import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.time.LocalDateTime.now;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static main.common.QuartzUtils.buildJob;
-import static org.eclipse.jgit.api.Git.cloneRepository;
 
 @Slf4j
 @Component
@@ -46,7 +42,7 @@ public class GitJob implements Job, QuartzJobsList {
 
 	@PostConstruct
 	private void init() throws IOException {
-		Files.createDirectory(Path.of(gitLocalPath));
+		createDirectory(Path.of(gitLocalPath));
 	}
 
 	@Override
@@ -71,7 +67,7 @@ public class GitJob implements Job, QuartzJobsList {
 		Path repoLocalPath = Path.of(gitLocalPath);
 		clearDir(repoLocalPath);
 
-		CloneCommand cloneCommand = cloneRepository()
+		CloneCommand cloneCommand = Git.cloneRepository()
 				.setURI(gitUrl)
 				.setDirectory(repoLocalPath.toFile())
 				.setCredentialsProvider(cred);
@@ -83,7 +79,7 @@ public class GitJob implements Job, QuartzJobsList {
 			try (Stream<Path> textFile = walk(gitDir).filter(this::filter)) {
 				Path file = textFile.findFirst().orElseThrow();
 				for (int i = 0; i < count; i++) {
-					TimeUnit.SECONDS.sleep(1);
+					SECONDS.sleep(1);
 					doChanges(file, git);
 				}
 			}
@@ -103,8 +99,8 @@ public class GitJob implements Job, QuartzJobsList {
 	}
 
 	private void smartChangeFile(Path file) throws IOException {
-		int size = Files.readAllLines(file).size();
-		StandardOpenOption option = size > 1000 ? TRUNCATE_EXISTING : APPEND;
+		int size = readAllLines(file).size();
+		var option = size > 1000 ? TRUNCATE_EXISTING : APPEND;
 
 		writeString(file, "\ntext", option);
 	}
