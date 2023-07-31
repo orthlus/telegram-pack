@@ -2,3 +2,4 @@ target
 .idea
 *.iml
 jooq-config.xml
+*production.properties
