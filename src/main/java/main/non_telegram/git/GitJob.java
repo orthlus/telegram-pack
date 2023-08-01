@@ -98,6 +98,7 @@ public class GitJob implements Job, QuartzJobsList {
 		String message = "add again at " + now(Main.zone);
 		git.commit()
 				.setMessage(message)
+				.setAuthor("", login)
 				.setAll(true)
 				.call();
 	}
