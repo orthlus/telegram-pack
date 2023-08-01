@@ -18,7 +18,11 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.security.SecureRandom;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.*;
@@ -72,7 +76,7 @@ public class GitJob implements Job, QuartzJobsList {
 				.setDirectory(repoLocalPath.toFile())
 				.setCredentialsProvider(cred);
 
-		int count = new Random().nextInt(3, 35);
+		int count = new SecureRandom().nextInt(35) + 3;
 
 		try (Git git = cloneCommand.call()) {
 			Path gitDir = git.getRepository().getWorkTree().toPath();
