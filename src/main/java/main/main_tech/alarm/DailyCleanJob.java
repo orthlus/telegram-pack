@@ -6,8 +6,9 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class DailyCleanJob implements Job {

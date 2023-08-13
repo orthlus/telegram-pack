@@ -6,18 +6,16 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
 public class DailyJob implements Job {
 	private final Telegram telegram;
-	@Value("${main_tech.alarm.url}")
-	private String alarmUrl;
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		telegram.sendAlarm(alarmUrl);
+		telegram.sendAlarm("Голосовой чат в чате");
 	}
 }
