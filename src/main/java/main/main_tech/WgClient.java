@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static main.common.OkHttpUtils.readBody;
 
+@SuppressWarnings("KotlinInternalInJava")
 @Slf4j
 @Component
 public class WgClient {
@@ -17,6 +18,7 @@ public class WgClient {
 			.callTimeout(2, TimeUnit.MINUTES)
 			.connectTimeout(2, TimeUnit.MINUTES)
 			.readTimeout(2, TimeUnit.MINUTES)
+			.cache(null)
 			.build();
 	@Value("${main_tech.api.url}")
 	private String url;
