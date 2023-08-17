@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static main.common.QuartzUtils.scheduleJob;
 
@@ -20,15 +22,36 @@ public class QuartzConfig {
 			throws SchedulerException {
 		Scheduler scheduler = factory.getScheduler();
 
+		Set<String[]> outputData = new HashSet<>();
+
 		for (QuartzJobsList jobsClass : jobsClasses) {
 			for (Tuple2<JobDetail, Trigger> job : jobsClass.getJobs()) {
 				scheduleJob(scheduler, job);
-				System.out.printf("job - %s, trigger - %s%n", job.v1.getJobClass().getName(), getTriggerInfo(job.v2));
+				outputData.add(new String[]{
+						job.v1.getJobClass().getName().replaceAll("^main.", ""),
+						getTriggerInfo(job.v2)
+				});
+//				System.out.printf("job - %s, trigger - %s%n", job.v1.getJobClass().getName(), getTriggerInfo(job.v2));
 			}
 		}
 
+		logJobsToStdout(outputData);
+
 		scheduler.start();
 		return scheduler;
+	}
+
+	private void logJobsToStdout(Set<String[]> outputData) {
+		int maxLength = outputData.stream()
+				.map(s -> s[0].length())
+				.mapToInt(Integer::intValue)
+				.max().orElse(50);
+
+		// job - %-50s trigger - %s%n
+		String outputPattern = "job - %-" + (maxLength + 1) + "s trigger - %s%n";
+		for (String[] job : outputData) {
+			System.out.printf(outputPattern, job[0], job[1]);
+		}
 	}
 
 	private String getTriggerInfo(Trigger trigger) {
