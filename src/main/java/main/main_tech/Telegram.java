@@ -20,16 +20,28 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	private final WgClient wgClient;
 	private final RuvdsEmailClient ruvdsEmailClient;
-	private Message lastMessage;
+	private Message message1;
+	private Message message2;
 
-	public void sendAlarm(String link) {
-		lastMessage = sendWithOutPreview("Го!\n" + link);
+	public void sendAlarm1(String link) {
+		message1 = sendWithOutPreview("Го!\n" + link);
 	}
 
-	public void deleteLastAlarmMessage() {
-		if (lastMessage.notEmpty()) {
-			deleteMessage(lastMessage);
-			lastMessage = Message.empty();
+	public void deleteLastAlarmMessage1() {
+		if (message1.notEmpty()) {
+			deleteMessage(message1);
+			message1 = Message.empty();
+		}
+	}
+
+	public void sendAlarm2(String link) {
+		message2 = sendWithOutPreview("Го!\n" + link);
+	}
+
+	public void deleteLastAlarmMessage2() {
+		if (message2.notEmpty()) {
+			deleteMessage(message2);
+			message2 = Message.empty();
 		}
 	}
 

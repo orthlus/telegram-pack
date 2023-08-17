@@ -16,6 +16,6 @@ public class DailyCleanJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		telegram.deleteLastAlarmMessage();
+		telegram.deleteLastAlarmMessage1();
 	}
 }

@@ -16,6 +16,6 @@ public class DailyJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		telegram.sendAlarm("Голосовой чат в чате");
+		telegram.sendAlarm1("Голосовой чат в чате");
 	}
 }
