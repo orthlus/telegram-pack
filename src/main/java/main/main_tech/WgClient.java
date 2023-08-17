@@ -26,6 +26,11 @@ public class WgClient {
 	private String secret;
 
 	public String getStat() {
+		getStat0();
+		return getStat0();
+	}
+
+	public String getStat0() {
 		FormBody body = new FormBody.Builder()
 				.add("secret", secret)
 				.build();
