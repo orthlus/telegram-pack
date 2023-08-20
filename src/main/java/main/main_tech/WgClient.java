@@ -18,26 +18,26 @@ public class WgClient {
 			.callTimeout(2, TimeUnit.MINUTES)
 			.connectTimeout(2, TimeUnit.MINUTES)
 			.readTimeout(2, TimeUnit.MINUTES)
+			.addInterceptor(new AuthInterceptor())
 			.cache(null)
 			.build();
 	@Value("${main_tech.api.url}")
 	private String url;
+	@Value("${main_tech.api.user}")
+	private String user;
 	@Value("${main_tech.api.secret}")
-	private String secret;
+	private String password;
 
-	public String getStat() {
-		getStat0();
-		return getStat0();
+	public String getRawStat() {
+		return req("/raw-stat");
 	}
 
-	public String getStat0() {
-		FormBody body = new FormBody.Builder()
-				.add("secret", secret)
-				.build();
-		Request request = new Request.Builder().post(body)
-				.url(url)
-				.addHeader("Authorization", secret)
-				.build();
+	public String getStat() {
+		return req("/pretty-stat");
+	}
+
+	public String req(String path) {
+		Request request = new Request.Builder().get().url(url + path).build();
 		Call call = httpClient.newCall(request);
 		try {
 			Response response = call.execute();
@@ -50,5 +50,14 @@ public class WgClient {
 			log.error("http error - wg stat", e);
 		}
 		throw new RuntimeException("error wg stat");
+	}
+
+	private class AuthInterceptor implements Interceptor {
+		public Response intercept(Chain chain) throws IOException {
+			return chain.proceed(chain.request()
+					.newBuilder()
+					.header("Authorization", Credentials.basic(user, password))
+					.build());
+		}
 	}
 }
