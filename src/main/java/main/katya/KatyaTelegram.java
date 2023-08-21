@@ -2,6 +2,7 @@ package main.katya;
 
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.CustomSpringWebhookBot;
+import main.common.telegram.PublicBot;
 import main.katya.exception.InstagramUnauthorizedException;
 import main.katya.exception.InvalidUrl;
 import main.katya.exception.UnknownHost;
@@ -22,7 +23,7 @@ import static main.katya.KnownHosts.YOUTUBE;
 
 @Slf4j
 @Component
-public class KatyaTelegram extends CustomSpringWebhookBot {
+public class KatyaTelegram extends CustomSpringWebhookBot implements PublicBot {
 	public KatyaTelegram(KatyaBotConfig botConfig,
 						 PaidClient instagram,
 						 SocialApiClient socialApiClient) {

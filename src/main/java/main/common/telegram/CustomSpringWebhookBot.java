@@ -40,6 +40,8 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 
 	@Override
 	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+		if (!isBotPublic() && !isAdmin(update)) return null;
+
 		onWebhookUpdate(update);
 		return null;
 	}
