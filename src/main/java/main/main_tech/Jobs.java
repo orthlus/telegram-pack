@@ -1,8 +1,7 @@
-package main.main_tech.alarm;
+package main.main_tech;
 
 import lombok.RequiredArgsConstructor;
 import main.common.QuartzJobsList;
-import main.main_tech.Telegram;
 import org.jooq.lambda.tuple.Tuple2;
 import org.quartz.*;
 import org.springframework.stereotype.Component;

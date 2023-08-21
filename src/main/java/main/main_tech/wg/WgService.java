@@ -1,4 +1,4 @@
-package main.main_tech;
+package main.main_tech.wg;
 
 import java.util.Arrays;
 import java.util.Set;

@@ -2,6 +2,7 @@ package main.main_tech;
 
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
+import main.main_tech.wg.WgClient;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
