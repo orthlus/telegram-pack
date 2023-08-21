@@ -11,7 +11,12 @@ import java.util.Set;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
-	private final Set<String> commands = new LinkedHashSet<>(List.of("/wg_stat", "/get_code", "/get_new_host"));
+	private final Set<String> commands = new LinkedHashSet<>(List.of(
+			"/wg_stat",
+			"/wg_stat_diff",
+			"/wg_stat_current",
+			"/get_code",
+			"/get_new_host"));
 	public Telegram(Config botConfig, WgClient wgClient, RuvdsEmailClient ruvdsEmailClient) {
 		super(botConfig);
 		this.wgClient = wgClient;
