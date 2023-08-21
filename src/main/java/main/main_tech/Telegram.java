@@ -53,16 +53,12 @@ public class Telegram extends CustomSpringWebhookBot {
 	@Override
 	public void onWebhookUpdate(Update update) {
 		if (update.hasMessage()) {
-			if (!isAdmin(update)) return;
+			String messageText = update.getMessage().getText();
 
-			if (update.hasMessage()) {
-				String messageText = update.getMessage().getText();
-
-				if (commands.contains(messageText)) {
-					handleCommand(messageText);
-				} else {
-					handleText(messageText);
-				}
+			if (commands.contains(messageText)) {
+				handleCommand(messageText);
+			} else {
+				handleText(messageText);
 			}
 		}
 	}

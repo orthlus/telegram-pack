@@ -54,21 +54,16 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 
 	@Override
 	public void onWebhookUpdate(Update update) {
-		if (update.hasMessage() || update.hasCallbackQuery()) {
+		if (update.hasMessage()) {
+			String messageText = update.getMessage().getText();
 
-			if (!isAdmin(update)) return;
-
-			if (update.hasMessage()) {
-				String messageText = update.getMessage().getText();
-
-				if (commands.contains(messageText)) {
-					handleCommand(messageText);
-				} else {
-					handleText(messageText);
-				}
-			} else if (update.hasCallbackQuery()) {
-				handleCallback(update);
+			if (commands.contains(messageText)) {
+				handleCommand(messageText);
+			} else {
+				handleText(messageText);
 			}
+		} else if (update.hasCallbackQuery()) {
+			handleCallback(update);
 		}
 	}
 

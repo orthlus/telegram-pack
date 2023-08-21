@@ -27,8 +27,6 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 	}
 
 	public void onWebhookUpdate(Update update) {
-		if (!isAdmin(update)) return;
-
 		if (!update.hasMessage()) return;
 		if (!update.getMessage().hasText()) return;
 
