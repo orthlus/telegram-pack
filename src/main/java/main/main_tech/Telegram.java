@@ -68,10 +68,11 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	private void handleCommand(String messageText) {
 		switch (messageText) {
-			case "/wg_stat_current" -> {
+			case "/wg_stat_current", "/wg_stat" -> {
 				String text = wgClient.getStat();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
-			}case "/wg_stat_diff" -> {
+			}
+			case "/wg_stat_diff" -> {
 				String text = wgClient.getRawStat();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
