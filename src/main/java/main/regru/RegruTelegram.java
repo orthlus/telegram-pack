@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Comparator;
 
-import static main.common.telegram.TelegramPropsProvider.getAdminId;
 import static main.regru.common.ChatStates.*;
 
 public class RegruTelegram extends CustomSpringWebhookBot {
@@ -28,9 +27,10 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 	}
 
 	public void onWebhookUpdate(Update update) {
+		if (!isAdmin(update)) return;
+
 		if (!update.hasMessage()) return;
 		if (!update.getMessage().hasText()) return;
-		if (update.getMessage().getChatId() != getAdminId()) return;
 
 		if (update.getMessage().getText().startsWith("/")) {
 			handleCommand(update);

@@ -15,6 +15,8 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	@Override
 	public void onWebhookUpdate(Update update) {
+		if (!isAdmin(update)) return;
+
 		send("работает");
 	}
 
