@@ -44,6 +44,10 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 		return null;
 	}
 
+	private boolean isBotPublic() {
+		return this instanceof PublicBot;
+	}
+
 	@Override
 	public String getBotPath() {
 		return getBotWebhookUrl(botConfig);
