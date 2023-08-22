@@ -2,7 +2,7 @@ package main.main_tech;
 
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
-import main.main_tech.wg.WgClient;
+import main.main_tech.wg.WgService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -18,13 +18,13 @@ public class Telegram extends CustomSpringWebhookBot {
 			"/wg_stat_current",
 			"/get_code",
 			"/get_new_host"));
-	public Telegram(Config botConfig, WgClient wgClient, RuvdsEmailClient ruvdsEmailClient) {
+	public Telegram(Config botConfig, WgService wg, RuvdsEmailClient ruvdsEmailClient) {
 		super(botConfig);
-		this.wgClient = wgClient;
+		this.wg = wg;
 		this.ruvdsEmailClient = ruvdsEmailClient;
 	}
 
-	private final WgClient wgClient;
+	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
 	private Message message1;
 	private Message message2;
@@ -71,11 +71,11 @@ public class Telegram extends CustomSpringWebhookBot {
 	private void handleCommand(String messageText) {
 		switch (messageText) {
 			case "/wg_stat_current", "/wg_stat" -> {
-				String text = wgClient.getStat();
+				String text = wg.getPrettyCurrent();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 			case "/wg_stat_diff" -> {
-				String text = wgClient.getRawStat();
+				String text = wg.getPrettyDiff();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 			case "/get_code" -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));

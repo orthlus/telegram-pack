@@ -28,12 +28,16 @@ public class WgClient {
 	@Value("${main_tech.api.secret}")
 	private String password;
 
-	public String getRawStat() {
+	String getRawStat() {
 		return req("/raw-stat");
 	}
 
-	public String getStat() {
+	String getStat() {
 		return req("/pretty-stat");
+	}
+
+	String getUsers() {
+		return req("/users");
 	}
 
 	public String req(String path) {
