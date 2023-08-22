@@ -22,16 +22,15 @@ public class QuartzConfig {
 			throws SchedulerException {
 		Scheduler scheduler = factory.getScheduler();
 
-		Set<String[]> outputData = new HashSet<>();
+		Set<Tuple2<String, String>> outputData = new HashSet<>();
 
 		for (QuartzJobsList jobsClass : jobsClasses) {
 			for (Tuple2<JobDetail, Trigger> job : jobsClass.getJobs()) {
 				scheduleJob(scheduler, job);
-				outputData.add(new String[]{
+				outputData.add(new Tuple2<>(
 						job.v1.getJobClass().getName().replaceAll("^main.", ""),
 						getTriggerInfo(job.v2)
-				});
-//				System.out.printf("job - %s, trigger - %s%n", job.v1.getJobClass().getName(), getTriggerInfo(job.v2));
+				));
 			}
 		}
 
@@ -41,16 +40,16 @@ public class QuartzConfig {
 		return scheduler;
 	}
 
-	private void logJobsToStdout(Set<String[]> outputData) {
+	private void logJobsToStdout(Set<Tuple2<String, String>> outputData) {
 		int maxLength = outputData.stream()
-				.map(s -> s[0].length())
+				.map(s -> s.v1.length())
 				.mapToInt(Integer::intValue)
 				.max().orElse(50);
 
 		// job - %-50s trigger - %s%n
 		String outputPattern = "job - %-" + (maxLength + 1) + "s trigger - %s%n";
-		for (String[] job : outputData) {
-			System.out.printf(outputPattern, job[0], job[1]);
+		for (Tuple2<String, String> job : outputData) {
+			System.out.printf(outputPattern, job.v1, job.v2);
 		}
 	}
 
