@@ -25,7 +25,7 @@ import static main.Main.zone;
 public class WgService {
 	private final WgClient client;
 	private final Repo repo;
-	private String header = "name       ⬆️        ⬇️        last connect\n";
+	private String header = "name      up     down    last conn\n";
 	private final BigDecimal b1kk = BigDecimal.valueOf(1024 * 1024);
 	private final BigDecimal b1kkk = BigDecimal.valueOf(1024 * 1024 * 1024);
 	private final BigDecimal d1kkk = BigDecimal.valueOf(1_000_000_000L);
@@ -42,8 +42,8 @@ public class WgService {
 		long nowSec = now.toEpochSecond(zone.getRules().getOffset(now));
 		long x = nowSec - seconds;
 		return x < 86400 ?
-				format("%4s%02d:%02d:%02d", "", x % 86400 / 3600, x % 3600 / 60, x % 60) :
-				format("%02dd:%02d:%02d:%02d", x / 86400, x % 86400 / 3600, x % 3600 / 60, x % 60);
+				format("%02d:%02d:%02d", x % 86400 / 3600, x % 3600 / 60, x % 60) :
+				format("%3d days", x / 86400);
 	}
 
 	public void saveCurrentItems() {
@@ -75,7 +75,7 @@ public class WgService {
 			String up = bytes2h(new BigDecimal(item.up()));
 			String down = bytes2h(new BigDecimal(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
-			String row = format("%-8s %-5s %-7s %12s%n", item.name(), up, down, time);
+			String row = format("%-8s %8s %8s %8s%n", item.name(), up, down, time);
 			sb.append(row);
 		}
 
