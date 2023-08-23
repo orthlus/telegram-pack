@@ -45,8 +45,8 @@ public class WgService {
 		long nowSec = now.toEpochSecond(zone.getRules().getOffset(now));
 		long x = nowSec - seconds;
 		return x < 86400 ?
-				format("%4s%02d:%02d:%02d%n", "", x % 86400 / 3600, x % 3600 / 60, x % 60) :
-				format("%02dd:%02d:%02d:%02d%n", x / 86400, x % 86400 / 3600, x % 3600 / 60, x % 60);
+				format("%4s%02d:%02d:%02d", "", x % 86400 / 3600, x % 3600 / 60, x % 60) :
+				format("%02dd:%02d:%02d:%02d", x / 86400, x % 86400 / 3600, x % 3600 / 60, x % 60);
 	}
 
 	public void saveCurrentItems() {
@@ -73,14 +73,8 @@ public class WgService {
 			String up = bytes2h(new BigDecimal(item.up()));
 			String down = bytes2h(new BigDecimal(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
-			sb.append(item.name())
-					.append(" ")
-					.append(up)
-					.append(" ")
-					.append(down)
-					.append(" ")
-					.append(time)
-					.append("\n");
+			String row = format("%-9s %-5s %-7s %12s%n", item.name(), up, down, time);
+			sb.append(row);
 		}
 
 		return sb.substring(0, sb.length() - 1);
