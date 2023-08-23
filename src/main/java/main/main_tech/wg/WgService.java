@@ -7,8 +7,6 @@ import main.main_tech.wg.m.Raw;
 import main.main_tech.wg.m.User;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Long.parseLong;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.time.LocalDateTime.now;
 import static main.Main.zone;
 
@@ -134,8 +133,8 @@ public class WgService {
 				if (currItem.name().equals(lastItem.name())) {
 					result.add(new Item(
 							currItem.name(),
-							new BigInteger(currItem.up()).subtract(new BigInteger(lastItem.up())).toString(),
-							new BigInteger(currItem.down()).subtract(new BigInteger(lastItem.down())).toString(),
+							valueOf(parseLong(currItem.up()) - parseLong(lastItem.up())),
+							valueOf(parseLong(currItem.down()) - parseLong(lastItem.down())),
 							currItem.time()
 					));
 				}
