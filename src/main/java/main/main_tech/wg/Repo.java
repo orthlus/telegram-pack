@@ -49,7 +49,7 @@ public class Repo {
 
 	public void saveCurrentItems(Set<Item> items) {
 		db.transaction(trx -> {
-			trx.dsl().truncate(WG_LAST_STAT).execute();
+			trx.dsl().delete(WG_LAST_STAT).execute();
 
 			trx.dsl().batchInsert(items.stream()
 							.map(i -> new WgLastStatRecord(i.name(), i.up(), i.down(), i.time()))
