@@ -63,12 +63,15 @@ public class WgService {
 		Set<Item> lastItems = repo.getLastStat();
 		Set<Item> diffByUser = getDiffByUser(currentItems, lastItems);
 
-		ArrayList<Item> sortedDiff = new ArrayList<>(diffByUser);
-		Collections.sort(sortedDiff, Comparator.comparing(o -> new BigDecimal(o.down())));
-		Collections.reverse(sortedDiff);
+		List<Item> sortedDiff = sortItems(diffByUser);
 
+		return buildPrettyList(sortedDiff, header);
+	}
+
+	private String buildPrettyList(List<Item> items, String header) {
 		StringBuilder sb = new StringBuilder(header);
-		for (Item item : sortedDiff) {
+
+		for (Item item : items) {
 			String up = bytes2h(parseLong(item.up()));
 			String down = bytes2h(parseLong(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
@@ -77,6 +80,13 @@ public class WgService {
 		}
 
 		return sb.substring(0, sb.length() - 1);
+	}
+
+	private List<Item> sortItems(Set<Item> items) {
+		ArrayList<Item> sorted = new ArrayList<>(items);
+		sorted.sort((o1, o2) -> Long.compare(parseLong(o2.down()), parseLong(o1.down())));
+
+		return sorted;
 	}
 
 	private Set<Item> join(Set<Raw> raw, Map<String, String> usersByKey) {
