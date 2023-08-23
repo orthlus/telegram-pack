@@ -10,10 +10,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -28,7 +25,7 @@ import static main.Main.zone;
 public class WgService {
 	private final WgClient client;
 	private final Repo repo;
-	private String header = "name      ⬆️    ⬇️     last connect\n";
+	private String header = "name       ⬆️        ⬇️        last connect\n";
 	private final BigDecimal b1kk = BigDecimal.valueOf(1024 * 1024);
 	private final BigDecimal b1kkk = BigDecimal.valueOf(1024 * 1024 * 1024);
 	private final BigDecimal d1kkk = BigDecimal.valueOf(1_000_000_000L);
@@ -67,13 +64,18 @@ public class WgService {
 		currentItemsAtomic.set(currentItems);
 
 		Set<Item> lastItems = repo.getLastStat();
+		Set<Item> diffByUser = getDiffByUser(currentItems, lastItems);
+
+		ArrayList<Item> sortedDiff = new ArrayList<>(diffByUser);
+		Collections.sort(sortedDiff, Comparator.comparing(o -> new BigDecimal(o.down())));
+		Collections.reverse(sortedDiff);
 
 		StringBuilder sb = new StringBuilder(header);
-		for (Item item : getDiffByUser(currentItems, lastItems)) {
+		for (Item item : sortedDiff) {
 			String up = bytes2h(new BigDecimal(item.up()));
 			String down = bytes2h(new BigDecimal(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
-			String row = format("%-9s %-5s %-7s %12s%n", item.name(), up, down, time);
+			String row = format("%-8s %-5s %-7s %12s%n", item.name(), up, down, time);
 			sb.append(row);
 		}
 
