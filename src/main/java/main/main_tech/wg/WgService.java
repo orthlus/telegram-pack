@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import main.main_tech.wg.m.Item;
 import main.main_tech.wg.m.Raw;
 import main.main_tech.wg.m.User;
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,7 +23,7 @@ import static java.time.LocalDateTime.now;
 import static main.Main.zone;
 
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class WgService {
 	private final WgClient client;
