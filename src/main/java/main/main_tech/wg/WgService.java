@@ -72,7 +72,7 @@ public class WgService {
 			String up = bytes2h(parseLong(item.up()));
 			String down = bytes2h(parseLong(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
-			String row = format("%-8s %8s %8s %8s%n", item.name(), up, down, time);
+			String row = format("%-8s %8s %8s %9s%n", item.name(), up, down, time);
 			sb.append(row);
 		}
 
