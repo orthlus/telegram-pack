@@ -116,9 +116,9 @@ public class WgService {
 				.filter(cols -> cols.length == 4)
 				.map(cols -> new Raw(
 						cols[0],
+						cols[2],
 						cols[3],
-						cols[1],
-						cols[2]
+						cols[1]
 				))
 				.collect(Collectors.toSet());
 	}
