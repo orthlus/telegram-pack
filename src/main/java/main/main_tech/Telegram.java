@@ -13,9 +13,9 @@ import java.util.Set;
 @Component
 public class Telegram extends CustomSpringWebhookBot {
 	private final Set<String> commands = new LinkedHashSet<>(List.of(
-			"/wg_stat",
 			"/wg_stat_diff",
 			"/wg_stat_current",
+			"/wg_update_users",
 			"/get_code",
 			"/get_new_host"));
 	public Telegram(Config botConfig, WgService wg, RuvdsEmailClient ruvdsEmailClient) {
@@ -77,6 +77,11 @@ public class Telegram extends CustomSpringWebhookBot {
 			case "/wg_stat_diff" -> {
 				String text = wg.getPrettyDiff();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				wg.saveCurrentItems();
+			}
+			case "/wg_update_users" -> {
+				wg.updateUsers();
+				send("Ok");
 			}
 			case "/get_code" -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
 			case "/get_new_host" -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
