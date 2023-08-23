@@ -51,7 +51,11 @@ public class WgService {
 	}
 
 	public String getPrettyCurrent() {
-		return client.getStat();
+		Set<Raw> raw = parseRaw(client.getRawStat());
+		Set<Item> items = join(raw, repo.getUsers());
+		List<Item> sortedItems = sortItems(items);
+
+		return buildPrettyList(sortedItems, header);
 	}
 
 	public String getPrettyDiff() {
