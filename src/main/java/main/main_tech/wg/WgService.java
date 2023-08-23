@@ -24,7 +24,7 @@ import static main.Main.zone;
 public class WgService {
 	private final WgClient client;
 	private final Repo repo;
-	private String header = "name      up     down    last conn\n";
+	private String header = "name        up     down     last conn\n";
 	private AtomicReference<Set<Item>> currentItemsAtomic = new AtomicReference<>(Set.of());
 
 	private String bytes2h(long bytes) {
@@ -74,7 +74,7 @@ public class WgService {
 			String up = bytes2h(parseLong(item.up()));
 			String down = bytes2h(parseLong(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
-			String row = format("%-8s %8s %8s %9s%n", item.name(), up, down, time);
+			String row = format("%-8s %8s %9s %9s%n", item.name(), up, down, time);
 			sb.append(row);
 		}
 
