@@ -26,15 +26,12 @@ public class WgService {
 	private final WgClient client;
 	private final Repo repo;
 	private String header = "name      up     down    last conn\n";
-	private final BigDecimal b1kk = BigDecimal.valueOf(1024 * 1024);
-	private final BigDecimal b1kkk = BigDecimal.valueOf(1024 * 1024 * 1024);
-	private final BigDecimal d1kkk = BigDecimal.valueOf(1_000_000_000L);
 	private AtomicReference<Set<Item>> currentItemsAtomic = new AtomicReference<>(Set.of());
 
-	private String bytes2h(BigDecimal bytes) {
-		return bytes.compareTo(d1kkk) < 0 ?
-				format("%4.1f MB", bytes.divide(b1kk)) :
-				format("%4.1f GB", bytes.divide(b1kkk));
+	private String bytes2h(long bytes) {
+		return bytes < 1_000_000_000L ?
+				format("%4.1f MB", bytes / (1024d * 1024)) :
+				format("%4.1f GB", bytes / (1024d * 1024 * 1024));
 	}
 
 	private String secondsToStr(long seconds) {
@@ -72,8 +69,8 @@ public class WgService {
 
 		StringBuilder sb = new StringBuilder(header);
 		for (Item item : sortedDiff) {
-			String up = bytes2h(new BigDecimal(item.up()));
-			String down = bytes2h(new BigDecimal(item.down()));
+			String up = bytes2h(parseLong(item.up()));
+			String down = bytes2h(parseLong(item.down()));
 			String time = secondsToStr(parseLong(item.time()));
 			String row = format("%-8s %8s %8s %8s%n", item.name(), up, down, time);
 			sb.append(row);
