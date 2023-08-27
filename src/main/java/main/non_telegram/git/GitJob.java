@@ -77,7 +77,8 @@ public class GitJob implements Job, QuartzJobsList {
 				.setDirectory(repoLocalPath.toFile())
 				.setCredentialsProvider(cred);
 
-		int count = new SecureRandom().nextInt(35) + 3;
+		int bound = now(zone).get(of(ENGLISH).weekOfYear()) % 2 == 0 ? 5 : 30;
+		int count = new SecureRandom().nextInt(bound) + 1;
 
 		try (Git git = cloneCommand.call()) {
 			Path gitDir = git.getRepository().getWorkTree().toPath();
