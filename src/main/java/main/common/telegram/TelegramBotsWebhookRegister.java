@@ -53,6 +53,7 @@ public class TelegramBotsWebhookRegister implements InitializingBean {
 		FormBody body = new FormBody.Builder()
 				.add("url", webhookUrl)
 				.add("secret_token", secret)
+				.add("drop_pending_updates", "True")
 				.build();
 		return new Request.Builder().url(url).post(body).build();
 	}
