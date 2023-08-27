@@ -2,9 +2,7 @@ package main.non_telegram.git;
 
 
 import lombok.extern.slf4j.Slf4j;
-import main.Main;
 import main.common.QuartzJobsList;
-import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -19,17 +17,20 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.SecureRandom;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.time.LocalDateTime.now;
+import static java.time.temporal.WeekFields.of;
+import static java.util.Comparator.reverseOrder;
+import static java.util.Locale.ENGLISH;
+import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static main.Main.zone;
 import static main.common.QuartzUtils.buildJob;
 
 @Slf4j
@@ -42,7 +43,7 @@ public class GitJob implements Job, QuartzJobsList {
 	private String pass;
 	@Value("${app.git.url}")
 	private String gitUrl;
-	private final String gitLocalPath = "/tmp/" + UUID.randomUUID();
+	private final String gitLocalPath = "/tmp/" + randomUUID();
 
 	@PostConstruct
 	private void init() throws IOException {
@@ -71,7 +72,7 @@ public class GitJob implements Job, QuartzJobsList {
 		Path repoLocalPath = Path.of(gitLocalPath);
 		clearDir(repoLocalPath);
 
-		CloneCommand cloneCommand = Git.cloneRepository()
+		var cloneCommand = Git.cloneRepository()
 				.setURI(gitUrl)
 				.setDirectory(repoLocalPath.toFile())
 				.setCredentialsProvider(cred);
@@ -95,7 +96,7 @@ public class GitJob implements Job, QuartzJobsList {
 	private void doChanges(Path file, Git git) throws IOException, GitAPIException {
 		smartChangeFile(file);
 
-		String message = "add again at " + now(Main.zone);
+		String message = "add again at " + now(zone);
 		git.commit()
 				.setMessage(message)
 				.setAuthor("", login)
@@ -120,7 +121,7 @@ public class GitJob implements Job, QuartzJobsList {
 
 	private void clearDir(Path dir) {
 		try (Stream<Path> walk = walk(dir)) {
-			walk.sorted(Comparator.reverseOrder())
+			walk.sorted(reverseOrder())
 					.filter(path -> !dir.equals(path))
 					.map(Path::toFile)
 					.forEach(File::delete);
