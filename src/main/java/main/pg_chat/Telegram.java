@@ -25,7 +25,7 @@ public class Telegram extends CustomSpringWebhookBot implements PublicBot {
 			if (update.getMessage().getChatId() == chatId) {
 				if (update.getMessage().hasText()) {
 					if (update.getMessage().getText().contains("/report")) {
-						String msg = "https://t.me/pgsql/" + update.getMessage().getMessageId();
+						String msg = "@pgsql\nhttps://t.me/pgsql/" + update.getMessage().getMessageId();
 						send(msg(channelId, msg).disableWebPagePreview(true));
 					}
 				}
