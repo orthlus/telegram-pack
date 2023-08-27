@@ -29,7 +29,7 @@ public class Repo {
 				.fetchMap(WG_USERS.USER_KEY, WG_USERS.USER_NAME);
 	}
 
-	@CacheEvict("wg-users")
+	@CacheEvict(value = "wg-users", allEntries = true)
 	public void saveUsers(Set<User> users) {
 		db.transaction(trx -> {
 			trx.dsl().truncate(WG_USERS).execute();
