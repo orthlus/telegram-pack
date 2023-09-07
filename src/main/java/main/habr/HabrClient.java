@@ -2,6 +2,7 @@ package main.habr;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
+import main.common.HttpClient;
 import main.habr.rss.RssAdapter;
 import main.habr.rss.RssFeed;
 import okhttp3.OkHttpClient;
@@ -15,11 +16,9 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static main.common.OkHttpUtils.readBody;
-
 @Slf4j
 @Component
-public class HabrClient {
+public class HabrClient extends HttpClient {
 	@Value("${habr.http.timeout}")
 	private int timeout;
 	@Value("${habr.http.delay}")
@@ -27,7 +26,7 @@ public class HabrClient {
 	@Autowired
 	private RssAdapter rssAdapter;
 
-	private OkHttpClient client = new OkHttpClient.Builder()
+	private OkHttpClient client = baseHttpClient.newBuilder()
 			.callTimeout(timeout, TimeUnit.SECONDS)
 			.addInterceptor(new HttpDelayInterceptor(delay))
 			.build();

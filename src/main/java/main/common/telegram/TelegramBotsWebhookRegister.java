@@ -2,8 +2,8 @@ package main.common.telegram;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.common.HttpClient;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.DependsOn;
@@ -21,31 +21,26 @@ import static main.common.telegram.TelegramPropsProvider.getBotWebhookUrl;
 @Component
 @RequiredArgsConstructor
 @DependsOn("main.common.telegram.telegramPropsProvider")
-public class TelegramBotsWebhookRegister implements InitializingBean {
+public class TelegramBotsWebhookRegister extends HttpClient implements InitializingBean {
 	private final List<BotConfig> botConfigs;
 	private final TelegramBotsRepository repo;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		OkHttpClient client = new OkHttpClient();
-
 		Map<String, String> secrets = repo.getSecretsMap();
 		for (BotConfig bot : botConfigs) {
 			if (secrets.get(bot.getNickname()) == null) {
 				String secret = UUID.randomUUID().toString();
-				register(client, bot, secret);
+				register(bot, secret);
 				repo.saveSecret(bot.getNickname(), secret);
 			}
 		}
-
-		client.dispatcher().executorService().shutdown();
-		client.connectionPool().evictAll();
 	}
 
-	private void register(OkHttpClient client, BotConfig bot, String secret) throws IOException {
+	private void register(BotConfig bot, String secret) throws IOException {
 		try {
 			Request request = request(bot.getToken(), getBotWebhookUrl(bot), secret);
-			client.newCall(request).execute().body().close();
+			baseHttpClient.newCall(request).execute().body().close();
 		} catch (NullPointerException ignored) {
 		}
 		log.info("bot {} webhook registered", bot.getNickname());

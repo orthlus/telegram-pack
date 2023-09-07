@@ -2,6 +2,7 @@ package main.regru;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.common.HttpClient;
 import main.regru.common.RR;
 import main.regru.common.RegRuResponseReader;
 import okhttp3.*;
@@ -11,13 +12,11 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 
-import static main.common.OkHttpUtils.readBody;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RegRuClient {
-	private OkHttpClient client = new OkHttpClient();
+public class RegRuClient extends HttpClient {
+	private OkHttpClient client = baseHttpClient;
 	private final RegRuResponseReader responseReader;
 
 	@Value("${regru.api.url}")

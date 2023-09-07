@@ -1,6 +1,7 @@
 package main.katya;
 
 import lombok.extern.slf4j.Slf4j;
+import main.common.HttpClient;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -14,14 +15,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-import static main.common.OkHttpUtils.readBinaryBody;
-
 @Slf4j
 @Component
-public class SocialApiClient {
+public class SocialApiClient extends HttpClient {
 	@Value("${katya.social.api.url}")
 	private String url;
-	private final OkHttpClient httpClient = new OkHttpClient.Builder()
+	private final OkHttpClient httpClient = baseHttpClient.newBuilder()
 			.callTimeout(2, TimeUnit.MINUTES)
 			.connectTimeout(2, TimeUnit.MINUTES)
 			.readTimeout(2, TimeUnit.MINUTES)

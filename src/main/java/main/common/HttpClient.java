@@ -1,6 +1,7 @@
 package main.common;
 
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 import java.io.IOException;
@@ -8,7 +9,9 @@ import java.io.InputStream;
 
 @Slf4j
 @SuppressWarnings("DataFlowIssue")
-public class OkHttpUtils {
+public class HttpClient {
+	protected OkHttpClient baseHttpClient = new OkHttpClient();
+
 	public static String readBody(Response response) {
 		try {
 			String string = response.body().string();
