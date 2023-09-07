@@ -19,14 +19,14 @@ import static main.debts.entity.M.of;
 public class Keyboards implements TgKeyboard {
 	private final Repo repo;
 	private final CallbackMapper mapper;
-	private final String green = "✅";
-	private final String red = "❌";
 
 	private String str(String s1, String s2) {
 		return "%s - %s".formatted(s1, s2);
 	}
 
 	private String sign(Set<Expense> marked, Expense e) {
+		String green = "✅";
+		String red = "❌";
 		return marked.contains(e) ? green : red;
 	}
 

@@ -32,7 +32,7 @@ public class Repo {
 	@CacheEvict(value = "wg-users", allEntries = true)
 	public void saveUsers(Set<User> users) {
 		db.transaction(trx -> {
-			trx.dsl().truncate(WG_USERS).execute();
+			trx.dsl().delete(WG_USERS).execute();
 
 			trx.dsl().batchInsert(users.stream()
 							.map(u -> new WgUsersRecord(u.key(), u.name()))

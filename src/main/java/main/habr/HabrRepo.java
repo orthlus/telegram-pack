@@ -32,7 +32,7 @@ public class HabrRepo {
 
 	public void saveLastRssNews(Set<String> news) {
 		db.transaction(trx -> {
-			trx.dsl().truncate(HABR_LAST_RSS_NEWS).execute();
+			trx.dsl().delete(HABR_LAST_RSS_NEWS).execute();
 
 			trx.dsl().batchInsert(news.stream().map(HabrLastRssNewsRecord::new).toList())
 					.execute();
@@ -41,7 +41,7 @@ public class HabrRepo {
 
 	public void saveLastRssPosts(Set<String> posts) {
 		db.transaction(trx -> {
-			trx.dsl().truncate(HABR_LAST_RSS_POSTS).execute();
+			trx.dsl().delete(HABR_LAST_RSS_POSTS).execute();
 
 			trx.dsl().batchInsert(posts.stream().map(HabrLastRssPostsRecord::new).toList())
 					.execute();

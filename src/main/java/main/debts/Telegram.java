@@ -148,7 +148,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	record ExpenseDto(String name, int amount, int day, LocalDate expire){}
 	record IncomeDto(int amount, int day){}
 
-	public ExpenseDto parseExpense(String text) {
+	private ExpenseDto parseExpense(String text) {
 		String[] split = text.split("\n");
 		String name = split[0].trim();
 		int amount = parseInt(split[1].trim());
@@ -173,7 +173,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		throw new IllegalArgumentException("invalid date " + strDate);
 	}
 
-	public IncomeDto parseIncome(String text) {
+	private IncomeDto parseIncome(String text) {
 		String[] arr = text.split(" ");
 		int amount = parseInt(arr[0]);
 		int day = parseInt(arr[1]);
