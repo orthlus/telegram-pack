@@ -91,7 +91,7 @@ public class Telegram extends CustomSpringWebhookBot {
 
 				String result = stream(domains)
 						.map(domain ->
-								domain + ":\n" + sorted.stream()
+								"<b>" + domain + ":</b>\n" + sorted.stream()
 										.filter(server -> server.name().contains(domain))
 										.map(server -> formatServer(domain, server))
 										.collect(joining("\n"))
@@ -105,7 +105,7 @@ public class Telegram extends CustomSpringWebhookBot {
 							.collect(joining("\n"));
 				}
 
-				send(msg("<code>%s</code>".formatted(result)).parseMode("html"));
+				send(msg(result).parseMode("html"));
 			}
 			case "/wg_stat_current", "/wg_stat" -> {
 				String text = wg.getPrettyCurrent();
@@ -130,11 +130,12 @@ public class Telegram extends CustomSpringWebhookBot {
 				.replaceFirst(domain, "")
 				.trim()
 				.replaceAll(" +", " ");
-		return format("%s%ncpu: %d ram: %.1f Gb disk: %dGb", name, server.cpu(), server.ramGb(), server.driveGb());
+		return format("<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>", name, server.cpu(), server.ramGb(), server.driveGb());
 	}
 
 	private String formatServer(Server server) {
-		return format("%s%ncpu: %d ram: %.1f Gb disk: %dGb", server.name(), server.cpu(), server.ramGb(), server.driveGb());
+		return format("<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>",
+				server.name(), server.cpu(), server.ramGb(), server.driveGb());
 	}
 
 	private boolean contains(String s, String[] toMatch) {
