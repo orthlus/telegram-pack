@@ -24,22 +24,25 @@ import static main.common.telegram.TelegramPropsProvider.getBotWebhookUrl;
 public class TelegramBotsWebhookRegister implements InitializingBean {
 	private final List<BotConfig> botConfigs;
 	private final TelegramBotsRepository repo;
-	private OkHttpClient client = new OkHttpClient();
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		OkHttpClient client = new OkHttpClient();
+
 		Map<String, String> secrets = repo.getSecretsMap();
 		for (BotConfig bot : botConfigs) {
 			if (secrets.get(bot.getNickname()) == null) {
 				String secret = UUID.randomUUID().toString();
-				register(bot, secret);
+				register(client, bot, secret);
 				repo.saveSecret(bot.getNickname(), secret);
 			}
 		}
-		client = null;
+
+		client.dispatcher().executorService().shutdown();
+		client.connectionPool().evictAll();
 	}
 
-	private void register(BotConfig bot, String secret) throws IOException {
+	private void register(OkHttpClient client, BotConfig bot, String secret) throws IOException {
 		try {
 			Request request = request(bot.getToken(), getBotWebhookUrl(bot), secret);
 			client.newCall(request).execute().body().close();
