@@ -162,7 +162,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 
 	private LocalDate parseDate(String strDate) {
-		String[] patterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy"};
+		String[] patterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy", "yyyy-MM-dd"};
 		for (String pattern : patterns) {
 			try {
 				return parse(strDate, ofPattern(pattern));
