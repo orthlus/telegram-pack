@@ -37,9 +37,13 @@ public class WgService {
 		LocalDateTime now = now(zone);
 		long nowSec = now.toEpochSecond(zone.getRules().getOffset(now));
 		long x = nowSec - seconds;
-		return x < 86400 ?
-				format("%02d:%02d:%02d", x % 86400 / 3600, x % 3600 / 60, x % 60) :
-				format("%3d days", x / 86400);
+
+		String result;
+		if (x < 86400) result = format("%02d:%02d:%02d", x % 86400 / 3600, x % 3600 / 60, x % 60);
+		else if (x > 86400 * 30) result = "> 30 days";
+		else result = format("%3d days", x / 86400);
+
+		return result;
 	}
 
 	public void saveCurrentItems() {
