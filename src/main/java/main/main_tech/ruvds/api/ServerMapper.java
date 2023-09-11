@@ -1,5 +1,7 @@
 package main.main_tech.ruvds.api;
 
+import main.main_tech.inventory.Server;
+import main.tables.records.TechInventoryServersRecord;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -22,4 +24,7 @@ public interface ServerMapper {
     default Set<RuvdsServer> map(ServersRaw serversRaw) {
         return Instance.map(serversRaw.getServerRaws());
     }
+
+    @SuppressWarnings("UnmappedTargetProperties")
+    TechInventoryServersRecord map(Server server);
 }
