@@ -23,7 +23,7 @@ public class RuvdsApi extends HttpClient {
 	private String token;
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public Set<Server> getServers() {
+	public Set<RuvdsServer> getServers() {
 		return getMapper(ServerMapper.class).map(getServers0());
 	}
 

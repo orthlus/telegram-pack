@@ -3,7 +3,7 @@ package main.main_tech;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.ruvds.api.RuvdsApi;
-import main.main_tech.ruvds.api.Server;
+import main.main_tech.ruvds.api.RuvdsServer;
 import main.main_tech.wg.WgService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -83,9 +83,9 @@ public class Telegram extends CustomSpringWebhookBot {
 		switch (messageText) {
 			case "/ruvds_servers" -> {
 				String[] domains = ruvdsDomains.split(",");
-				List<Server> sorted = new ArrayList<>(ruvdsApi.getServers());
-				sorted.sort(Comparator.comparing(Server::name));
-				List<Server> restServers = sorted.stream()
+				List<RuvdsServer> sorted = new ArrayList<>(ruvdsApi.getServers());
+				sorted.sort(Comparator.comparing(RuvdsServer::name));
+				List<RuvdsServer> restServers = sorted.stream()
 						.filter(s -> !contains(s.name(), domains))
 						.toList();
 
@@ -125,7 +125,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		}
 	}
 
-	private String formatServer(String domain, Server server) {
+	private String formatServer(String domain, RuvdsServer server) {
 		String name = server.name()
 				.replaceFirst(domain, "")
 				.trim()
@@ -133,7 +133,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		return format("<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>", name, server.cpu(), server.ramGb(), server.driveGb());
 	}
 
-	private String formatServer(Server server) {
+	private String formatServer(RuvdsServer server) {
 		return format("<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>",
 				server.name(), server.cpu(), server.ramGb(), server.driveGb());
 	}

@@ -1,6 +1,6 @@
 package main.main_tech.ruvds.api;
 
-public record Server(
+public record RuvdsServer(
         String name,
         long id,
         int cpu,

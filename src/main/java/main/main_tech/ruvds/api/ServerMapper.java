@@ -13,13 +13,13 @@ public interface ServerMapper {
     @Mapping(target = "ramGb", source = "ram")
     @Mapping(target = "id", source = "virtualServerId")
     @Mapping(target = "name", source = "userComment")
-    Server map(ServerRaw s);
+	RuvdsServer map(ServerRaw s);
 
     ServerMapper Instance = Mappers.getMapper(ServerMapper.class);
 
-    Set<Server> map(Set<ServerRaw> s);
+    Set<RuvdsServer> map(Set<ServerRaw> s);
 
-    default Set<Server> map(ServersRaw serversRaw) {
+    default Set<RuvdsServer> map(ServersRaw serversRaw) {
         return Instance.map(serversRaw.getServerRaws());
     }
 }
