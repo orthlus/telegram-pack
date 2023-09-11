@@ -9,6 +9,6 @@ import java.util.Set;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ServersRaw {
-    @JsonProperty("servers")
-    private Set<ServerRaw> serverRaws;
+	@JsonProperty("servers")
+	private Set<ServerRaw> serverRaws;
 }

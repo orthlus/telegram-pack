@@ -10,21 +10,21 @@ import java.util.Set;
 
 @Mapper
 public interface ServerMapper {
-    @Mapping(target = "additionalDriveGb", source = "additionalDrive")
-    @Mapping(target = "driveGb", source = "drive")
-    @Mapping(target = "ramGb", source = "ram")
-    @Mapping(target = "id", source = "virtualServerId")
-    @Mapping(target = "name", source = "userComment")
+	@Mapping(target = "additionalDriveGb", source = "additionalDrive")
+	@Mapping(target = "driveGb", source = "drive")
+	@Mapping(target = "ramGb", source = "ram")
+	@Mapping(target = "id", source = "virtualServerId")
+	@Mapping(target = "name", source = "userComment")
 	RuvdsServer map(ServerRaw s);
 
-    ServerMapper Instance = Mappers.getMapper(ServerMapper.class);
+	ServerMapper Instance = Mappers.getMapper(ServerMapper.class);
 
-    Set<RuvdsServer> map(Set<ServerRaw> s);
+	Set<RuvdsServer> map(Set<ServerRaw> s);
 
-    default Set<RuvdsServer> map(ServersRaw serversRaw) {
-        return Instance.map(serversRaw.getServerRaws());
-    }
+	default Set<RuvdsServer> map(ServersRaw serversRaw) {
+		return Instance.map(serversRaw.getServerRaws());
+	}
 
-    @SuppressWarnings("UnmappedTargetProperties")
-    TechInventoryServersRecord map(Server server);
+	@SuppressWarnings("UnmappedTargetProperties")
+	TechInventoryServersRecord map(Server server);
 }
