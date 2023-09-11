@@ -3,6 +3,8 @@ package main.main_tech.inventory;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.ruvds.api.ServerMapper;
 import org.jooq.DSLContext;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -17,6 +19,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 public class Repo {
 	private final DSLContext db;
 
+	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void saveServers(Set<Server> servers) {
 		db.transaction(trx -> {
 			trx.dsl().delete(TECH_INVENTORY_SERVERS).execute();
@@ -28,6 +31,7 @@ public class Repo {
 		});
 	}
 
+	@Cacheable("inventory-servers")
 	public Set<Server> getServers() {
 		return db.select(
 				TECH_INVENTORY_SERVERS.ID,
@@ -44,6 +48,7 @@ public class Repo {
 				.fetchSet(mapping(Server::new));
 	}
 
+	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void setSshPortById(int serverId, int sshPort) {
 		db.update(TECH_INVENTORY_SERVERS)
 				.set(TECH_INVENTORY_SERVERS.SSH_PORT, sshPort)
@@ -51,6 +56,7 @@ public class Repo {
 				.execute();
 	}
 
+	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void setIpAddressById(int serverId, String ipAddress) {
 		db.update(TECH_INVENTORY_SERVERS)
 				.set(TECH_INVENTORY_SERVERS.ADDRESS, ipAddress)
