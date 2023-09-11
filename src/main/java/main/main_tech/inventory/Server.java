@@ -10,6 +10,7 @@ public record Server(
 		Integer drive,
 		Integer addDrive,
 		String hostingId,
-		String os
+		String os,
+		boolean activeMonitoring
 ) {
 }

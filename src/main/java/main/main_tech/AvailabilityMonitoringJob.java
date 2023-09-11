@@ -3,11 +3,15 @@ package main.main_tech;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.inventory.InventoryService;
 import main.main_tech.inventory.Repo;
+import main.main_tech.inventory.Server;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +23,12 @@ public class AvailabilityMonitoringJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		inventoryService.checkConnections(repo.getServers())
+		Set<Server> servers = repo.getServers()
+				.stream()
+				.filter(Server::activeMonitoring)
+				.collect(Collectors.toSet());
+
+		inventoryService.checkConnections(servers)
 				.forEach((k, v) -> {
 					if (!v) telegram.sendNotAvailableAlarm(k);
 				});
