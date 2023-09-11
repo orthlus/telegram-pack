@@ -2,6 +2,7 @@ package main.main_tech;
 
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
+import main.main_tech.inventory.Server;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.ruvds.api.RuvdsServer;
 import main.main_tech.wg.WgService;
@@ -60,6 +61,10 @@ public class Telegram extends CustomSpringWebhookBot {
 			deleteMessage(message2);
 			message2 = Message.empty();
 		}
+	}
+
+	public void sendNotAvailableAlarm(Server server) {
+		send("Сервер '%s' недоступен по порту %d".formatted(server.name(), server.sshPort()));
 	}
 
 	@Override
