@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
+import main.main_tech.inventory.InventoryService;
 import main.main_tech.inventory.Server;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.ruvds.api.RuvdsServer;
@@ -36,11 +37,16 @@ public class Telegram extends CustomSpringWebhookBot {
 			.map(Commands::getCommand)
 			.collect(Collectors.toSet());
 
-	public Telegram(Config botConfig, RuvdsApi ruvdsApi, WgService wg, RuvdsEmailClient ruvdsEmailClient) {
+	public Telegram(Config botConfig,
+					RuvdsApi ruvdsApi,
+					WgService wg,
+					RuvdsEmailClient ruvdsEmailClient,
+					InventoryService inventoryService) {
 		super(botConfig);
 		this.ruvdsApi = ruvdsApi;
 		this.wg = wg;
 		this.ruvdsEmailClient = ruvdsEmailClient;
+		this.inventoryService = inventoryService;
 	}
 
 	@Value("${main_tech.ruvds.api.domains}")
@@ -48,6 +54,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	private final RuvdsApi ruvdsApi;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
+	private final InventoryService inventoryService;
 	private Message message1;
 	private Message message2;
 
@@ -92,6 +99,12 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	private void handleCommand(String messageText) {
 		switch (Commands.valueOf(messageText)) {
+			case SERVERS -> {
+				String text = inventoryService.getServers().stream()
+						.map(Server::toString)
+						.collect(joining("\n\n"));
+				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+			}
 			case RUVDS_SERVERS -> {
 				String[] domains = ruvdsDomains.split(",");
 				List<RuvdsServer> sorted = new ArrayList<>(ruvdsApi.getServers());
