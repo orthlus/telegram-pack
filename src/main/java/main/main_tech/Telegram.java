@@ -17,6 +17,7 @@ import java.util.*;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
@@ -35,7 +36,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 	private final Set<String> commands = stream(Commands.values())
 			.map(Commands::getCommand)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 
 	public Telegram(Config botConfig,
 					RuvdsApi ruvdsApi,
