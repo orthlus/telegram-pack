@@ -24,6 +24,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	@AllArgsConstructor
 	private enum Commands {
 		SERVERS("/servers"),
+		UPDATE_SERVERS_FROM_RUVDS("/update_servers_from_ruvds"),
 		RUVDS_SERVERS("/ruvds_servers"),
 		WG_STAT_DIFF("/wg_stat_diff"),
 		WG_STAT_CURRENT("/wg_stat_current"),
@@ -103,6 +104,10 @@ public class Telegram extends CustomSpringWebhookBot {
 						.map(Server::toString)
 						.collect(joining("\n\n"));
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+			}
+			case UPDATE_SERVERS_FROM_RUVDS -> {
+				inventoryService.updateServersFromRuvds(ruvdsApi.getServers());
+				send("Ok");
 			}
 			case RUVDS_SERVERS -> {
 				String[] domains = ruvdsDomains.split(",");
