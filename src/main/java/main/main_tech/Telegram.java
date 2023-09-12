@@ -63,10 +63,6 @@ public class Telegram extends CustomSpringWebhookBot {
 		}
 	}
 
-	public void sendNotAvailableAlarm(Server server) {
-		send("Сервер '%s' недоступен по порту %d".formatted(server.name(), server.sshPort()));
-	}
-
 	@Override
 	public void onWebhookUpdate(Update update) {
 		if (update.hasMessage()) {
