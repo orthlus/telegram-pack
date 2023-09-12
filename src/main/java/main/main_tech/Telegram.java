@@ -15,7 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.*;
 
-import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
@@ -154,12 +153,13 @@ public class Telegram extends CustomSpringWebhookBot {
 				.replaceFirst(domain, "")
 				.trim()
 				.replaceAll(" +", " ");
-		return format("<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>", name, server.cpu(), server.ramGb(), server.driveGb());
+		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb%n%s</code>"
+				.formatted(name, server.cpu(), server.ramGb(), server.driveGb(), server.id());
 	}
 
 	private String formatServer(RuvdsServer server) {
-		return format("<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>",
-				server.name(), server.cpu(), server.ramGb(), server.driveGb());
+		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>%s"
+				.formatted(server.name(), server.cpu(), server.ramGb(), server.driveGb(), server.id());
 	}
 
 	private boolean contains(String s, String[] toMatch) {
