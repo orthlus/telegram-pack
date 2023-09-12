@@ -1,34 +1,38 @@
 package main.main_tech.inventory;
 
 import lombok.RequiredArgsConstructor;
-import main.main_tech.ruvds.api.ServerMapper;
+import main.main_tech.ruvds.api.RuvdsServer;
 import org.jooq.DSLContext;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static main.Tables.TECH_INVENTORY_SERVERS;
 import static org.jooq.Records.mapping;
-import static org.mapstruct.factory.Mappers.getMapper;
 
 @Component
 @RequiredArgsConstructor
 public class Repo {
 	private final DSLContext db;
 
-	@CacheEvict(value = "inventory-servers", allEntries = true)
-	public void saveServers(Set<Server> servers) {
-		db.transaction(trx -> {
-			trx.dsl().delete(TECH_INVENTORY_SERVERS).execute();
+	public void updateServer(RuvdsServer ruvdsServer) {
+		db.update(TECH_INVENTORY_SERVERS)
+				.set(TECH_INVENTORY_SERVERS.CPU, ruvdsServer.cpu())
+				.set(TECH_INVENTORY_SERVERS.RAM, ruvdsServer.ramGb())
+				.set(TECH_INVENTORY_SERVERS.DRIVE, ruvdsServer.driveGb())
+				.set(TECH_INVENTORY_SERVERS.ADD_DRIVE, ruvdsServer.additionalDriveGb())
+				.set(TECH_INVENTORY_SERVERS.NAME, ruvdsServer.name())
+				.where(TECH_INVENTORY_SERVERS.HOSTING_ID.eq(String.valueOf(ruvdsServer.id())))
+				.execute();
+	}
 
-			trx.dsl().batchInsert(servers.stream()
-							.map(server -> getMapper(ServerMapper.class).map(server))
-							.collect(Collectors.toSet()))
-					.execute();
-		});
+	@CacheEvict(value = "inventory-servers", allEntries = true)
+	public void updateServers(Set<RuvdsServer> ruvdsServers) {
+		for (RuvdsServer ruvdsServer : ruvdsServers) {
+			updateServer(ruvdsServer);
+		}
 	}
 
 	@Cacheable("inventory-servers")
