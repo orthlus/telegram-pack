@@ -1,5 +1,7 @@
 package main.main_tech;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.inventory.Server;
@@ -18,13 +20,21 @@ import static java.util.stream.Collectors.joining;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
-	private final Set<String> commands = new LinkedHashSet<>(List.of(
-			"/ruvds_servers",
-			"/wg_stat_diff",
-			"/wg_stat_current",
-			"/wg_update_users",
-			"/get_code",
-			"/get_new_host"));
+	@Getter
+	@AllArgsConstructor
+	private enum Commands {
+		SERVERS("/servers"),
+		RUVDS_SERVERS("/ruvds_servers"),
+		WG_STAT_DIFF("/wg_stat_diff"),
+		WG_STAT_CURRENT("/wg_stat_current"),
+		WG_UPDATE_USERS("/wg_update_users"),
+		GET_CODE("/get_code"),
+		GET_NEW_HOST("/get_new_host");
+		private String command;
+	}
+	private final Set<String> commands = stream(Commands.values())
+			.map(Commands::getCommand)
+			.collect(Collectors.toSet());
 
 	public Telegram(Config botConfig, RuvdsApi ruvdsApi, WgService wg, RuvdsEmailClient ruvdsEmailClient) {
 		super(botConfig);
@@ -81,8 +91,8 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 
 	private void handleCommand(String messageText) {
-		switch (messageText) {
-			case "/ruvds_servers" -> {
+		switch (Commands.valueOf(messageText)) {
+			case RUVDS_SERVERS -> {
 				String[] domains = ruvdsDomains.split(",");
 				List<RuvdsServer> sorted = new ArrayList<>(ruvdsApi.getServers());
 				sorted.sort(Comparator.comparing(RuvdsServer::name));
@@ -108,21 +118,21 @@ public class Telegram extends CustomSpringWebhookBot {
 
 				send(msg(result).parseMode("html"));
 			}
-			case "/wg_stat_current", "/wg_stat" -> {
+			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
-			case "/wg_stat_diff" -> {
+			case WG_STAT_DIFF -> {
 				String text = wg.getPrettyDiff();
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 				wg.saveCurrentItems();
 			}
-			case "/wg_update_users" -> {
+			case WG_UPDATE_USERS -> {
 				wg.updateUsers();
 				send("Ok");
 			}
-			case "/get_code" -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
-			case "/get_new_host" -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
+			case GET_CODE -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
+			case GET_NEW_HOST -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
 		}
 	}
 
