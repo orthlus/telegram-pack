@@ -1,7 +1,6 @@
 package main.main_tech;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.inventory.InventoryService;
@@ -17,11 +16,9 @@ import java.util.*;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
-	@Getter
 	@AllArgsConstructor
 	private enum Commands {
 		SERVERS("/servers"),
@@ -32,11 +29,13 @@ public class Telegram extends CustomSpringWebhookBot {
 		WG_UPDATE_USERS("/wg_update_users"),
 		GET_CODE("/get_code"),
 		GET_NEW_HOST("/get_new_host");
-		private String command;
+		final String command;
 	}
-	private final Set<String> commands = stream(Commands.values())
-			.map(Commands::getCommand)
-			.collect(toSet());
+
+	private final Map<String, Commands> commandsMap = new HashMap<>();
+	{
+		for (Commands command : Commands.values()) commandsMap.put(command.command, command);
+	}
 
 	public Telegram(Config botConfig,
 					RuvdsApi ruvdsApi,
@@ -86,7 +85,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
-			if (commands.contains(messageText)) {
+			if (commandsMap.containsKey(messageText)) {
 				handleCommand(messageText);
 			} else {
 				handleText(messageText);
@@ -95,11 +94,11 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 
 	private void handleText(String messageText) {
-		send("работает. команды:\n" + String.join("\n", commands));
+		send("работает. команды:\n" + String.join("\n", commandsMap.keySet()));
 	}
 
 	private void handleCommand(String messageText) {
-		switch (Commands.valueOf(messageText)) {
+		switch (commandsMap.get(messageText)) {
 			case SERVERS -> {
 				String text = inventoryService.getServers().stream()
 						.map(Server::toString)
