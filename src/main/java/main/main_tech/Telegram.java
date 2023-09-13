@@ -158,12 +158,12 @@ public class Telegram extends CustomSpringWebhookBot {
 				.replaceFirst(domain, "")
 				.trim()
 				.replaceAll(" +", " ");
-		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb%n%s</code>"
+		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb%n  %s</code>"
 				.formatted(name, server.cpu(), server.ramGb(), server.driveGb(), server.id());
 	}
 
 	private String formatServer(RuvdsServer server) {
-		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb</code>%s"
+		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb  %s</code>"
 				.formatted(server.name(), server.cpu(), server.ramGb(), server.driveGb(), server.id());
 	}
 
