@@ -24,7 +24,9 @@ public class Repo {
 				.set(TECH_INVENTORY_SERVERS.DRIVE, ruvdsServer.driveGb())
 				.set(TECH_INVENTORY_SERVERS.ADD_DRIVE, ruvdsServer.additionalDriveGb())
 				.set(TECH_INVENTORY_SERVERS.NAME, ruvdsServer.name())
-				.where(TECH_INVENTORY_SERVERS.HOSTING_ID.eq(String.valueOf(ruvdsServer.id())))
+				.where(TECH_INVENTORY_SERVERS.HOSTING_ID.eq(String.valueOf(ruvdsServer.id()))
+						.and(TECH_INVENTORY_SERVERS.HOSTING_NAME.eq("ruvds"))
+				)
 				.execute();
 	}
 
@@ -48,7 +50,8 @@ public class Repo {
 				TECH_INVENTORY_SERVERS.ADD_DRIVE,
 				TECH_INVENTORY_SERVERS.HOSTING_ID,
 				TECH_INVENTORY_SERVERS.OS,
-				TECH_INVENTORY_SERVERS.ACTIVE_MONITORING)
+				TECH_INVENTORY_SERVERS.ACTIVE_MONITORING,
+				TECH_INVENTORY_SERVERS.HOSTING_NAME)
 				.from(TECH_INVENTORY_SERVERS)
 				.fetchSet(mapping(Server::new));
 	}

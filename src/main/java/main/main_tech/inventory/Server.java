@@ -11,7 +11,8 @@ public record Server(
 		Integer addDrive,
 		String hostingId,
 		String os,
-		boolean activeMonitoring
+		boolean activeMonitoring,
+		String hostingName
 ) {
 	@Override
 	public String toString() {
