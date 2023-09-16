@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.inventory.InventoryService;
+import main.main_tech.inventory.NamingService;
 import main.main_tech.inventory.Server;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.ruvds.api.RuvdsServer;
@@ -41,20 +42,23 @@ public class Telegram extends CustomSpringWebhookBot {
 					RuvdsApi ruvdsApi,
 					WgService wg,
 					RuvdsEmailClient ruvdsEmailClient,
-					InventoryService inventoryService) {
+					InventoryService inventoryService,
+					NamingService naming) {
 		super(botConfig);
 		this.ruvdsApi = ruvdsApi;
 		this.wg = wg;
 		this.ruvdsEmailClient = ruvdsEmailClient;
 		this.inventoryService = inventoryService;
+		this.naming = naming;
 	}
 
-	@Value("${main_tech.ruvds.api.domains}")
-	private String ruvdsDomains;
+	@Value("${main_tech.servers.domains}")
+	private String serversDomains;
 	private final RuvdsApi ruvdsApi;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
 	private final InventoryService inventoryService;
+	private final NamingService naming;
 	private Message message1;
 	private Message message2;
 
@@ -110,14 +114,13 @@ public class Telegram extends CustomSpringWebhookBot {
 				send("Ok");
 			}
 			case RUVDS_SERVERS -> {
-				String[] domains = ruvdsDomains.split(",");
 				List<RuvdsServer> sorted = new ArrayList<>(ruvdsApi.getServers());
 				sorted.sort(Comparator.comparing(RuvdsServer::name));
 				List<RuvdsServer> restServers = sorted.stream()
-						.filter(s -> !contains(s.name(), domains))
+						.filter(s -> !naming.containsDomain(s.name()))
 						.toList();
 
-				String result = stream(domains)
+				String result = stream(serversDomains.split(","))
 						.map(domain ->
 								"<b>" + domain + ":</b>\n" + sorted.stream()
 										.filter(server -> server.name().contains(domain))
@@ -165,11 +168,5 @@ public class Telegram extends CustomSpringWebhookBot {
 	private String formatServer(RuvdsServer server) {
 		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb  %s</code>"
 				.formatted(server.name(), server.cpu(), server.ramGb(), server.driveGb(), server.id());
-	}
-
-	private boolean contains(String s, String[] toMatch) {
-		for (String match : toMatch) if (s.contains(match)) return true;
-
-		return false;
 	}
 }
