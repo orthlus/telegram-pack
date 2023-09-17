@@ -14,15 +14,4 @@ public record Server(
 		boolean activeMonitoring,
 		String hostingName
 ) {
-	@Override
-	public String toString() {
-		return """
-			%s
-			%s:%d
-			%d cpu %.1f Gb %d Gb (%d Gb) %s"""
-				.formatted(
-						name,
-						address, sshPort,
-						cpu, ram, drive, addDrive, os);
-	}
 }
