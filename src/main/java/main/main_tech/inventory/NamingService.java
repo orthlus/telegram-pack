@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -33,6 +36,18 @@ public class NamingService {
 
 	public String formatDomains(Set<Server> servers) {
 
+	}
+
+	private List<RuvdsServer> sortRuvds(Set<RuvdsServer> set) {
+		List<RuvdsServer> list = new ArrayList<>(set);
+		list.sort(Comparator.comparing(ruvdsServer -> dropDomains(ruvdsServer.name())));
+		return list;
+	}
+
+	private List<Server> sort(Set<Server> set) {
+		List<Server> list = new ArrayList<>(set);
+		list.sort(Comparator.comparing(server -> dropDomains(server.name())));
+		return list;
 	}
 
 	public String format(Server s) {
