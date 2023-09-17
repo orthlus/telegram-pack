@@ -55,24 +55,24 @@ public class NamingService {
 
 		for (int i = 0; i < domains.length; i++) {
 			sb.append("<b>").append(domains[i]).append(":</b>\n");
-			String join = lists[i].stream()
-					.map(this::format)
-					.collect(Collectors.joining("\n"));
-			sb.append(join);
+			sb.append(formatAndJoin(lists[i]));
 			sb.append("\n\n");
 		}
 
 		if (!lists[lists.length - 1].isEmpty()) {
-			String restJoin = lists[lists.length - 1].stream()
-					.map(this::format)
-					.collect(Collectors.joining("\n"));
-			sb.append(restJoin);
+			sb.append(formatAndJoin(lists[lists.length - 1]));
 		} else {
 			sb.deleteCharAt(sb.length());
 			sb.deleteCharAt(sb.length());
 		}
 
 		return sb.toString();
+	}
+
+	private String formatAndJoin(List<Server> servers) {
+		return servers.stream()
+				.map(this::format)
+				.collect(Collectors.joining("\n"));
 	}
 
 	private List<RuvdsServer> sortRuvds(Set<RuvdsServer> set) {
