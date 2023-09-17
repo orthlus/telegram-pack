@@ -76,6 +76,7 @@ public class NamingService {
 		return sb.toString();
 	}
 
+	// TODO split by hosting name
 	public String formatDomains(Set<Server> servers) {
 		List<Server> list = sort(servers);
 		List<Server>[] lists = new List[domains.length + 1];

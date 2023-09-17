@@ -114,6 +114,9 @@ public class Telegram extends CustomSpringWebhookBot {
 				send("Ok");
 			}
 			case RUVDS_SERVERS -> {
+//				String text = naming.formatDomainsRuvds(ruvdsApi.getServers());
+//				send(msg(text).parseMode("html"));
+
 				List<RuvdsServer> sorted = new ArrayList<>(ruvdsApi.getServers());
 				sorted.sort(Comparator.comparing(RuvdsServer::name));
 				List<RuvdsServer> restServers = sorted.stream()
