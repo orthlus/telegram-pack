@@ -23,10 +23,10 @@ public class NamingService {
 		domains = serversDomains.split(",");
 	}
 
-	public boolean containsDomain(String s) {
-		for (String match : domains) if (s.contains(match)) return true;
+	private boolean notContainsDomain(String s) {
+		for (String match : domains) if (s.contains(match)) return false;
 
-		return false;
+		return true;
 	}
 
 	private String dropDomains(String s) {
@@ -52,7 +52,7 @@ public class NamingService {
 
 		lists[lists.length - 1] = new ArrayList<>(list.size());
 		for (RuvdsServer server : list) {
-			if (!containsDomain(server.name())) {
+			if (notContainsDomain(server.name())) {
 				lists[lists.length - 1].add(server);
 			}
 		}
@@ -92,7 +92,7 @@ public class NamingService {
 
 		lists[lists.length - 1] = new ArrayList<>(list.size());
 		for (Server server : list) {
-			if (!containsDomain(server.name())) {
+			if (notContainsDomain(server.name())) {
 				lists[lists.length - 1].add(server);
 			}
 		}
@@ -140,7 +140,7 @@ public class NamingService {
 		return list;
 	}
 
-	public String format(Server s) {
+	private String format(Server s) {
 		String name = dropDomains(s.name());
 		if (s.addDrive() == null) {
 			return """
@@ -165,7 +165,7 @@ public class NamingService {
 		}
 	}
 
-	public String format(RuvdsServer s) {
+	private String format(RuvdsServer s) {
 		String name = dropDomains(s.name());
 		if (s.additionalDriveGb() == null) {
 			return """
