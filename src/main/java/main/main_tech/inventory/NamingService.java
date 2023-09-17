@@ -145,8 +145,9 @@ public class NamingService {
 		String name = dropDomains(s.name());
 		return """
 			<b>%s</b>
-			<code>%s:%d
-			%d cpu %.1f Gb %d Gb (%d Gb) %s</code>"""
+			  <code>%s</code>:<code>%d</code>
+			  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
+			  <code>%s</code>"""
 				.formatted(
 						name,
 						s.address(), s.sshPort(),
@@ -164,11 +165,12 @@ public class NamingService {
 				.formatted(name, server.cpu(), server.ramGb(), server.driveGb(), server.id());
 	}
 
-	public String format(RuvdsServer server) {
-		String name = dropDomains(server.name());
+	public String format(RuvdsServer s) {
+		String name = dropDomains(s.name());
 		return """
 				<b>%s</b>
-				  <code>cpu: %d ram: %.1f Gb disk: %d Gb  %s</code>"""
-				.formatted(name, server.cpu(), server.ramGb(), server.driveGb(), server.id());
+				  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
+				  <code>%s</code>"""
+				.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.additionalDriveGb(), s.id());
 	}
 }
