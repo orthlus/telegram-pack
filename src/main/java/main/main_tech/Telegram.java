@@ -5,18 +5,13 @@ import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.inventory.InventoryService;
 import main.main_tech.inventory.NamingService;
-import main.main_tech.inventory.Server;
 import main.main_tech.ruvds.api.RuvdsApi;
-import main.main_tech.ruvds.api.RuvdsServer;
 import main.main_tech.wg.WgService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.*;
-
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
@@ -52,8 +47,6 @@ public class Telegram extends CustomSpringWebhookBot {
 		this.naming = naming;
 	}
 
-	@Value("${main_tech.servers.domains}")
-	private String serversDomains;
 	private final RuvdsApi ruvdsApi;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
@@ -104,42 +97,16 @@ public class Telegram extends CustomSpringWebhookBot {
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
 			case SERVERS -> {
-				String text = inventoryService.getServers().stream()
-						.map(Server::toString)
-						.collect(joining("\n\n"));
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				String text = naming.formatDomains(inventoryService.getServers());
+				send(msg(text).parseMode("html"));
 			}
 			case UPDATE_SERVERS_FROM_RUVDS -> {
 				inventoryService.updateServersFromRuvds(ruvdsApi.getServers());
 				send("Ok");
 			}
 			case RUVDS_SERVERS -> {
-//				String text = naming.formatDomainsRuvds(ruvdsApi.getServers());
-//				send(msg(text).parseMode("html"));
-
-				List<RuvdsServer> sorted = new ArrayList<>(ruvdsApi.getServers());
-				sorted.sort(Comparator.comparing(RuvdsServer::name));
-				List<RuvdsServer> restServers = sorted.stream()
-						.filter(s -> !naming.containsDomain(s.name()))
-						.toList();
-
-				String result = stream(serversDomains.split(","))
-						.map(domain ->
-								"<b>" + domain + ":</b>\n" + sorted.stream()
-										.filter(server -> server.name().contains(domain))
-										.map(server -> formatServer(domain, server))
-										.collect(joining("\n"))
-						)
-						.collect(joining("\n\n"));
-
-				if (!restServers.isEmpty()) {
-					result += "\n\nunknown domains:\n";
-					result += restServers.stream()
-							.map(this::formatServer)
-							.collect(joining("\n"));
-				}
-
-				send(msg(result).parseMode("html"));
+				String text = naming.formatDomainsRuvds(ruvdsApi.getServers());
+				send(msg(text).parseMode("html"));
 			}
 			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
@@ -157,19 +124,5 @@ public class Telegram extends CustomSpringWebhookBot {
 			case GET_CODE -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
 			case GET_NEW_HOST -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
 		}
-	}
-
-	private String formatServer(String domain, RuvdsServer server) {
-		String name = server.name()
-				.replaceFirst(domain, "")
-				.trim()
-				.replaceAll(" +", " ");
-		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb%n  %s</code>"
-				.formatted(name, server.cpu(), server.ramGb(), server.driveGb(), server.id());
-	}
-
-	private String formatServer(RuvdsServer server) {
-		return "<b>%s</b>%n<code>  cpu: %d ram: %.1f Gb disk: %d Gb  %s</code>"
-				.formatted(server.name(), server.cpu(), server.ramGb(), server.driveGb(), server.id());
 	}
 }

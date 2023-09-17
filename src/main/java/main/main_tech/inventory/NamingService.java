@@ -154,17 +154,6 @@ public class NamingService {
 						s.cpu(), s.ram(), s.drive(), s.addDrive(), s.os());
 	}
 
-	public String formatServer(String domain, RuvdsServer server) {
-		String name = server.name()
-				.replaceFirst(domain, "")
-				.trim();
-		return """
-				<b>%s</b>
-				  <code>cpu: %d ram: %.1f Gb disk: %d Gb
-				  %s</code>"""
-				.formatted(name, server.cpu(), server.ramGb(), server.driveGb(), server.id());
-	}
-
 	public String format(RuvdsServer s) {
 		String name = dropDomains(s.name());
 		return """
