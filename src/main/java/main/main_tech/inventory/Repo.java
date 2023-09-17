@@ -18,17 +18,17 @@ import static org.jooq.Records.mapping;
 @RequiredArgsConstructor
 public class Repo {
 	private final DSLContext db;
-	private final TechInventoryServers s = TECH_INVENTORY_SERVERS.as("s");
+	private final TechInventoryServers tis = TECH_INVENTORY_SERVERS;
 
 	public void updateServer(RuvdsServer o) {
-		Condition condition = s.HOSTING_ID.eq(String.valueOf(o.id()))
-				.and(s.HOSTING_NAME.eq("ruvds"));
-		db.update(s)
-				.set(s.CPU, o.cpu())
-				.set(s.RAM, o.ramGb())
-				.set(s.DRIVE, o.driveGb())
-				.set(s.ADD_DRIVE, o.additionalDriveGb())
-				.set(s.NAME, o.name())
+		Condition condition = tis.HOSTING_ID.eq(String.valueOf(o.id()))
+				.and(tis.HOSTING_NAME.eq("ruvds"));
+		db.update(tis)
+				.set(tis.CPU, o.cpu())
+				.set(tis.RAM, o.ramGb())
+				.set(tis.DRIVE, o.driveGb())
+				.set(tis.ADD_DRIVE, o.additionalDriveGb())
+				.set(tis.NAME, o.name())
 				.where(condition)
 				.execute();
 	}
@@ -43,27 +43,27 @@ public class Repo {
 	@Cacheable("inventory-servers")
 	public Set<Server> getServers() {
 		return db.select(
-				s.ID, s.ADDRESS, s.SSH_PORT, s.NAME,
-				s.CPU, s.RAM, s.DRIVE, s.ADD_DRIVE,
-				s.HOSTING_ID, s.OS, s.ACTIVE_MONITORING,
-				s.HOSTING_NAME)
-				.from(s)
+				tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
+				tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
+				tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
+				tis.HOSTING_NAME)
+				.from(tis)
 				.fetchSet(mapping(Server::new));
 	}
 
 	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void setSshPortById(int serverId, int sshPort) {
-		db.update(s)
-				.set(s.SSH_PORT, sshPort)
-				.where(s.ID.eq(serverId))
+		db.update(tis)
+				.set(tis.SSH_PORT, sshPort)
+				.where(tis.ID.eq(serverId))
 				.execute();
 	}
 
 	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void setIpAddressById(int serverId, String ipAddress) {
-		db.update(s)
-				.set(s.ADDRESS, ipAddress)
-				.where(s.ID.eq(serverId))
+		db.update(tis)
+				.set(tis.ADDRESS, ipAddress)
+				.where(tis.ID.eq(serverId))
 				.execute();
 	}
 }

@@ -6,6 +6,8 @@ import main.Main;
 import main.payments_reminders.entity.Remind;
 import main.payments_reminders.entity.RemindToSend;
 import main.payments_reminders.entity.RemindWithoutId;
+import main.tables.PaymentsHoldsOnReminders;
+import main.tables.PaymentsReminders;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
@@ -29,24 +31,26 @@ import static org.jooq.impl.DSL.extract;
 @RequiredArgsConstructor
 public class Repo {
 	private final DSLContext db;
+	private final PaymentsHoldsOnReminders phor = PAYMENTS_HOLDS_ON_REMINDERS;
+	private final PaymentsReminders pr = PAYMENTS_REMINDERS;
 
 	public void addHoldOnRemind(Remind remind, LocalDate holdEndDate) {
-		db.insertInto(PAYMENTS_HOLDS_ON_REMINDERS)
-				.columns(PAYMENTS_HOLDS_ON_REMINDERS.REMIND_ID, PAYMENTS_HOLDS_ON_REMINDERS.HOLD_END_DT)
+		db.insertInto(phor)
+				.columns(phor.REMIND_ID, phor.HOLD_END_DT)
 				.values(remind.getId(), holdEndDate)
-				.onConflict(PAYMENTS_HOLDS_ON_REMINDERS.REMIND_ID)
+				.onConflict(phor.REMIND_ID)
 				.doUpdate()
-				.set(PAYMENTS_HOLDS_ON_REMINDERS.HOLD_END_DT, holdEndDate)
-				.where(PAYMENTS_HOLDS_ON_REMINDERS.REMIND_ID.eq(remind.getId()))
+				.set(phor.HOLD_END_DT, holdEndDate)
+				.where(phor.REMIND_ID.eq(remind.getId()))
 				.execute();
 	}
 
 	public void addRemind(RemindWithoutId remindWithoutId) {
-		db.insertInto(PAYMENTS_REMINDERS)
-				.columns(PAYMENTS_REMINDERS.REMIND_NAME,
-						PAYMENTS_REMINDERS.START_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.END_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.HOUR_OF_DAY_TO_FIRE)
+		db.insertInto(pr)
+				.columns(pr.REMIND_NAME,
+						pr.START_DAY_OF_MONTH,
+						pr.END_DAY_OF_MONTH,
+						pr.HOUR_OF_DAY_TO_FIRE)
 				.values(remindWithoutId.name(),
 						remindWithoutId.startDayOfMonth(),
 						remindWithoutId.endDayOfMonth(),
@@ -56,35 +60,35 @@ public class Repo {
 	}
 
 	public void addRemind(Remind remind) {
-		db.insertInto(PAYMENTS_REMINDERS)
-				.columns(PAYMENTS_REMINDERS.ID,
-						PAYMENTS_REMINDERS.REMIND_NAME,
-						PAYMENTS_REMINDERS.START_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.END_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.HOUR_OF_DAY_TO_FIRE)
+		db.insertInto(pr)
+				.columns(pr.ID,
+						pr.REMIND_NAME,
+						pr.START_DAY_OF_MONTH,
+						pr.END_DAY_OF_MONTH,
+						pr.HOUR_OF_DAY_TO_FIRE)
 				.values(remind.getId(),
 						remind.getName(),
 						remind.getStartDayOfMonth(),
 						remind.getEndDayOfMonth(),
 						remind.getHourOfDayToFire())
-				.onConflict(PAYMENTS_REMINDERS.ID)
+				.onConflict(pr.ID)
 				.doUpdate()
-				.set(PAYMENTS_REMINDERS.REMIND_NAME, remind.getName())
-				.set(PAYMENTS_REMINDERS.START_DAY_OF_MONTH, remind.getStartDayOfMonth())
-				.set(PAYMENTS_REMINDERS.END_DAY_OF_MONTH, remind.getEndDayOfMonth())
-				.set(PAYMENTS_REMINDERS.HOUR_OF_DAY_TO_FIRE, remind.getHourOfDayToFire())
-				.where(PAYMENTS_REMINDERS.ID.eq(remind.getId()))
+				.set(pr.REMIND_NAME, remind.getName())
+				.set(pr.START_DAY_OF_MONTH, remind.getStartDayOfMonth())
+				.set(pr.END_DAY_OF_MONTH, remind.getEndDayOfMonth())
+				.set(pr.HOUR_OF_DAY_TO_FIRE, remind.getHourOfDayToFire())
+				.where(pr.ID.eq(remind.getId()))
 				.execute();
 	}
 
 	public Set<Remind> getReminds() {
-		return db.select(PAYMENTS_REMINDERS.ID,
-						PAYMENTS_REMINDERS.REMIND_NAME,
-						PAYMENTS_REMINDERS.START_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.END_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.HOUR_OF_DAY_TO_FIRE)
-				.from(PAYMENTS_REMINDERS)
-				.orderBy(PAYMENTS_REMINDERS.START_DAY_OF_MONTH)
+		return db.select(pr.ID,
+						pr.REMIND_NAME,
+						pr.START_DAY_OF_MONTH,
+						pr.END_DAY_OF_MONTH,
+						pr.HOUR_OF_DAY_TO_FIRE)
+				.from(pr)
+				.orderBy(pr.START_DAY_OF_MONTH)
 				.fetchSet(mapping(Remind::new));
 
 	}
@@ -92,15 +96,15 @@ public class Repo {
 	public List<RemindToSend> getRemindsForNow() {
 		LocalDateTime now = LocalDateTime.now(Main.zone);
 
-		Condition startDayEq = PAYMENTS_REMINDERS.START_DAY_OF_MONTH.lessOrEqual(extract(now, DatePart.DAY));
-		Condition endDayEq = PAYMENTS_REMINDERS.END_DAY_OF_MONTH.greaterOrEqual(extract(now, DatePart.DAY));
-		Condition timeEq = PAYMENTS_REMINDERS.HOUR_OF_DAY_TO_FIRE.eq(extract(now, DatePart.HOUR));
-		Condition holdDateEq = PAYMENTS_HOLDS_ON_REMINDERS.HOLD_END_DT.lessOrEqual(now.toLocalDate());
+		Condition startDayEq = pr.START_DAY_OF_MONTH.lessOrEqual(extract(now, DatePart.DAY));
+		Condition endDayEq = pr.END_DAY_OF_MONTH.greaterOrEqual(extract(now, DatePart.DAY));
+		Condition timeEq = pr.HOUR_OF_DAY_TO_FIRE.eq(extract(now, DatePart.HOUR));
+		Condition holdDateEq = phor.HOLD_END_DT.lessOrEqual(now.toLocalDate());
 
-		return db.select(PAYMENTS_REMINDERS.ID, PAYMENTS_REMINDERS.REMIND_NAME)
-				.from(PAYMENTS_REMINDERS)
-				.leftJoin(PAYMENTS_HOLDS_ON_REMINDERS)
-				.on(PAYMENTS_REMINDERS.ID.eq(PAYMENTS_HOLDS_ON_REMINDERS.REMIND_ID))
+		return db.select(pr.ID, pr.REMIND_NAME)
+				.from(pr)
+				.leftJoin(phor)
+				.on(pr.ID.eq(phor.REMIND_ID))
 				.where(startDayEq
 						.and(endDayEq)
 						.and(timeEq)
@@ -111,23 +115,23 @@ public class Repo {
 	@Cacheable("reminds")
 	public Remind getRemindById(long id) {
 		return db.select(
-						PAYMENTS_REMINDERS.ID,
-						PAYMENTS_REMINDERS.REMIND_NAME,
-						PAYMENTS_REMINDERS.START_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.END_DAY_OF_MONTH,
-						PAYMENTS_REMINDERS.HOUR_OF_DAY_TO_FIRE)
-				.from(PAYMENTS_REMINDERS)
-				.where(PAYMENTS_REMINDERS.ID.eq(id))
+						pr.ID,
+						pr.REMIND_NAME,
+						pr.START_DAY_OF_MONTH,
+						pr.END_DAY_OF_MONTH,
+						pr.HOUR_OF_DAY_TO_FIRE)
+				.from(pr)
+				.where(pr.ID.eq(id))
 				.fetchOne(mapping(Remind::new));
 	}
 
 	@CacheEvict(value = "reminds")
 	public void deleteRemind(long id) {
-		db.delete(PAYMENTS_HOLDS_ON_REMINDERS)
-				.where(PAYMENTS_HOLDS_ON_REMINDERS.REMIND_ID.eq(id))
+		db.delete(phor)
+				.where(phor.REMIND_ID.eq(id))
 				.execute();
-		db.delete(PAYMENTS_REMINDERS)
-				.where(PAYMENTS_REMINDERS.ID.eq(id))
+		db.delete(pr)
+				.where(pr.ID.eq(id))
 				.execute();
 	}
 }

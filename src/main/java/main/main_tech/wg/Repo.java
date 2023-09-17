@@ -3,6 +3,8 @@ package main.main_tech.wg;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.wg.m.Item;
 import main.main_tech.wg.m.User;
+import main.tables.WgLastStat;
+import main.tables.WgUsers;
 import main.tables.records.WgLastStatRecord;
 import main.tables.records.WgUsersRecord;
 import org.jooq.DSLContext;
@@ -21,18 +23,20 @@ import static org.jooq.Records.mapping;
 @RequiredArgsConstructor
 public class Repo {
 	private final DSLContext db;
+	private final WgUsers wu = WG_USERS;
+	private final WgLastStat wls = WG_LAST_STAT;
 
 	@Cacheable("wg-users")
 	public Map<String, String> getUsers() {
-		return db.select(WG_USERS.USER_KEY, WG_USERS.USER_NAME)
-				.from(WG_USERS)
-				.fetchMap(WG_USERS.USER_KEY, WG_USERS.USER_NAME);
+		return db.select(wu.USER_KEY, wu.USER_NAME)
+				.from(wu)
+				.fetchMap(wu.USER_KEY, wu.USER_NAME);
 	}
 
 	@CacheEvict(value = "wg-users", allEntries = true)
 	public void saveUsers(Set<User> users) {
 		db.transaction(trx -> {
-			trx.dsl().delete(WG_USERS).execute();
+			trx.dsl().delete(wu).execute();
 
 			trx.dsl().batchInsert(users.stream()
 							.map(u -> new WgUsersRecord(u.key(), u.name()))
@@ -42,14 +46,14 @@ public class Repo {
 	}
 
 	public Set<Item> getLastStat() {
-		return db.select(WG_LAST_STAT.USER_NAME, WG_LAST_STAT.UP, WG_LAST_STAT.DOWN, WG_LAST_STAT.TIME)
-				.from(WG_LAST_STAT)
+		return db.select(wls.USER_NAME, wls.UP, wls.DOWN, wls.TIME)
+				.from(wls)
 				.fetchSet(mapping(Item::new));
 	}
 
 	public void saveCurrentItems(Set<Item> items) {
 		db.transaction(trx -> {
-			trx.dsl().delete(WG_LAST_STAT).execute();
+			trx.dsl().delete(wls).execute();
 
 			trx.dsl().batchInsert(items.stream()
 							.map(i -> new WgLastStatRecord(i.name(), i.up(), i.down(), i.time()))

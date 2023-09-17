@@ -2,6 +2,7 @@ package main.common.telegram;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.tables.TelegramBots;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
@@ -14,20 +15,21 @@ import static main.Tables.TELEGRAM_BOTS;
 @RequiredArgsConstructor
 public class TelegramBotsRepository {
 	private final DSLContext db;
+	private final TelegramBots tb = TELEGRAM_BOTS;
 
 	public Map<String, String> getSecretsMap() {
-		return db.select(TELEGRAM_BOTS.NICKNAME, TELEGRAM_BOTS.SECRET)
-				.from(TELEGRAM_BOTS)
-				.fetchMap(TELEGRAM_BOTS.NICKNAME, TELEGRAM_BOTS.SECRET);
+		return db.select(tb.NICKNAME, tb.SECRET)
+				.from(tb)
+				.fetchMap(tb.NICKNAME, tb.SECRET);
 	}
 
 	public void saveSecret(String nickname, String secret) {
-		db.insertInto(TELEGRAM_BOTS)
-				.columns(TELEGRAM_BOTS.NICKNAME, TELEGRAM_BOTS.SECRET)
+		db.insertInto(tb)
+				.columns(tb.NICKNAME, tb.SECRET)
 				.values(nickname, secret)
 				.onDuplicateKeyUpdate()
-				.set(TELEGRAM_BOTS.SECRET, secret)
-				.where(TELEGRAM_BOTS.NICKNAME.eq(nickname))
+				.set(tb.SECRET, secret)
+				.where(tb.NICKNAME.eq(nickname))
 				.execute();
 	}
 }
