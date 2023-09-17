@@ -101,7 +101,10 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
-			case UPDATE_MONITORING_FROM_DB -> monitoring.updateMonitoringDataFromDb();
+			case UPDATE_MONITORING_FROM_DB -> {
+				monitoring.updateMonitoringDataFromDb();
+				send("Ok");
+			}
 			case SERVERS -> {
 				String text = naming.formatDomains(inventoryService.getServers());
 				send(msg(text).parseMode("html"));
