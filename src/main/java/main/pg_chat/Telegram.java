@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
-@Component
+//@Component
 public class Telegram extends CustomSpringWebhookBot implements PublicBot {
 	@Value("${pg_chat.telegram.channel.id}")
 	private long channelId;
