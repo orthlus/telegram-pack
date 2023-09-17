@@ -5,8 +5,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
 
 @Component
 public class NamingService {
@@ -30,6 +34,45 @@ public class NamingService {
 			s = s.replace(domain, "").trim();
 		}
 		return s;
+	}
+
+	public String formatDomainsRuvds(Set<RuvdsServer> servers) {
+		List<RuvdsServer> list = sortRuvds(servers);
+		List<RuvdsServer>[] lists = new List[domains.length + 1];
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < domains.length; i++) {
+			lists[i] = new ArrayList<>(list.size());
+			for (RuvdsServer server : list) {
+				if (server.name().contains(domains[i])) {
+					lists[i].add(server);
+				}
+			}
+		}
+
+		lists[lists.length - 1] = new ArrayList<>(list.size());
+		for (RuvdsServer server : list) {
+			if (!containsDomain(server.name())) {
+				lists[lists.length - 1].add(server);
+			}
+		}
+
+		for (int i = 0; i < domains.length; i++) {
+			sb.append("<b>")
+					.append(domains[i])
+					.append(":</b>\n");
+			sb.append(formatAndJoinRuvds(lists[i]));
+			sb.append("\n\n");
+		}
+
+		if (!lists[lists.length - 1].isEmpty()) {
+			sb.append(formatAndJoinRuvds(lists[lists.length - 1]));
+		} else {
+			sb.deleteCharAt(sb.length());
+			sb.deleteCharAt(sb.length());
+		}
+
+		return sb.toString();
 	}
 
 	public String formatDomains(Set<Server> servers) {
@@ -71,21 +114,27 @@ public class NamingService {
 		return sb.toString();
 	}
 
+	private String formatAndJoinRuvds(List<RuvdsServer> servers) {
+		return servers.stream()
+				.map(this::format)
+				.collect(joining("\n"));
+	}
+
 	private String formatAndJoin(List<Server> servers) {
 		return servers.stream()
 				.map(this::format)
-				.collect(Collectors.joining("\n"));
+				.collect(joining("\n"));
 	}
 
 	private List<RuvdsServer> sortRuvds(Set<RuvdsServer> set) {
 		List<RuvdsServer> list = new ArrayList<>(set);
-		list.sort(Comparator.comparing(ruvdsServer -> dropDomains(ruvdsServer.name())));
+		list.sort(comparing(ruvdsServer -> dropDomains(ruvdsServer.name())));
 		return list;
 	}
 
 	private List<Server> sort(Set<Server> set) {
 		List<Server> list = new ArrayList<>(set);
-		list.sort(Comparator.comparing(server -> dropDomains(server.name())));
+		list.sort(comparing(server -> dropDomains(server.name())));
 		return list;
 	}
 
