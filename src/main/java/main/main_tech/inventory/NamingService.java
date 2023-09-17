@@ -143,23 +143,43 @@ public class NamingService {
 
 	public String format(Server s) {
 		String name = dropDomains(s.name());
-		return """
-			<b>%s</b>
-			  <code>%s</code>:<code>%d</code>
-			  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
-			  <code>%s</code>"""
-				.formatted(
-						name,
-						s.address(), s.sshPort(),
-						s.cpu(), s.ram(), s.drive(), s.addDrive(), s.os());
+		if (s.addDrive() == null) {
+			return """
+				<b>%s</b>
+				  <code>%s</code>:<code>%d</code>
+				  <code>%d cpu %.1f Gb %d Gb</code>
+				  <code>%s</code>"""
+					.formatted(
+							name,
+							s.address(), s.sshPort(),
+							s.cpu(), s.ram(), s.drive(), s.os());
+		} else {
+			return """
+				<b>%s</b>
+				  <code>%s</code>:<code>%d</code>
+				  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
+				  <code>%s</code>"""
+					.formatted(
+							name,
+							s.address(), s.sshPort(),
+							s.cpu(), s.ram(), s.drive(), s.addDrive(), s.os());
+		}
 	}
 
 	public String format(RuvdsServer s) {
 		String name = dropDomains(s.name());
-		return """
-				<b>%s</b>
-				  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
-				  <code>%s</code>"""
-				.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.additionalDriveGb(), s.id());
+		if (s.additionalDriveGb() == null) {
+			return """
+					<b>%s</b>
+					  <code>%d cpu %.1f Gb %d Gb</code>
+					  <code>%s</code>"""
+					.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.id());
+		} else {
+			return """
+					<b>%s</b>
+					  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
+					  <code>%s</code>"""
+					.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.additionalDriveGb(), s.id());
+		}
 	}
 }
