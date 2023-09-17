@@ -76,7 +76,6 @@ public class NamingService {
 		return sb.toString();
 	}
 
-	// TODO add hosting name
 	public String formatDomains(Set<Server> servers) {
 		List<Server> list = sort(servers);
 		List<Server>[] lists = new List[domains.length + 1];
@@ -148,21 +147,21 @@ public class NamingService {
 				<b>%s</b>
 				  <code>%s</code>:<code>%d</code>
 				  <code>%d cpu %.1f Gb %d Gb</code>
-				  <code>%s</code>"""
+				  <code>%s</code>, <u>%s</u>"""
 					.formatted(
 							name,
 							s.address(), s.sshPort(),
-							s.cpu(), s.ram(), s.drive(), s.os());
+							s.cpu(), s.ram(), s.drive(), s.os(), s.hostingName());
 		} else {
 			return """
 				<b>%s</b>
 				  <code>%s</code>:<code>%d</code>
 				  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
-				  <code>%s</code>"""
+				  <code>%s</code>, <u>%s</u>"""
 					.formatted(
 							name,
 							s.address(), s.sshPort(),
-							s.cpu(), s.ram(), s.drive(), s.addDrive(), s.os());
+							s.cpu(), s.ram(), s.drive(), s.addDrive(), s.os(), s.hostingName());
 		}
 	}
 
