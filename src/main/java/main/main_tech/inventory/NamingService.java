@@ -69,8 +69,8 @@ public class NamingService {
 			sb.append("<b>unknown domains:</b>\n");
 			sb.append(formatAndJoinRuvds(lists[lists.length - 1]));
 		} else {
-			sb.deleteCharAt(sb.length());
-			sb.deleteCharAt(sb.length());
+			sb.deleteCharAt(sb.length() - 1);
+			sb.deleteCharAt(sb.length() - 1);
 		}
 
 		return sb.toString();
@@ -110,8 +110,8 @@ public class NamingService {
 			sb.append("<b>unknown domains:</b>\n");
 			sb.append(formatAndJoin(lists[lists.length - 1]));
 		} else {
-			sb.deleteCharAt(sb.length());
-			sb.deleteCharAt(sb.length());
+			sb.deleteCharAt(sb.length() - 1);
+			sb.deleteCharAt(sb.length() - 1);
 		}
 
 		return sb.toString();
