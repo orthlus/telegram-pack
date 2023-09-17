@@ -66,6 +66,7 @@ public class NamingService {
 		}
 
 		if (!lists[lists.length - 1].isEmpty()) {
+			sb.append("<b>unknown domains:</b>\n");
 			sb.append(formatAndJoinRuvds(lists[lists.length - 1]));
 		} else {
 			sb.deleteCharAt(sb.length());
@@ -105,6 +106,7 @@ public class NamingService {
 		}
 
 		if (!lists[lists.length - 1].isEmpty()) {
+			sb.append("<b>unknown domains:</b>\n");
 			sb.append(formatAndJoin(lists[lists.length - 1]));
 		} else {
 			sb.deleteCharAt(sb.length());
