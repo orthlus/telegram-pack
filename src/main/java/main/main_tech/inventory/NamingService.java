@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class NamingService {
@@ -35,7 +33,46 @@ public class NamingService {
 	}
 
 	public String formatDomains(Set<Server> servers) {
+		List<Server> list = sort(servers);
+		List<Server>[] lists = new List[domains.length + 1];
+		StringBuilder sb = new StringBuilder();
 
+		for (int i = 0; i < domains.length; i++) {
+			lists[i] = new ArrayList<>(list.size());
+			for (Server server : list) {
+				if (server.name().contains(domains[i])) {
+					lists[i].add(server);
+				}
+			}
+		}
+
+		lists[lists.length - 1] = new ArrayList<>(list.size());
+		for (Server server : list) {
+			if (!containsDomain(server.name())) {
+				lists[lists.length - 1].add(server);
+			}
+		}
+
+		for (int i = 0; i < domains.length; i++) {
+			sb.append("<b>").append(domains[i]).append(":</b>\n");
+			String join = lists[i].stream()
+					.map(this::format)
+					.collect(Collectors.joining("\n"));
+			sb.append(join);
+			sb.append("\n\n");
+		}
+
+		if (!lists[lists.length - 1].isEmpty()) {
+			String restJoin = lists[lists.length - 1].stream()
+					.map(this::format)
+					.collect(Collectors.joining("\n"));
+			sb.append(restJoin);
+		} else {
+			sb.deleteCharAt(sb.length());
+			sb.deleteCharAt(sb.length());
+		}
+
+		return sb.toString();
 	}
 
 	private List<RuvdsServer> sortRuvds(Set<RuvdsServer> set) {
