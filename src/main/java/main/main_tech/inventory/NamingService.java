@@ -54,7 +54,9 @@ public class NamingService {
 		}
 
 		for (int i = 0; i < domains.length; i++) {
-			sb.append("<b>").append(domains[i]).append(":</b>\n");
+			sb.append("<b>")
+					.append(domains[i])
+					.append(":</b>\n");
 			sb.append(formatAndJoin(lists[i]));
 			sb.append("\n\n");
 		}
