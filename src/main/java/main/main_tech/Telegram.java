@@ -5,6 +5,7 @@ import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.inventory.InventoryService;
 import main.main_tech.inventory.NamingService;
+import main.main_tech.monitoring.MonitoringService;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.wg.WgService;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class Telegram extends CustomSpringWebhookBot {
 	@AllArgsConstructor
 	private enum Commands {
+		UPDATE_MONITORING_FROM_DB("/update_monitoring_from_db"),
 		SERVERS("/servers"),
 		UPDATE_SERVERS_FROM_RUVDS("/update_servers_from_ruvds"),
 		RUVDS_SERVERS("/ruvds_servers"),
@@ -38,13 +40,15 @@ public class Telegram extends CustomSpringWebhookBot {
 					WgService wg,
 					RuvdsEmailClient ruvdsEmailClient,
 					InventoryService inventoryService,
-					NamingService naming) {
+					NamingService naming,
+					MonitoringService monitoring) {
 		super(botConfig);
 		this.ruvdsApi = ruvdsApi;
 		this.wg = wg;
 		this.ruvdsEmailClient = ruvdsEmailClient;
 		this.inventoryService = inventoryService;
 		this.naming = naming;
+		this.monitoring = monitoring;
 	}
 
 	private final RuvdsApi ruvdsApi;
@@ -52,6 +56,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	private final RuvdsEmailClient ruvdsEmailClient;
 	private final InventoryService inventoryService;
 	private final NamingService naming;
+	private final MonitoringService monitoring;
 	private Message message1;
 	private Message message2;
 
@@ -96,6 +101,7 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
+			case UPDATE_MONITORING_FROM_DB -> monitoring.updateMonitoringDataFromDb();
 			case SERVERS -> {
 				String text = naming.formatDomains(inventoryService.getServers());
 				send(msg(text).parseMode("html"));

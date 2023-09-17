@@ -5,6 +5,7 @@ import main.main_tech.ruvds.api.RuvdsServer;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -17,5 +18,13 @@ public class InventoryService {
 
 	public void updateServersFromRuvds(Set<RuvdsServer> ruvdsServers) {
 		repo.updateServers(ruvdsServers);
+	}
+
+	public String getStringListForMonitoring() {
+		return repo.getServers().stream()
+				.filter(Server::activeMonitoring)
+				.map(server -> server.address() + ":" + server.sshPort())
+				.collect(Collectors.joining("\n"))
+				+ "\n";
 	}
 }
