@@ -5,8 +5,6 @@ import main.main_tech.ruvds.api.RuvdsServer;
 import main.tables.TechInventoryServers;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -33,14 +31,12 @@ public class Repo {
 				.execute();
 	}
 
-	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void updateServers(Set<RuvdsServer> ruvdsServers) {
 		for (RuvdsServer ruvdsServer : ruvdsServers) {
 			updateServer(ruvdsServer);
 		}
 	}
 
-	@Cacheable("inventory-servers")
 	public Set<Server> getServers() {
 		return db.select(
 				tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
@@ -51,7 +47,6 @@ public class Repo {
 				.fetchSet(mapping(Server::new));
 	}
 
-	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void setSshPortById(int serverId, int sshPort) {
 		db.update(tis)
 				.set(tis.SSH_PORT, sshPort)
@@ -59,7 +54,6 @@ public class Repo {
 				.execute();
 	}
 
-	@CacheEvict(value = "inventory-servers", allEntries = true)
 	public void setIpAddressById(int serverId, String ipAddress) {
 		db.update(tis)
 				.set(tis.ADDRESS, ipAddress)
