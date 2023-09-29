@@ -53,7 +53,7 @@ public class KatyaTelegram extends CustomSpringWebhookBot implements PublicBot {
 					groupChat(update);
 				}
 			} catch (InstagramUnauthorizedException e) {
-				sendByUpdate("не получилась авторизация до инстаграма, сходите к @aelaort", update);
+				sendByUpdate("не получилась авторизация до инстаграма", update);
 			}
 		}
 	}
