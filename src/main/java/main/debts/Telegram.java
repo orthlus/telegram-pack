@@ -1,7 +1,9 @@
 package main.debts;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import main.common.telegram.Command;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.debts.entity.Expense;
 import main.debts.entity.Income;
@@ -10,7 +12,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Integer.parseInt;
@@ -25,7 +30,8 @@ import static main.debts.UserState.*;
 @Component
 public class Telegram extends CustomSpringWebhookBot {
 	@AllArgsConstructor
-	private enum Commands {
+	@Getter
+	private enum Commands implements Command {
 		START("/start"),
 		ADD_INCOME("/add_income"),
 		DELETE_INCOME("/delete_income"),
@@ -36,10 +42,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		final String command;
 	}
 
-	private final Map<String, Commands> commandsMap = new HashMap<>();
-	{
-		for (Commands command : Commands.values()) commandsMap.put(command.command, command);
-	}
+	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final Repo repo;
 

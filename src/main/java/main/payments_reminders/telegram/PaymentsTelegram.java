@@ -1,7 +1,9 @@
 package main.payments_reminders.telegram;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import main.common.telegram.Command;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.payments_reminders.entity.Remind;
 import main.payments_reminders.entity.RemindToSend;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -46,7 +47,8 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 
 	@AllArgsConstructor
-	private enum Commands {
+	@Getter
+	private enum Commands implements Command {
 		START("/start"),
 		LIST("/list"),
 		NEW_REMIND("/new_remind"),
@@ -54,10 +56,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 		final String command;
 	}
 
-	private final Map<String, Commands> commandsMap = new HashMap<>();
-	{
-		for (Commands command : Commands.values()) commandsMap.put(command.command, command);
-	}
+	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	public void sendRemind(RemindToSend remind) {
 		String msg = remind.getName();

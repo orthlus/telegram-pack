@@ -1,6 +1,8 @@
 package main.main_tech;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import main.common.telegram.Command;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.common.telegram.Message;
 import main.main_tech.inventory.InventoryService;
@@ -11,13 +13,13 @@ import main.main_tech.wg.WgService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
 	@AllArgsConstructor
-	private enum Commands {
+	@Getter
+	private enum Commands implements Command {
 		UPDATE_MONITORING_FROM_DB("/update_monitoring_from_db"),
 		SERVERS("/servers"),
 		UPDATE_SERVERS_FROM_RUVDS("/update_servers_from_ruvds"),
@@ -30,10 +32,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		final String command;
 	}
 
-	private final Map<String, Commands> commandsMap = new HashMap<>();
-	{
-		for (Commands command : Commands.values()) commandsMap.put(command.command, command);
-	}
+	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	public Telegram(Config botConfig,
 					RuvdsApi ruvdsApi,
