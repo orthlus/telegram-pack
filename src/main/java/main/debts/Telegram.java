@@ -218,7 +218,7 @@ public class Telegram extends CustomSpringWebhookBot {
 							.mapToInt(Expense::amount)
 							.sum();
 					int sumAfterDay2 = expenses.stream()
-							.filter(e -> e.day() >= day2 && e.day() < day1)
+							.filter(e -> e.day() >= day2 || e.day() < day1)
 							.mapToInt(Expense::amount)
 							.sum();
 					text += """
