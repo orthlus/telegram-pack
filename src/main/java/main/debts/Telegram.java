@@ -13,17 +13,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.time.LocalDate.parse;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.stream.Collectors.joining;
 import static main.debts.UserState.*;
 
 @Slf4j
@@ -235,7 +234,7 @@ public class Telegram extends CustomSpringWebhookBot {
 						.sum();
 				String list = incomes.stream()
 						.map(Income::toString)
-						.collect(Collectors.joining("\n"));
+						.collect(joining("\n"));
 				String text = "%s\n==========\nИтого: %d".formatted(list, sum);
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
@@ -248,8 +247,29 @@ public class Telegram extends CustomSpringWebhookBot {
 				String list = expenses
 						.stream()
 						.map(Expense::toString)
-						.collect(Collectors.joining("\n"));
-				String text = "%s\n==========\nИтого: %d".formatted(list, sum);
+						.collect(joining("\n"));
+				String text = list + "\n==========\n";
+
+				List<Income> incomes = new ArrayList<>(repo.getIncomes());
+				if (incomes.size() == 2) {
+					int day1 = min(incomes.get(0).day(), incomes.get(1).day());
+					int day2 = max(incomes.get(0).day(), incomes.get(1).day());
+					int sumAfterDay1 = expenses.stream()
+							.filter(e -> e.day() >= day1 && e.day() < day2)
+							.mapToInt(Expense::amount)
+							.sum();
+					int sumAfterDay2 = expenses.stream()
+							.filter(e -> e.day() >= day2 && e.day() < day1)
+							.mapToInt(Expense::amount)
+							.sum();
+					text += """
+							Итого:
+							траты с 1-ой получки - %d
+							траты со 2-ой получки - %d"""
+							.formatted(sumAfterDay1, sumAfterDay2);
+				} else {
+					text += "Итого: " + sum;
+				}
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 		}
