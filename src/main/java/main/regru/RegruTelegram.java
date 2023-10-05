@@ -113,7 +113,7 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 	}
 
 	private boolean isValidDomain(String domainStr) {
-		return domainStr.replaceAll("[a-zA-Z0-9-@]+", "").length() == 0;
+		return domainStr.replaceAll("[a-zA-Z0-9-@]+", "").isEmpty();
 	}
 
 	private boolean isValidIp(String ipStr) {

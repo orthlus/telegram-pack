@@ -1,5 +1,6 @@
 package main.debts;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.debts.entity.Expense;
@@ -9,10 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Integer.parseInt;
@@ -26,14 +24,22 @@ import static main.debts.UserState.*;
 @Slf4j
 @Component
 public class Telegram extends CustomSpringWebhookBot {
-	private final Set<String> commands = new LinkedHashSet<>(List.of(
-			"/start",
-			"/add_income",
-			"/delete_income",
-			"/add_expense",
-			"/delete_expense",
-			"/incomes",
-			"/expenses"));
+	@AllArgsConstructor
+	private enum Commands {
+		START("/start"),
+		ADD_INCOME("/add_income"),
+		DELETE_INCOME("/delete_income"),
+		ADD_EXPENSE("/add_expense"),
+		DELETE_EXPENSE("/delete_expense"),
+		INCOMES("/incomes"),
+		EXPENSES("/expenses");
+		final String command;
+	}
+
+	private final Map<String, Commands> commandsMap = new HashMap<>();
+	{
+		for (Commands command : Commands.values()) commandsMap.put(command.command, command);
+	}
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final Repo repo;
 
@@ -47,7 +53,7 @@ public class Telegram extends CustomSpringWebhookBot {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
-			if (commands.contains(messageText)) {
+			if (commandsMap.containsKey(messageText)) {
 				handleCommand(messageText);
 			} else {
 				handleText(messageText);
@@ -149,20 +155,20 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 
 	private void handleCommand(String messageText) {
-		switch (messageText) {
-			case "/start" -> {
+		switch (commandsMap.get(messageText)) {
+			case START -> {
 				state.set(NOTHING_WAIT);
-				send("Учёт доходов и расходов\n" + String.join("\n", commands));
+				send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
 			}
-			case "/add_income" -> {
+			case ADD_INCOME -> {
 				state.set(WAIT_NEW_INCOME);
 				send("Новый доход: сумма и день месяца\n\n1000 25");
 			}
-			case "/delete_income" -> {
+			case DELETE_INCOME -> {
 				state.set(WAIT_DELETE_INCOME_ID);
 				send("id для удаления дохода:");
 			}
-			case "/add_expense" -> {
+			case ADD_EXPENSE -> {
 				state.set(WAIT_NEW_EXPENSE);
 				send("""
 						Новый расход:
@@ -172,11 +178,11 @@ public class Telegram extends CustomSpringWebhookBot {
 						день месяца
 						дата окончания dd.mm.yy / dd,mm,yy / dd mm yy""");
 			}
-			case "/delete_expense" -> {
+			case DELETE_EXPENSE -> {
 				state.set(WAIT_DELETE_EXPENSE_ID);
 				send("id для удаления расхода:");
 			}
-			case "/incomes" -> {
+			case INCOMES -> {
 				Set<Income> incomes = repo.getIncomes();
 				int sum = incomes.stream()
 						.map(Income::amount)
@@ -188,7 +194,7 @@ public class Telegram extends CustomSpringWebhookBot {
 				String text = "%s\n==========\nИтого: %d".formatted(list, sum);
 				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
-			case "/expenses" -> {
+			case EXPENSES -> {
 				Set<Expense> expenses = repo.getExpenses();
 				int sum = expenses.stream()
 						.map(Expense::amount)

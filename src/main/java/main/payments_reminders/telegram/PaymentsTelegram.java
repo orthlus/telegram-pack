@@ -1,5 +1,6 @@
 package main.payments_reminders.telegram;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.payments_reminders.entity.Remind;
@@ -15,10 +16,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -45,7 +45,19 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 	private final Repo repo;
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 
-	private final Set<String> commands = new LinkedHashSet<>(List.of("/start", "/list", "/new_remind", "/delete_remind"));
+	@AllArgsConstructor
+	private enum Commands {
+		START("/start"),
+		LIST("/list"),
+		NEW_REMIND("/new_remind"),
+		DELETE_REMIND("/delete_remind");
+		final String command;
+	}
+
+	private final Map<String, Commands> commandsMap = new HashMap<>();
+	{
+		for (Commands command : Commands.values()) commandsMap.put(command.command, command);
+	}
 
 	public void sendRemind(RemindToSend remind) {
 		String msg = remind.getName();
@@ -57,7 +69,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
-			if (commands.contains(messageText)) {
+			if (commandsMap.containsKey(messageText)) {
 				handleCommand(messageText);
 			} else {
 				handleText(messageText);
@@ -106,7 +118,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 
 	private void handleText(String messageText) {
 		switch (state.get()) {
-			case NOTHING_WAIT -> send("Используйте команды: \n" + String.join("\n", commands));
+			case NOTHING_WAIT -> send("Используйте команды: \n" + String.join("\n", commandsMap.keySet()));
 			case WAIT_NEW_REMIND_DATA -> {
 				try {
 					RemindWithoutId remind = parseNewRemind1(messageText);
@@ -143,7 +155,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 						даты оплаты счетов или передачи показаний счётчиков,
 						и бот напомнит о них в нужные дни.
 						Команды:
-						%s""".formatted(String.join("\n", commands)));
+						%s""".formatted(String.join("\n", commandsMap.keySet())));
 			}
 			case "/list" -> {
 				String text = repo.getReminds()
