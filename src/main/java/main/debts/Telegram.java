@@ -2,19 +2,17 @@ package main.debts;
 
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.CustomSpringWebhookBot;
-import main.debts.callback.CallbackMapper;
-import main.debts.callback.CallbackType;
 import main.debts.entity.Expense;
 import main.debts.entity.Income;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Integer.parseInt;
@@ -30,7 +28,6 @@ import static main.debts.UserState.*;
 public class Telegram extends CustomSpringWebhookBot {
 	private final Set<String> commands = new LinkedHashSet<>(List.of(
 			"/start",
-			"/balance",
 			"/add_income",
 			"/delete_income",
 			"/add_expense",
@@ -39,17 +36,10 @@ public class Telegram extends CustomSpringWebhookBot {
 			"/expenses"));
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final Repo repo;
-	private final Keyboards keyboards;
-	private final CallbackMapper mapper;
-	private final Set<Expense> markedExpenses = ConcurrentHashMap.newKeySet();
-	private final DebtsService service;
 
-	public Telegram(Config botConfig, Repo repo, Keyboards keyboards, CallbackMapper mapper, DebtsService service) {
+	public Telegram(Config botConfig, Repo repo) {
 		super(botConfig);
 		this.repo = repo;
-		this.keyboards = keyboards;
-		this.mapper = mapper;
-		this.service = service;
 	}
 
 	@Override
@@ -61,31 +51,6 @@ public class Telegram extends CustomSpringWebhookBot {
 				handleCommand(messageText);
 			} else {
 				handleText(messageText);
-			}
-		} else if (update.hasCallbackQuery()) {
-			handleCallback(update);
-		}
-	}
-
-	private void handleCallback(Update update) {
-		CallbackQuery callbackQuery = update.getCallbackQuery();
-
-		Optional<CallbackType> valueOp = mapper.getTypeFromQuery(callbackQuery);
-		if (valueOp.isEmpty()) {
-			send("Что-то пошло не так, попробуйте заново (неизвестный callback)");
-			return;
-		}
-
-		switch (valueOp.get()) {
-			case SELECT_EXPENSE -> {
-				Optional<Expense> expenseOp = mapper.getExpenseFromQuery(callbackQuery);
-				if (expenseOp.isPresent()) {
-					Expense exp = expenseOp.get();
-					if (!markedExpenses.remove(exp)) markedExpenses.add(exp);
-
-					int sum = service.getSumNearestExpensesBeforeNextIncome(markedExpenses);
-					updateMessageTextAndKeyboard(callbackQuery, balanceText(sum), keyboards.expenses(markedExpenses));
-				}
 			}
 		}
 	}
@@ -183,26 +148,11 @@ public class Telegram extends CustomSpringWebhookBot {
 		return new IncomeDto(amount, day);
 	}
 
-	private String balanceText(int nearestExpensesSum) {
-		return """
-			Сумма ближайших платежей
-			%d
-			""".formatted(nearestExpensesSum);
-	}
-
 	private void handleCommand(String messageText) {
 		switch (messageText) {
 			case "/start" -> {
 				state.set(NOTHING_WAIT);
 				send("Учёт доходов и расходов\n" + String.join("\n", commands));
-			}
-			case "/balance" -> {
-				markedExpenses.clear();
-				markedExpenses.addAll(service.getPassedExpensesIds());
-				InlineKeyboardMarkup keyboard = keyboards.expenses(markedExpenses);
-
-				int nearestExpensesSum = service.getSumNearestExpensesBeforeNextIncome();
-				send(balanceText(nearestExpensesSum), keyboard);
 			}
 			case "/add_income" -> {
 				state.set(WAIT_NEW_INCOME);
