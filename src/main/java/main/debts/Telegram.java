@@ -222,10 +222,10 @@ public class Telegram extends CustomSpringWebhookBot {
 							.mapToInt(Expense::amount)
 							.sum();
 					text += """
-							Итого:
+							Итого: %d
 							траты с 1-ой получки - %d
 							траты со 2-ой получки - %d"""
-							.formatted(sumAfterDay1, sumAfterDay2);
+							.formatted(sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
 				} else {
 					text += "Итого: " + sum;
 				}
