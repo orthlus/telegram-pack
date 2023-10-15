@@ -12,4 +12,9 @@ public class KatyaBotConfig implements BotConfig {
 	private String nickname;
 	@Value("${katya.telegram.bot.token}")
 	private String token;
+
+	@Override
+	public boolean isPrivateApi() {
+		return true;
+	}
 }

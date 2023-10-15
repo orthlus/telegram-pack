@@ -4,6 +4,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.meta.ApiConstants;
 
 @Component
 public class TelegramPropsProvider implements InitializingBean {
@@ -34,13 +35,14 @@ public class TelegramPropsProvider implements InitializingBean {
 		BOT_API_URL = url;
 	}
 
-	public static String getBotApiUrl() {
-		return BOT_API_URL;
+	public static String getBotApiUrl(BotConfig botConfig) {
+		return botConfig.isPrivateApi() ? BOT_API_URL : ApiConstants.BASE_URL;
 	}
 
-	public static DefaultBotOptions getCustomBotOptions() {
+	public static DefaultBotOptions getCustomBotOptions(BotConfig botConfig) {
 		DefaultBotOptions botOptions = new DefaultBotOptions();
-		botOptions.setBaseUrl(BOT_API_URL);
+		if (botConfig.isPrivateApi())
+			botOptions.setBaseUrl(BOT_API_URL);
 		return botOptions;
 	}
 

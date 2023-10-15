@@ -39,15 +39,15 @@ public class TelegramBotsWebhookRegister extends HttpClient implements Initializ
 
 	private void register(BotConfig bot, String secret) throws IOException {
 		try {
-			Request request = request(bot.getToken(), getBotWebhookUrl(bot), secret);
+			Request request = request(bot, getBotWebhookUrl(bot), secret);
 			baseHttpClient.newCall(request).execute().body().close();
 		} catch (NullPointerException ignored) {
 		}
 		log.info("bot {} webhook registered", bot.getNickname());
 	}
 
-	private Request request(String botToken, String webhookUrl, String secret) {
-		String url = "%s%s/setWebhook".formatted(getBotApiUrl(), botToken);
+	private Request request(BotConfig bot, String webhookUrl, String secret) {
+		String url = "%s%s/setWebhook".formatted(getBotApiUrl(bot), bot.getToken());
 		FormBody body = new FormBody.Builder()
 				.add("url", webhookUrl)
 				.add("secret_token", secret)

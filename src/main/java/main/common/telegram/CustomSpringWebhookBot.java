@@ -32,7 +32,7 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 	private final BotConfig botConfig;
 
 	public CustomSpringWebhookBot(BotConfig botConfig) {
-		super(getCustomBotOptions(), new SetWebhook(getBotWebhookUrl(botConfig)), botConfig.getToken());
+		super(getCustomBotOptions(botConfig), new SetWebhook(getBotWebhookUrl(botConfig)), botConfig.getToken());
 		this.botConfig = botConfig;
 	}
 
