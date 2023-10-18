@@ -64,13 +64,17 @@ public class Repo {
 
 	@Cacheable(value = "expenses")
 	public Set<Expense> getExpenses() {
+		return getExpenses(LocalDate.now(zone));
+	}
+
+	public Set<Expense> getExpenses(LocalDate date) {
 		return db.select(de.ID,
 						de.EXP_NAME,
 						de.AMOUNT,
 						de.DAY_OF_MONTH,
 						de.EXPIRE_DATE)
 				.from(de)
-				.where(de.EXPIRE_DATE.greaterOrEqual(LocalDate.now(zone)))
+				.where(de.EXPIRE_DATE.greaterOrEqual(date))
 				.orderBy(de.DAY_OF_MONTH, de.EXP_NAME)
 				.fetchSet(mapping(Expense::new));
 	}

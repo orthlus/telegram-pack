@@ -38,13 +38,15 @@ public class Telegram extends CustomSpringWebhookBot {
 		ADD_EXPENSE("/add_expense"),
 		DELETE_EXPENSE("/delete_expense"),
 		INCOMES("/incomes"),
-		EXPENSES("/expenses");
+		EXPENSES("/expenses"),
+		EXPENSES_FOR_DATE("/expenses_for_date");
 		final String command;
 	}
 
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final Repo repo;
+	private final String[] dateParsePatterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy", "yyyy-MM-dd"};
 
 	public Telegram(Config botConfig, Repo repo) {
 		super(botConfig);
@@ -115,6 +117,17 @@ public class Telegram extends CustomSpringWebhookBot {
 					send("error");
 				}
 			}
+			case EXPENSES_FOR_DATE_WAIT_DATE_VALUE -> {
+				try {
+					Set<Expense> expenses = repo.getExpenses(parseDate(messageText));
+					String text = calculateExpenses(expenses);
+					state.set(NOTHING_WAIT);
+					send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				} catch (Exception e) {
+					log.error("error EXPENSES_FOR_DATE", e);
+					send("Еще раз");
+				}
+			}
 		}
 	}
 
@@ -135,8 +148,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 
 	private LocalDate parseDate(String strDate) {
-		String[] patterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy", "yyyy-MM-dd"};
-		for (String pattern : patterns) {
+		for (String pattern : dateParsePatterns) {
 			try {
 				return parse(strDate, ofPattern(pattern));
 			} catch (IllegalArgumentException | DateTimeParseException ignored) {
@@ -179,7 +191,7 @@ public class Telegram extends CustomSpringWebhookBot {
 						название
 						сумма
 						день месяца
-						дата окончания dd.mm.yy / dd,mm,yy / dd mm yy""");
+						дата окончания\s""" + String.join(" / ", dateParsePatterns));
 			}
 			case DELETE_EXPENSE -> {
 				state.set(WAIT_DELETE_EXPENSE_ID);
@@ -199,38 +211,48 @@ public class Telegram extends CustomSpringWebhookBot {
 			}
 			case EXPENSES -> {
 				Set<Expense> expenses = repo.getExpenses();
-				int sum = expenses.stream()
-						.map(Expense::amount)
-						.mapToInt(Integer::intValue)
-						.sum();
-				String list = expenses
-						.stream()
-						.map(Expense::toString)
-						.collect(joining("\n"));
-				String text = list + "\n==========\n";
+				String text = calculateExpenses(expenses);
+				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+			}
+			case EXPENSES_FOR_DATE -> {
+				state.set(EXPENSES_FOR_DATE_WAIT_DATE_VALUE);
+				send("на какую дату?\n" + String.join(" / ", dateParsePatterns));
+			}
+		}
+	}
 
-				List<Income> incomes = new ArrayList<>(repo.getIncomes());
-				if (incomes.size() == 2) {
-					int day1 = min(incomes.get(0).day(), incomes.get(1).day());
-					int day2 = max(incomes.get(0).day(), incomes.get(1).day());
-					int sumAfterDay1 = expenses.stream()
-							.filter(e -> e.day() >= day1 && e.day() < day2)
-							.mapToInt(Expense::amount)
-							.sum();
-					int sumAfterDay2 = expenses.stream()
-							.filter(e -> e.day() >= day2 || e.day() < day1)
-							.mapToInt(Expense::amount)
-							.sum();
-					text += """
+	private String calculateExpenses(Set<Expense> expenses) {
+		int sum = expenses.stream()
+				.map(Expense::amount)
+				.mapToInt(Integer::intValue)
+				.sum();
+		String list = expenses
+				.stream()
+				.map(Expense::toString)
+				.collect(joining("\n"));
+		String text = list + "\n==========\n";
+
+		List<Income> incomes = new ArrayList<>(repo.getIncomes());
+		if (incomes.size() == 2) {
+			int day1 = min(incomes.get(0).day(), incomes.get(1).day());
+			int day2 = max(incomes.get(0).day(), incomes.get(1).day());
+			int sumAfterDay1 = expenses.stream()
+					.filter(e -> e.day() >= day1 && e.day() < day2)
+					.mapToInt(Expense::amount)
+					.sum();
+			int sumAfterDay2 = expenses.stream()
+					.filter(e -> e.day() >= day2 || e.day() < day1)
+					.mapToInt(Expense::amount)
+					.sum();
+			text += """
 							Итого: %d
 							траты с 1-ой получки - %d
 							траты со 2-ой получки - %d"""
-							.formatted(sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
-				} else {
-					text += "Итого: " + sum;
-				}
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
-			}
+					.formatted(sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
+		} else {
+			text += "Итого: " + sum;
 		}
+
+		return text;
 	}
 }
