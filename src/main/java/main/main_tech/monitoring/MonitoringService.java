@@ -12,10 +12,10 @@ public class MonitoringService {
 	private String bucket;
 	@Value("${main_tech.monitoring.storage.file}")
 	private String file;
-	private final S3Client s3Client;
+	private final MonitoringStorage monitoringStorage;
 	private final InventoryService inventoryService;
 
 	public void updateMonitoringDataFromDb() {
-		s3Client.uploadFileContent(bucket, file, inventoryService.getStringListForMonitoring());
+		monitoringStorage.uploadFileContent(bucket, file, inventoryService.getStringListForMonitoring());
 	}
 }
