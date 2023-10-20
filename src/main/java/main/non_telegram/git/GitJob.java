@@ -3,6 +3,7 @@ package main.non_telegram.git;
 
 import lombok.extern.slf4j.Slf4j;
 import main.common.QuartzJobsList;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.SecureRandom;
@@ -26,7 +26,6 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.time.LocalDateTime.now;
 import static java.time.temporal.WeekFields.of;
-import static java.util.Comparator.reverseOrder;
 import static java.util.Locale.ENGLISH;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -121,11 +120,8 @@ public class GitJob implements Job, QuartzJobsList {
 	}
 
 	private void clearDir(Path dir) {
-		try (Stream<Path> walk = walk(dir)) {
-			walk.sorted(reverseOrder())
-					.filter(path -> !dir.equals(path))
-					.map(Path::toFile)
-					.forEach(File::delete);
+		try {
+			FileUtils.deleteDirectory(dir.toFile());
 		} catch (IOException e) {
 			log.error("Git error clean dir", e);
 			throw new RuntimeException(e);
