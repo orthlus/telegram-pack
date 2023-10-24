@@ -8,8 +8,6 @@ import main.common.telegram.CustomSpringWebhookBot;
 import main.payments_reminders.entity.Remind;
 import main.payments_reminders.entity.RemindToSend;
 import main.payments_reminders.entity.RemindWithoutId;
-import main.payments_reminders.exceptions.RemindCreateException;
-import main.payments_reminders.exceptions.RemindHoldOnException;
 import main.payments_reminders.reminds.RemindsService;
 import main.payments_reminders.reminds.Repo;
 import main.payments_reminders.telegram.callback.CallbackDataMapper;
@@ -97,7 +95,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 					try {
 						remindsService.addHoldOnRemind(t.v1, t.v2);
 						deleteMessage(callbackQuery);
-					} catch (RemindHoldOnException e) {
+					} catch (RuntimeException e) {
 						send("Что-то пошло не так, попробуйте заново");
 					}
 				} else {
@@ -127,7 +125,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 					send("Ок: \n%s\n/list".formatted(remind));
 					handleCommand("/list");
 					state.set(NOTHING_WAIT);
-				} catch (RemindCreateException e) {
+				} catch (RuntimeException e) {
 					send("Что-то пошло не так, попробуйте заново. \n(дата от 1 до 31, час от 0 до 23)");
 					handleCommand("/new_remind");
 				}

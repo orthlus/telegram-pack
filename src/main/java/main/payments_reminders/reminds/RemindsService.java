@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.payments_reminders.entity.Remind;
 import main.payments_reminders.entity.RemindWithoutId;
-import main.payments_reminders.exceptions.RemindCreateException;
-import main.payments_reminders.exceptions.RemindHoldOnException;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +12,7 @@ import java.time.LocalDate;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
+import static main.Main.zone;
 
 @Slf4j
 @Component
@@ -21,9 +20,9 @@ import static java.lang.Math.abs;
 public class RemindsService {
 	private final Repo repo;
 
-	public void addHoldOnRemind(Remind remind, int daysForHold) throws RemindHoldOnException {
+	public void addHoldOnRemind(Remind remind, int daysForHold) {
 		int days = abs(daysForHold);
-		LocalDate now = LocalDate.now();
+		LocalDate now = LocalDate.now(zone);
 
 		LocalDate remindEndDate;
 		try {
@@ -42,12 +41,12 @@ public class RemindsService {
 		if (a && b) {
 			repo.addHoldOnRemind(remind, holdEndDate);
 		} else {
-			throw new RemindHoldOnException();
+			throw new RuntimeException();
 		}
 	}
 
 	public void submitRemind(Remind remind) {
-		LocalDate holdEndDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
+		LocalDate holdEndDate = LocalDate.now(zone).withDayOfMonth(1).plusMonths(1);
 		try {
 			repo.addHoldOnRemind(remind, holdEndDate);
 		} catch (DataAccessException e) {
@@ -57,25 +56,37 @@ public class RemindsService {
 	}
 
 	public RemindWithoutId parseNewRemind(String messageText) {
-		String[] rows = messageText.split("\n");
-		if (rows.length != 4) throw new RemindCreateException();
+		String[] rows = parseRemindText(messageText);
 
 		String name = rows[0].trim();
-		int startDay = parseInt(rows[1].trim());
-		validDbRemindDay(startDay);
-		int endDay = parseInt(rows[2].trim());
-		validDbRemindDay(endDay);
-		int hour = parseInt(rows[3].trim());
-		validDbRemindHourOfDay(hour);
+		int startDay = parseDay(rows[1].trim());
+		int endDay = parseDay(rows[2].trim());
+		int hour = parseHour(rows[3].trim());
 
 		return new RemindWithoutId(name, startDay, endDay, hour);
 	}
 
-	private void validDbRemindDay(int startDay) {
-		if (startDay < 1 || startDay > 31) throw new RemindCreateException();
+	private String[] parseRemindText(String s) {
+		String[] rows = s.split("\n");
+		if (rows.length != 4)
+			throw new RuntimeException();
+
+		return rows;
 	}
 
-	private void validDbRemindHourOfDay(int hourOfDay) {
-		if (hourOfDay < 0 || hourOfDay > 23) throw new RemindCreateException();
+	private int parseDay(String s) {
+		int day = parseInt(s);
+		if (day < 1 || day > 31)
+			throw new RuntimeException();
+
+		return day;
+	}
+
+	private int parseHour(String s) {
+		int hour = parseInt(s);
+		if (hour < 0 || hour > 23)
+			throw new RuntimeException();
+
+		return hour;
 	}
 }
