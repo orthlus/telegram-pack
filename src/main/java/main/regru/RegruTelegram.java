@@ -1,6 +1,5 @@
 package main.regru;
 
-import com.google.common.net.InetAddresses;
 import main.common.telegram.BotConfig;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.regru.common.ChatState;
@@ -9,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Comparator;
 
+import static com.google.common.net.InetAddresses.isInetAddress;
 import static main.regru.common.ChatStates.*;
 
 public class RegruTelegram extends CustomSpringWebhookBot {
@@ -39,11 +39,11 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 
 	private void handleText(Update update) {
 		String text = update.getMessage().getText();
-		switch (chatState.getCurrentState()) {
+		switch (chatState.currentState.get()) {
 			case NOTHING_WAIT -> send("работает");
 			case WAIT_IP_TO_ADD -> {
 				if (isValidIp(text)) {
-					chatState.setState(WAIT_DOMAIN_NAME_TO_ADD);
+					chatState.currentState.set(WAIT_DOMAIN_NAME_TO_ADD);
 					chatState.addValue(WAIT_IP_TO_ADD, text);
 					send("domain:");
 				} else {
@@ -55,17 +55,19 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_ADD), text);
 					boolean add = regRuClient.addSubdomain(rr, domainName);
 					if (add) {
-						chatState.setState(NOTHING_WAIT);
+						chatState.currentState.set(NOTHING_WAIT);
 						send("::ok::\n/list");
 						sendList();
-					} else send("error :( need logs");
+					} else {
+						send("error :( need logs");
+					}
 				} else {
 					send("invalid, try again\ndomain:");
 				}
 			}
 			case WAIT_IP_TO_DELETE -> {
 				if (isValidIp(text)) {
-					chatState.setState(WAIT_DOMAIN_NAME_TO_DELETE);
+					chatState.currentState.set(WAIT_DOMAIN_NAME_TO_DELETE);
 					chatState.addValue(WAIT_IP_TO_DELETE, text);
 					send("domain:");
 				} else {
@@ -77,10 +79,12 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_DELETE), text);
 					boolean delete = regRuClient.deleteSubdomain(rr, domainName);
 					if (delete) {
-						chatState.setState(NOTHING_WAIT);
+						chatState.currentState.set(NOTHING_WAIT);
 						send("::ok::\n/list");
 						sendList();
-					} else send("error :( need logs");
+					} else {
+						send("error :( need logs");
+					}
 				} else {
 					send("invalid, try again\ndomain:");
 				}
@@ -93,23 +97,19 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 		switch (text) {
 			case "/start" -> send("Тут можно управлять поддоменами домена " + domainName);
 			case "/list" -> sendList();
-			case "/add" -> addSubDomain();
-			case "/delete" -> deleteSubDomain();
+			case "/add" -> {
+				send("ip:");
+				chatState.currentState.set(WAIT_IP_TO_ADD);
+			}
+			case "/delete" -> {
+				send("ip:");
+				chatState.currentState.set(WAIT_IP_TO_DELETE);
+			}
 			case "/cancel" -> {
 				send("canceled");
-				chatState.setState(NOTHING_WAIT);
+				chatState.currentState.set(NOTHING_WAIT);
 			}
 		}
-	}
-
-	private void deleteSubDomain() {
-		send("ip:");
-		chatState.setState(WAIT_IP_TO_DELETE);
-	}
-
-	private void addSubDomain() {
-		send("ip:");
-		chatState.setState(WAIT_IP_TO_ADD);
 	}
 
 	private boolean isValidDomain(String domainStr) {
@@ -117,7 +117,7 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 	}
 
 	private boolean isValidIp(String ipStr) {
-		return InetAddresses.isInetAddress(ipStr);
+		return isInetAddress(ipStr);
 	}
 
 	private void sendList() {

@@ -3,7 +3,6 @@ package main.non_telegram.git;
 
 import lombok.extern.slf4j.Slf4j;
 import main.common.QuartzJobsList;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -31,6 +30,7 @@ import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static main.Main.zone;
 import static main.common.QuartzUtils.buildJob;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 
 @Slf4j
 @Component
@@ -121,7 +121,7 @@ public class GitJob implements Job, QuartzJobsList {
 
 	private void clearDir(Path dir) {
 		try {
-			FileUtils.deleteDirectory(dir.toFile());
+			deleteDirectory(dir.toFile());
 		} catch (IOException e) {
 			log.error("Git error clean dir", e);
 			throw new RuntimeException(e);

@@ -14,29 +14,13 @@ import static main.regru.common.ChatStates.NOTHING_WAIT;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ChatState {
 	private final Map<String, String> values = new ConcurrentHashMap<>();
-	private final AtomicReference<ChatStates> currentState = new AtomicReference<>(NOTHING_WAIT);
-
-	public void setState(ChatStates state) {
-		currentState.set(state);
-	}
-
-	public ChatStates getCurrentState() {
-		return currentState.get();
-	}
+	public final AtomicReference<ChatStates> currentState = new AtomicReference<>(NOTHING_WAIT);
 
 	public void addValue(ChatStates key, String value) {
-		addValue(key.toString(), value);
-	}
-
-	public void addValue(String key, String value) {
-		values.put(key, value);
+		values.put(key.toString(), value);
 	}
 
 	public String getAndDeleteValue(ChatStates key) {
-		return getAndDeleteValue(key.toString());
-	}
-
-	public String getAndDeleteValue(String key) {
-		return values.remove(key);
+		return values.remove(key.toString());
 	}
 }
