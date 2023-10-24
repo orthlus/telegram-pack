@@ -12,7 +12,9 @@ import main.payments_reminders.exceptions.RemindCreateException;
 import main.payments_reminders.exceptions.RemindHoldOnException;
 import main.payments_reminders.reminds.RemindsService;
 import main.payments_reminders.reminds.Repo;
-import main.payments_reminders.users.UserState;
+import main.payments_reminders.telegram.callback.CallbackDataMapper;
+import main.payments_reminders.telegram.callback.CallbackType;
+import main.payments_reminders.UserState;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -24,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.Long.parseLong;
-import static main.payments_reminders.users.UserState.*;
+import static main.payments_reminders.UserState.*;
 
 @Slf4j
 @Component
@@ -32,7 +34,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 	public PaymentsTelegram(PaymentsBotConfig botConfig,
 							KeyboardsProvider keyboards,
 							RemindsService remindsService,
-							CallbackMapper mapper, Repo repo) {
+							CallbackDataMapper mapper, Repo repo) {
 		super(botConfig);
 		this.keyboards = keyboards;
 		this.remindsService = remindsService;
@@ -42,7 +44,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 
 	private final KeyboardsProvider keyboards;
 	private final RemindsService remindsService;
-	private final CallbackMapper mapper;
+	private final CallbackDataMapper mapper;
 	private final Repo repo;
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 

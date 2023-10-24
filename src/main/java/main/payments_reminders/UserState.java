@@ -1,4 +1,4 @@
-package main.payments_reminders.users;
+package main.payments_reminders;
 
 public enum UserState {
 	NOTHING_WAIT,

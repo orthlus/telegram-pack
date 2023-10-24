@@ -1,4 +1,4 @@
-package main.payments_reminders.quartz;
+package main.payments_reminders;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

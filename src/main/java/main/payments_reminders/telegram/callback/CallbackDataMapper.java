@@ -1,4 +1,4 @@
-package main.payments_reminders.telegram;
+package main.payments_reminders.telegram.callback;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CallbackMapper {
+public class CallbackDataMapper {
 	private final Repo repo;
 	private ObjectMapper mapper = new ObjectMapper();
 	private Map<Integer, CallbackType> typesById = new HashMap<>();
@@ -28,20 +28,20 @@ public class CallbackMapper {
 	}
 
 	public Optional<Tuple2<Remind, Integer>> getRemindAndDaysFromCallback(CallbackQuery callbackQuery) {
-		Optional<M.RemindDaysCallback> dataOp = getDataFromQuery(callbackQuery, M.RemindDaysCallback.class);
+		Optional<RemindDaysCallback> dataOp = getDataFromQuery(callbackQuery, RemindDaysCallback.class);
 		return dataOp.map(r -> new Tuple2<>(repo.getRemindById(dataOp.get().remindId()), dataOp.get().days()));
 	}
 
 	public Optional<Remind> getRemindFromCallback(CallbackQuery query) {
 		if (getTypeFromQuery(query).isEmpty()) return Optional.empty();
 
-		return getDataFromQuery(query, M.RemindCallback.class)
+		return getDataFromQuery(query, RemindCallback.class)
 				.map(remindCallback -> repo.getRemindById(remindCallback.remindId()));
 	}
 
 	public Optional<CallbackType> getTypeFromQuery(CallbackQuery callbackQuery) {
 		try {
-			val someCallback = mapper.readValue(callbackQuery.getData(), M.SomeCallback.class);
+			val someCallback = mapper.readValue(callbackQuery.getData(), SomeCallback.class);
 			return Optional.of(typesById.get(someCallback.typeId()));
 		} catch (JsonProcessingException e) {
 			log.error("Error parsing callback type from query: {}", callbackQuery.getData(), e);
