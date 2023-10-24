@@ -3,18 +3,19 @@ package main.habr;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 import main.common.HttpClient;
-import main.habr.rss.RssAdapter;
 import main.habr.rss.RssFeed;
+import main.habr.rss.RssMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import static org.mapstruct.factory.Mappers.getMapper;
 
 @Slf4j
 @Component
@@ -23,8 +24,7 @@ public class HabrClient extends HttpClient {
 	private int timeout;
 	@Value("${habr.http.delay}")
 	private int delay;
-	@Autowired
-	private RssAdapter rssAdapter;
+	private final RssMapper rssMapper = getMapper(RssMapper.class);
 
 	private OkHttpClient client = baseHttpClient.newBuilder()
 			.callTimeout(timeout, TimeUnit.SECONDS)
@@ -45,7 +45,7 @@ public class HabrClient extends HttpClient {
 		try (Response response = call(request)) {
 			String text = readBody(response);
 			RssFeed feed = xmlMapper.readValue(text, RssFeed.class);
-			return rssAdapter.convert(feed.getPosts());
+			return rssMapper.map(feed.getPosts());
 		} catch (IOException e) {
 			log.error("http error - HabrClient.getRss", e);
 			return Set.of();
