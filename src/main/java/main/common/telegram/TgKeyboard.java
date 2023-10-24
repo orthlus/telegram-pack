@@ -47,4 +47,7 @@ public interface TgKeyboard {
 		}
 		return result;
 	}
+
+	record ButtonPair(String name, String query) {
+	}
 }
