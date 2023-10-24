@@ -1,6 +1,6 @@
 package main.common.telegram;
 
-public interface BotConfig extends UsingPrivateApi {
+public interface BotConfig {
 	String getToken();
 	String getNickname();
 }

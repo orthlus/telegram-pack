@@ -36,12 +36,12 @@ public class TelegramPropsProvider implements InitializingBean {
 	}
 
 	public static String getBotApiUrl(BotConfig botConfig) {
-		return botConfig.isPrivateApi() ? BOT_API_URL : ApiConstants.BASE_URL;
+		return botConfig instanceof UsingPrivateApi ? BOT_API_URL : ApiConstants.BASE_URL;
 	}
 
 	public static DefaultBotOptions getCustomBotOptions(BotConfig botConfig) {
 		DefaultBotOptions botOptions = new DefaultBotOptions();
-		if (botConfig.isPrivateApi())
+		if (botConfig instanceof UsingPrivateApi)
 			botOptions.setBaseUrl(BOT_API_URL);
 		return botOptions;
 	}
