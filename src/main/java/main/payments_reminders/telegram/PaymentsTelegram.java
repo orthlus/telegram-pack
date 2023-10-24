@@ -28,7 +28,7 @@ import static main.payments_reminders.users.UserState.*;
 
 @Slf4j
 @Component
-public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsUtils {
+public class PaymentsTelegram extends CustomSpringWebhookBot {
 	public PaymentsTelegram(PaymentsBotConfig botConfig,
 							KeyboardsProvider keyboards,
 							RemindsService remindsService,
@@ -120,7 +120,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot implements RemindsU
 			case NOTHING_WAIT -> send("Используйте команды: \n" + String.join("\n", commandsMap.keySet()));
 			case WAIT_NEW_REMIND_DATA -> {
 				try {
-					RemindWithoutId remind = parseNewRemind1(messageText);
+					RemindWithoutId remind = remindsService.parseNewRemind(messageText);
 					repo.addRemind(remind);
 					send("Ок: \n%s\n/list".formatted(remind));
 					handleCommand("/list");
