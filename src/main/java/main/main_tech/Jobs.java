@@ -18,10 +18,10 @@ public class Jobs implements QuartzJobsList {
 	@Override
 	public List<Tuple2<JobDetail, Trigger>> getJobs() {
 		return List.of(
-				buildJob(DailyJob1.class, "30 29 11 ? * 2-6"),
-				buildJob(DailyCleanJob1.class, "0 35 11 ? * 2-6"),
-				buildJob(DailyJob2.class, "30 29 12 ? * 2-6"),
-				buildJob(DailyCleanJob2.class, "0 35 12 ? * 2-6")
+//				buildJob(DailyJob1.class, "30 29 11 ? * 2-6"),
+//				buildJob(DailyCleanJob1.class, "0 35 11 ? * 2-6"),
+//				buildJob(DailyJob2.class, "30 29 12 ? * 2-6"),
+//				buildJob(DailyCleanJob2.class, "0 35 12 ? * 2-6")
 		);
 	}
 
