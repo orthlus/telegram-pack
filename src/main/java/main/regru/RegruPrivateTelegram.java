@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 public class RegruPrivateTelegram extends RegruTelegram {
 
 	public RegruPrivateTelegram(PrivateBotConfig botConfig,
-								RegRuClient regRuClient,
+								RegRuService regRuService,
 								ChatState chatState) {
-		super(botConfig, regRuClient, chatState, botConfig.getDomainName());
+		super(botConfig, regRuService, chatState, botConfig.getDomainName());
 	}
 }

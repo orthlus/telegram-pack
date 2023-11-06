@@ -146,22 +146,28 @@ public class NamingService {
 			return """
 				<b>%s</b>
 				  <code>%s</code>:<code>%d</code>
+				  <b>%s</b>
 				  <code>%d cpu %.1f Gb %d Gb</code>
 				  <code>%s</code>, <u>%s</u>"""
 					.formatted(
 							name,
 							s.address(), s.sshPort(),
-							s.cpu(), s.ram(), s.drive(), s.os(), s.hostingName());
+							s.domainName(),
+							s.cpu(), s.ram(), s.drive(),
+							s.os(), s.hostingName());
 		} else {
 			return """
 				<b>%s</b>
 				  <code>%s</code>:<code>%d</code>
+				  <b>%s</b>
 				  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
 				  <code>%s</code>, <u>%s</u>"""
 					.formatted(
 							name,
 							s.address(), s.sshPort(),
-							s.cpu(), s.ram(), s.drive(), s.addDrive(), s.os(), s.hostingName());
+							s.domainName(),
+							s.cpu(), s.ram(), s.drive(), s.addDrive(),
+							s.os(), s.hostingName());
 		}
 	}
 

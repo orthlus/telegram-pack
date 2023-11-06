@@ -1,11 +1,10 @@
 package main.main_tech.inventory;
 
-public record Server(
+public record ServerDTO(
 		int id,
 		String address,
 		Integer sshPort,
 		String name,
-		String domainName,
 		Integer cpu,
 		Double ram,
 		Integer drive,

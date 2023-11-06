@@ -37,14 +37,14 @@ public class Repo {
 		}
 	}
 
-	public Set<Server> getServers() {
+	public Set<ServerDTO> getServers() {
 		return db.select(
 				tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
 				tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
 				tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
 				tis.HOSTING_NAME)
 				.from(tis)
-				.fetchSet(mapping(Server::new));
+				.fetchSet(mapping(ServerDTO::new));
 	}
 
 	public void setSshPortById(int serverId, int sshPort) {

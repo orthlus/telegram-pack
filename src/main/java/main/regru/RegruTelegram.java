@@ -12,16 +12,16 @@ import static com.google.common.net.InetAddresses.isInetAddress;
 import static main.regru.common.ChatStates.*;
 
 public class RegruTelegram extends CustomSpringWebhookBot {
-	private final RegRuClient regRuClient;
+	private final RegRuService regRuService;
 	private final ChatState chatState;
 	private final String domainName;
 
 	public RegruTelegram(BotConfig botConfig,
-						 RegRuClient regRuClient,
+						 RegRuService regRuService,
 						 ChatState chatState,
 						 String domainName) {
 		super(botConfig);
-		this.regRuClient = regRuClient;
+		this.regRuService = regRuService;
 		this.chatState = chatState;
 		this.domainName = domainName;
 	}
@@ -53,7 +53,7 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 			case WAIT_DOMAIN_NAME_TO_ADD -> {
 				if (isValidDomain(text)) {
 					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_ADD), text);
-					boolean add = regRuClient.addSubdomain(rr, domainName);
+					boolean add = regRuService.addSubdomain(rr, domainName);
 					if (add) {
 						chatState.currentState.set(NOTHING_WAIT);
 						send("::ok::\n/list");
@@ -77,7 +77,7 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 			case WAIT_DOMAIN_NAME_TO_DELETE -> {
 				if (isValidDomain(text)) {
 					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_DELETE), text);
-					boolean delete = regRuClient.deleteSubdomain(rr, domainName);
+					boolean delete = regRuService.deleteSubdomain(rr, domainName);
 					if (delete) {
 						chatState.currentState.set(NOTHING_WAIT);
 						send("::ok::\n/list");
@@ -122,7 +122,7 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 
 	private void sendList() {
 		StringBuilder msgContent = new StringBuilder("Список поддоменов и адресов домена %s:\n".formatted(domainName));
-		regRuClient.getSubdomainsList(domainName)
+		regRuService.getSubdomainsList(domainName)
 				.stream()
 				.sorted(Comparator.comparing(RR::ip))
 				.forEach(rr -> {
