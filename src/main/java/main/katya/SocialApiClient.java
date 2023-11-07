@@ -3,7 +3,6 @@ package main.katya;
 import feign.Feign;
 import feign.Request;
 import lombok.extern.slf4j.Slf4j;
-import main.common.HttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class SocialApiClient extends HttpClient {
+public class SocialApiClient {
 	@Value("${katya.social.api.url}")
 	private String url;
 	private SocialApi client;
