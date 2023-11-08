@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @Getter
-class ItemDto {
+public class ItemDto {
 	@JacksonXmlProperty
 	private String guid;
 }

@@ -1,8 +1,8 @@
 package main.habr;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import feign.Feign;
-import feign.jaxb.JAXBContextFactory;
-import feign.jaxb.JAXBDecoder;
+import feign.jackson.JacksonDecoder;
 import lombok.extern.slf4j.Slf4j;
 import main.habr.rss.RssMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,10 +28,9 @@ public class HabrClient {
 	@PostConstruct
 	private void init() {
 		feign.Request.Options options = new feign.Request.Options(timeout, TimeUnit.SECONDS, timeout, TimeUnit.SECONDS, true);
-		JAXBContextFactory jaxbContextFactory = new JAXBContextFactory.Builder().build();
 		client = Feign.builder()
 				.options(options)
-				.decoder(new JAXBDecoder(jaxbContextFactory))
+				.decoder(new JacksonDecoder(new XmlMapper()))
 				.requestInterceptor(new HttpDelayInterceptor(delay))
 				.target(HabrHttp.class, baseUrl);
 	}
