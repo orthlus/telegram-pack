@@ -33,10 +33,6 @@ public class WgClient {
 		return client.raw();
 	}
 
-	String getStat() {
-		return client.pretty();
-	}
-
 	String getUsers() {
 		return client.users();
 	}
