@@ -1,15 +1,15 @@
 package main.habr;
 
-import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import main.habr.rss.RssFeed;
 
+import java.net.URI;
+
 public interface HabrHttp {
-	@RequestLine("GET {url}")
-	String pageContent(@Param("url") String url);
+	@RequestLine("GET /")
+	String pageContent(URI uri);
 
 	@RequestLine("GET /rss/{type}/?limit=100")
-	@Headers("Accept: text/xml")
 	RssFeed rss(@Param("type") String type);
 }

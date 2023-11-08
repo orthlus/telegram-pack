@@ -2,6 +2,7 @@ package main.habr;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import feign.Feign;
+import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import lombok.extern.slf4j.Slf4j;
 import main.habr.rss.RssMapper;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +32,10 @@ public class HabrClient {
 		feign.Request.Options options = new feign.Request.Options(timeout, TimeUnit.SECONDS, timeout, TimeUnit.SECONDS, true);
 		client = Feign.builder()
 				.options(options)
-				.decoder(new JacksonDecoder(new XmlMapper()))
+				.decoder((response, type) ->
+						type.getTypeName().equals("java.lang.String") ?
+								new Decoder.Default().decode(response, type) :
+								new JacksonDecoder(new XmlMapper()).decode(response, type))
 				.requestInterceptor(new HttpDelayInterceptor(delay))
 				.target(HabrHttp.class, baseUrl);
 	}
@@ -45,8 +50,8 @@ public class HabrClient {
 
 	public boolean isPostHasABBR(String url) {
 		try {
-			String clearedUrl = url.replace(baseUrl, "");
-			return client.pageContent(clearedUrl).contains("class=\"habraabbr\"");
+			String pageContent = client.pageContent(URI.create(url));
+			return pageContent.contains("class=\"habraabbr\"");
 		} catch (Exception e) {
 			return false;
 		}
