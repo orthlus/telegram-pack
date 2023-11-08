@@ -40,14 +40,13 @@ public class BackupsCleanJob extends S3Client implements Job, QuartzJobsList {
 	@Value("${main_tech.backups.cleaner.bucket}")
 	private String bucket;
 	@Value("${main_tech.backups.cleaner.groups}")
-	private String groups;
+	private String[] groups;
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		AmazonS3 s3 = client();
 
 		ObjectListing objects = s3.listObjects(bucket);
-		String[] groups = getGroups();
 		for (String group : groups) {
 			Set<S3ObjectSummary> objectsInGroup = objects.getObjectSummaries()
 					.stream()
@@ -65,10 +64,6 @@ public class BackupsCleanJob extends S3Client implements Job, QuartzJobsList {
 		}
 
 		s3.shutdown();
-	}
-
-	private String[] getGroups() {
-		return groups.split(",");
 	}
 
 	private boolean isObjectOlderNDays(S3ObjectSummary object) {

@@ -4,7 +4,6 @@ import main.main_tech.ruvds.api.RuvdsServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,13 +14,7 @@ import static java.util.stream.Collectors.joining;
 @Component
 public class NamingService {
 	@Value("${main_tech.servers.domains}")
-	private String serversDomains;
 	private String[] domains;
-
-	@PostConstruct
-	private void init() {
-		domains = serversDomains.split(",");
-	}
 
 	private boolean notContainsDomain(String s) {
 		for (String match : domains) if (s.contains(match)) return false;
