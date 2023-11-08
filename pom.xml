@@ -145,6 +145,11 @@
             <artifactId>feign-jaxb</artifactId>
             <version>13.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-jackson</artifactId>
+            <version>13.0</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
