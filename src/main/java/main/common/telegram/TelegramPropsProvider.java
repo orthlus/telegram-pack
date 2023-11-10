@@ -12,27 +12,22 @@ public class TelegramPropsProvider implements InitializingBean {
 	private static long ADMIN_ID;
 	private static String BOT_API_URL;
 
-	@Value("${app.base.url}")
-	private void setAppBaseUrl(String url) {
-		APP_BASE_URL = url;
+	TelegramPropsProvider(
+			@Value("${app.base.url}") String appBaseUrl,
+			@Value("${telegram.admin.id}") long adminId,
+			@Value("${telegram.api.url}") String botApiUrl
+	) {
+		APP_BASE_URL = appBaseUrl;
+		ADMIN_ID = adminId;
+		BOT_API_URL = botApiUrl;
 	}
 
 	public static String getBotWebhookUrl(BotConfig botConfig) {
 		return APP_BASE_URL + "/telegram/" + botConfig.getNickname();
 	}
 
-	@Value("${telegram.admin.id}")
-	private void setAdminId(long id) {
-		ADMIN_ID = id;
-	}
-
 	public static long getAdminId() {
 		return ADMIN_ID;
-	}
-
-	@Value("${telegram.api.url}")
-	private void setBotApiUrl(String url) {
-		BOT_API_URL = url;
 	}
 
 	public static String getBotApiUrl(BotConfig botConfig) {
