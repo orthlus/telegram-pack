@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static main.common.telegram.TelegramPropsProvider.getBotWebhookUrl;
+import static main.common.telegram.TelegramPropsProvider.getAppBaseUrl;
 import static org.telegram.telegrambots.meta.ApiConstants.BASE_URL;
 
 @Slf4j
@@ -39,7 +39,7 @@ public class TelegramBotsWebhookRegister extends HttpClient implements Initializ
 
 	private void register(BotConfig bot, String secret) throws IOException {
 		try {
-			Request request = request(bot, getBotWebhookUrl(bot), secret);
+			Request request = request(bot, getAppBaseUrl() + bot.getNickname(), secret);
 			baseHttpClient.newCall(request).execute().body().close();
 		} catch (NullPointerException ignored) {
 		}
