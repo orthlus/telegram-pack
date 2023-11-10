@@ -25,14 +25,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import static main.common.telegram.TelegramPropsProvider.*;
+import static main.common.telegram.TelegramPropsProvider.getAdminId;
+import static main.common.telegram.TelegramPropsProvider.getBotWebhookUrl;
 
 @Slf4j
 public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 	private final BotConfig botConfig;
 
 	public CustomSpringWebhookBot(BotConfig botConfig) {
-		super(getCustomBotOptions(botConfig), new SetWebhook(getBotWebhookUrl(botConfig)), botConfig.getToken());
+		super(new SetWebhook(getBotWebhookUrl(botConfig)), botConfig.getToken());
 		this.botConfig = botConfig;
 	}
 
