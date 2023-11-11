@@ -1,23 +1,29 @@
 package main.regru;
 
+import feign.Feign;
+import feign.form.FormEncoder;
+import feign.jackson.JacksonDecoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.common.HttpClient;
+import main.regru.common.Add;
+import main.regru.common.Basic;
+import main.regru.common.Delete;
 import main.regru.common.RR;
-import main.regru.common.RegRuResponseReader;
-import okhttp3.*;
+import main.regru.common.dto.DomainsList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import javax.annotation.PostConstruct;
 import java.util.List;
+
+import static org.mapstruct.factory.Mappers.getMapper;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RegRuClient extends HttpClient {
-	private OkHttpClient client = baseHttpClient;
-	private final RegRuResponseReader responseReader;
+public class RegRuClient {
+	private RegRuHttp client;
+	private final RRMapper mapper = getMapper(RRMapper.class);
 
 	@Value("${regru.api.url}")
 	private String baseUrl;
@@ -26,83 +32,50 @@ public class RegRuClient extends HttpClient {
 	@Value("${regru.account.password}")
 	private String password;
 
-	private FormBody.Builder basicBody(String domainName) {
-		return new FormBody.Builder()
-				.add("username", login)
-				.add("password", password)
-				.add("domain_name", domainName);
+	@PostConstruct
+	private void init() {
+		client = Feign.builder()
+				.encoder(new FormEncoder())
+				.decoder(new JacksonDecoder())
+				.target(RegRuHttp.class, baseUrl);
+	}
+
+	private Basic basic(String domainName) {
+		return new Basic(login, password, domainName);
 	}
 
 	public boolean deleteSubdomain(RR record, String domainName) {
-		FormBody.Builder data = basicBody(domainName)
-				.add("subdomain", record.domain())
-				.add("content", record.ip())
-				.add("record_type", "A");
-		Request request = new Request.Builder()
-				.post(data.build())
-				.url(baseUrl + "/zone/remove_record")
-				.build();
-		Call call = client.newCall(request);
 		try {
-			Response response = call.execute();
-			if (response.code() == 200) {
-				String text = readBody(response);
-				return responseReader.isDomainAddingOrDeletingSuccess(text);
-			} else {
-				log.error("http error - 'deleteSubdomain' response code - {}, body - {}",
-						response.code(), readBody(response));
-				return false;
-			}
-		} catch (IOException e) {
-			log.error("http error - 'deleteSubdomain'", e);
+			Delete delete = mapper.delete(record, basic(domainName));
+			return client.deleteSubdomain(delete).isResultSuccess();
+		} catch (Exception e) {
 			return false;
 		}
 	}
 
 	public boolean addSubdomain(RR record, String domainName) {
-		FormBody.Builder data = basicBody(domainName)
-				.add("subdomain", record.domain())
-				.add("ipaddr", record.ip());
-		Request request = new Request.Builder()
-				.post(data.build())
-				.url(baseUrl + "/zone/add_alias")
-				.build();
-		Call call = client.newCall(request);
 		try {
-			Response response = call.execute();
-			if (response.code() == 200) {
-				String text = readBody(response);
-				return responseReader.isDomainAddingOrDeletingSuccess(text);
-			} else {
-				log.error("http error - 'addSubdomain' response code - {}, body - {}",
-						response.code(), readBody(response));
-				return false;
-			}
-		} catch (IOException e) {
-			log.error("http error - 'addSubdomain'", e);
+			Add add = mapper.add(record, basic(domainName));
+			return client.addSubdomain(add).isResultSuccess();
+		} catch (Exception e) {
 			return false;
 		}
 	}
 
 	public List<RR> getSubdomainsList(String domainName) {
-		Request request = new Request.Builder()
-				.post(basicBody(domainName).build())
-				.url(baseUrl + "/zone/get_resource_records")
-				.build();
-		Call call = client.newCall(request);
-		try {
-			Response response = call.execute();
-			if (response.code() == 200) {
-				String text = readBody(response);
-				return responseReader.readDomainsList(text);
-			} else {
-				log.error("http error - 'get subdomains list' response code - {}, body - {}",
-						response.code(), readBody(response));
-				return List.of();
-			}
-		} catch (IOException e) {
-			log.error("http error - 'get subdomains list'", e);
-			return List.of();
+		DomainsList domainsList = client.subdomains(basic(domainName));
+		return extractList(domainsList);
+	}
+
+	private List<RR> extractList(DomainsList domainsList) {
+		if (domainsList.isResultSuccess()) {
+			return domainsList.getList()
+					.stream()
+					.filter(rrDto -> rrDto.rectype.equals("A"))
+					.map(rrDto -> new RR(rrDto.content, rrDto.subname))
+					.toList();
 		}
+
+		return List.of();
 	}
 }
