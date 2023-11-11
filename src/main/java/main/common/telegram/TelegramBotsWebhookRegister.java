@@ -2,7 +2,6 @@ package main.common.telegram;
 
 import feign.Feign;
 import feign.Headers;
-import feign.Param;
 import feign.RequestLine;
 import feign.form.FormEncoder;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,17 +39,23 @@ public class TelegramBotsWebhookRegister implements InitializingBean {
 				String secret = UUID.randomUUID().toString();
 
 				Map<String, ?> params = params(getAppBaseUrl() + bot.getNickname(), secret, true);
-				client.register(bot.getToken(), params);
+				client.register(uri(bot), params);
 
 				repo.saveSecret(bot.getNickname(), secret);
+
+				log.info("bot {} webhook registered", bot.getNickname());
 			}
 		}
 	}
 
+	private URI uri(BotConfig bot) {
+		return URI.create(BASE_URL + bot.getToken() + "/setWebhook");
+	}
+
 	interface TelegramApiHttp {
-		@RequestLine("POST /bot{token}/setWebhook")
+		@RequestLine("POST")
 		@Headers("Content-Type: application/x-www-form-urlencoded")
-		void register(@Param("token") String token, Map<String, ?> params);
+		void register(URI uri, Map<String, ?> params);
 	}
 
 	private Map<String, ?> params(String url, String secretToken, boolean dropPendingUpdates) {
