@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @Slf4j
 @RestController
 @RequestMapping("/telegram")
@@ -35,15 +37,10 @@ public class TelegramController {
 			String nickname = bot.getBotUsername();
 
 			if (nickname.equals(requestPath)) {
-				log.debug("request will be processed by the {} handler", nickname);
+				validSecret(request, requestPath);
 
-				if (validSecret(request, requestPath)) {
-					bot.onWebhookUpdateReceived(update);
-				} else {
-					log.info("invalid or not found secret in request for bot {}", nickname);
-				}
-
-				return ResponseEntity.ok().build();
+				BotApiMethod<?> r = bot.onWebhookUpdateReceived(update);
+				return ResponseEntity.ok(r);
 			}
 		}
 
@@ -51,24 +48,23 @@ public class TelegramController {
 		return ResponseEntity.notFound().build();
 	}
 
-	private boolean validSecret(HttpServletRequest request, String nickname) {
+	private void validSecret(HttpServletRequest request, String nickname) {
 		try {
 			String secret = getSecret(request);
 			String botStoredSecret = secrets.get(nickname);
 
-			if (botStoredSecret == null) throw new TelegramSecretNotStoredException();
-			if (!secret.equals(botStoredSecret)) throw new InvalidTelegramSecretException();
-
-			return true;
+			if (botStoredSecret == null) {
+				log.error("failed validate telegram secret - secret not stored for bot {}", nickname);
+				throw new TelegramErrorException();
+			}
+			if (!secret.equals(botStoredSecret)) {
+				log.error("telegram request to {} with invalid secret, skipped", nickname);
+				throw new TelegramErrorException();
+			}
 		} catch (TelegramSecretNotFoundException e) {
 			log.error("telegram request to {} without secret, skipped", nickname);
-		} catch (TelegramSecretNotStoredException e) {
-			log.error("failed validate telegram secret - secret not stored for bot {}", nickname);
-		} catch (InvalidTelegramSecretException e) {
-			log.error("telegram request to {} with invalid secret, skipped", nickname);
+			throw new TelegramErrorException();
 		}
-
-		return false;
 	}
 
 	private String getSecret(HttpServletRequest request) {
@@ -80,7 +76,7 @@ public class TelegramController {
 			throw new TelegramSecretNotFoundException();
 	}
 
+	@ResponseStatus(NOT_FOUND)
+	public static class TelegramErrorException extends RuntimeException {}
 	public static class TelegramSecretNotFoundException extends RuntimeException {}
-	public static class TelegramSecretNotStoredException extends RuntimeException {}
-	public static class InvalidTelegramSecretException extends RuntimeException {}
 }
