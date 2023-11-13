@@ -1,6 +1,5 @@
 package main;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -24,7 +23,6 @@ public class Main {
 	}
 
 	public static class CustomGenerator extends AnnotationBeanNameGenerator {
-		@NotNull
 		@Override
 		public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
 			String beanClassName = null;
