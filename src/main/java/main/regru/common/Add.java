@@ -1,8 +1,11 @@
 package main.regru.common;
 
+import lombok.Getter;
+
+@Getter
 public class Add extends Basic {
-	public final String subdomain;
-	public final String ipaddr;
+	private String subdomain;
+	private String ipaddr;
 
 	public Add(String username, String password, String domain_name,
 			   String subdomain, String ipaddr) {

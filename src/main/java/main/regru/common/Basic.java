@@ -1,9 +1,12 @@
 package main.regru.common;
 
+import lombok.Getter;
+
+@Getter
 public class Basic {
-	public final String username;
-	public final String password;
-	public final String domain_name;
+	private String username;
+	private String password;
+	private String domain_name;
 
 	public Basic(String username, String password, String domain_name) {
 		this.username = username;
