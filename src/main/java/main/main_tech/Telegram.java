@@ -4,16 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import main.common.telegram.Command;
 import main.common.telegram.CustomSpringWebhookBot;
-import main.common.telegram.Message;
 import main.main_tech.inventory.InventoryService;
 import main.main_tech.inventory.NamingService;
 import main.main_tech.monitoring.MonitoringService;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.wg.WgService;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
@@ -56,28 +57,28 @@ public class Telegram extends CustomSpringWebhookBot {
 	private final InventoryService inventoryService;
 	private final NamingService naming;
 	private final MonitoringService monitoring;
-	private Message message1;
-	private Message message2;
+	private Optional<Message> message1;
+	private Optional<Message> message2;
 
 	public void sendAlarm1(String link) {
-		message1 = sendWithOutPreview("Го!\n" + link);
+		message1 = Optional.of(sendWithOutPreview("Го!\n" + link));
 	}
 
 	public void deleteLastAlarmMessage1() {
-		if (message1.notEmpty()) {
-			deleteMessage(message1);
-			message1 = Message.empty();
+		if (message1.isPresent()) {
+			deleteMessage(message1.get());
+			message1 = Optional.empty();
 		}
 	}
 
 	public void sendAlarm2(String link) {
-		message2 = sendWithOutPreview("Го!\n" + link);
+		message2 = Optional.of(sendWithOutPreview("Го!\n" + link));
 	}
 
 	public void deleteLastAlarmMessage2() {
-		if (message2.notEmpty()) {
-			deleteMessage(message2);
-			message2 = Message.empty();
+		if (message2.isPresent()) {
+			deleteMessage(message2.get());
+			message2 = Optional.empty();
 		}
 	}
 

@@ -2,28 +2,15 @@ package main.common.telegram;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
-import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
-
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 
 import static main.common.telegram.TelegramPropsProvider.getAdminId;
 import static main.common.telegram.TelegramPropsProvider.getAppBaseUrl;
@@ -67,46 +54,32 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 	}
 
 	public void send(String text) {
-		send(getAdminId(), text);
+		send(msg(text));
 	}
 
 	public Message sendWithOutPreview(String text) {
 		return send(msg(text).disableWebPagePreview(true));
 	}
 
-	public void sendByUpdate(String text, Update update) {
-		send(update.getMessage().getChatId(), text);
-	}
-
-	public void send(long chatId, String text) {
-		send(msg(chatId, text));
-	}
-
 	private Message send(SendMessage message) {
 		try {
-			var execute = execute(message);
-			log.debug("{} - Sent message '{}'", this.getClass().getName(), message.getText());
-			return new Message(execute.getChatId(), execute.getMessageId());
+			return execute(message);
 		} catch (TelegramApiException e) {
 			log.error("{} - Error send message '{}'", this.getClass().getName(), message.getText(), e);
+			throw new RuntimeException(e);
 		}
-		return Message.empty();
 	}
 
-	public Message send(String text, ReplyKeyboard keyboard) {
-		return send(msg(text).replyMarkup(keyboard));
+	public void send(String text, ReplyKeyboard keyboard) {
+		send(msg(text).replyMarkup(keyboard));
 	}
 
 	public Message send(SendMessage.SendMessageBuilder sendMessageBuilder) {
 		return send(sendMessageBuilder.build());
 	}
 
-	public SendMessage.SendMessageBuilder msg(long chatId, String text) {
-		return SendMessage.builder().chatId(chatId).text(text);
-	}
-
 	public SendMessage.SendMessageBuilder msg(String text) {
-		return msg(getAdminId(), text);
+		return SendMessage.builder().chatId(getAdminId()).text(text);
 	}
 
 	public void deleteMessage(Update update) {
@@ -118,7 +91,7 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 	}
 
 	public void deleteMessage(Message message) {
-		deleteMessage(message.chatId(), message.messageId());
+		deleteMessage(message.getChatId(), message.getMessageId());
 	}
 
 	public void deleteMessage(long chatId, int messageId) {
