@@ -2,9 +2,12 @@ package main.habr;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import feign.Feign;
+import feign.Param;
+import feign.RequestLine;
 import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import lombok.extern.slf4j.Slf4j;
+import main.habr.rss.RssFeed;
 import main.habr.rss.RssMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,6 +29,14 @@ public class HabrClient {
 	private final RssMapper rssMapper = getMapper(RssMapper.class);
 	private HabrHttp client;
 	private final String baseUrl = "https://habr.com/ru";
+
+	public interface HabrHttp {
+		@RequestLine("GET /")
+		String pageContent(URI uri);
+
+		@RequestLine("GET /rss/{type}/?limit=100")
+		RssFeed rss(@Param("type") String type);
+	}
 
 	@PostConstruct
 	private void init() {
