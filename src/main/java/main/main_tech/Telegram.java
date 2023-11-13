@@ -10,11 +10,9 @@ import main.main_tech.monitoring.MonitoringService;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.wg.WgService;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class Telegram extends CustomSpringWebhookBot {
@@ -57,30 +55,6 @@ public class Telegram extends CustomSpringWebhookBot {
 	private final InventoryService inventoryService;
 	private final NamingService naming;
 	private final MonitoringService monitoring;
-	private Optional<Message> message1;
-	private Optional<Message> message2;
-
-	public void sendAlarm1(String link) {
-		message1 = Optional.of(sendWithOutPreview("Го!\n" + link));
-	}
-
-	public void deleteLastAlarmMessage1() {
-		if (message1.isPresent()) {
-			deleteMessage(message1.get());
-			message1 = Optional.empty();
-		}
-	}
-
-	public void sendAlarm2(String link) {
-		message2 = Optional.of(sendWithOutPreview("Го!\n" + link));
-	}
-
-	public void deleteLastAlarmMessage2() {
-		if (message2.isPresent()) {
-			deleteMessage(message2.get());
-			message2 = Optional.empty();
-		}
-	}
 
 	@Override
 	public void onWebhookUpdate(Update update) {

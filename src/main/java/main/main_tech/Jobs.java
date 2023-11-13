@@ -8,12 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static main.common.QuartzUtils.buildJob;
-
 @Component
 @RequiredArgsConstructor
 public class Jobs implements QuartzJobsList {
-	private final Telegram telegram;
+	private final TelegramSender telegram;
 
 	@Override
 	public List<Tuple2<JobDetail, Trigger>> getJobs() {
