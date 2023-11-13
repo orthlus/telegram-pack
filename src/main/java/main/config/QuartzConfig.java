@@ -1,7 +1,7 @@
 package main.config;
 
 import lombok.extern.slf4j.Slf4j;
-import main.common.QuartzJobsList;
+import main.common.QuartzJobs;
 import org.jooq.lambda.tuple.Tuple2;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
@@ -18,13 +18,13 @@ import static main.common.QuartzUtils.scheduleJob;
 @Configuration
 public class QuartzConfig {
 	@Bean
-	public Scheduler scheduler(SchedulerFactoryBean factory, List<QuartzJobsList> jobsClasses)
+	public Scheduler scheduler(SchedulerFactoryBean factory, List<QuartzJobs> jobsClasses)
 			throws SchedulerException {
 		Scheduler scheduler = factory.getScheduler();
 
 		Set<Tuple2<String, String>> outputData = new HashSet<>();
 
-		for (QuartzJobsList jobsClass : jobsClasses) {
+		for (QuartzJobs jobsClass : jobsClasses) {
 			for (Tuple2<JobDetail, Trigger> job : jobsClass.getJobs()) {
 				scheduleJob(scheduler, job);
 				outputData.add(new Tuple2<>(

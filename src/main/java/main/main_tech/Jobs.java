@@ -1,7 +1,7 @@
 package main.main_tech;
 
 import lombok.RequiredArgsConstructor;
-import main.common.QuartzJobsList;
+import main.common.QuartzJobs;
 import org.jooq.lambda.tuple.Tuple2;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class Jobs implements QuartzJobsList {
+public class Jobs implements QuartzJobs {
 	private final TelegramSender telegram;
 
 	@Override

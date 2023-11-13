@@ -3,7 +3,7 @@ package main.habr.quartz;
 import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.common.QuartzJobsList;
+import main.common.QuartzJobs;
 import main.habr.HabrClient;
 import main.habr.HabrRepo;
 import main.habr.Telegram;
@@ -20,7 +20,7 @@ import static main.common.QuartzUtils.buildJob;
 @Component
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
-public class ScanJob implements Job, QuartzJobsList {
+public class ScanJob implements Job, QuartzJobs {
 	private final HabrClient habrClient;
 	private final Telegram telegram;
 	private final HabrRepo repo;

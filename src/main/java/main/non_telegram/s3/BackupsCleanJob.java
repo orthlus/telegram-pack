@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import lombok.extern.slf4j.Slf4j;
 import main.Main;
-import main.common.QuartzJobsList;
+import main.common.QuartzJobs;
 import main.main_tech.S3Client;
 import org.jooq.lambda.tuple.Tuple2;
 import org.quartz.*;
@@ -24,7 +24,7 @@ import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
 @Slf4j
 @Component
 @DisallowConcurrentExecution
-public class BackupsCleanJob extends S3Client implements Job, QuartzJobsList {
+public class BackupsCleanJob extends S3Client implements Job, QuartzJobs {
 	@Value("${main_tech.backups.cleaner.id}")
 	private String id;
 	@Value("${main_tech.backups.cleaner.key}")

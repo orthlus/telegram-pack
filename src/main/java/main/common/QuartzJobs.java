@@ -6,6 +6,6 @@ import org.quartz.Trigger;
 
 import java.util.List;
 
-public interface QuartzJobsList {
+public interface QuartzJobs {
 	List<Tuple2<JobDetail, Trigger>> getJobs();
 }

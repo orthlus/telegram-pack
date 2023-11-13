@@ -2,7 +2,7 @@ package main.payments_reminders;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.common.QuartzJobsList;
+import main.common.QuartzJobs;
 import main.payments_reminders.entity.RemindToSend;
 import main.payments_reminders.reminds.Repo;
 import main.payments_reminders.telegram.TelegramSender;
@@ -18,7 +18,7 @@ import static main.common.QuartzUtils.buildJob;
 @Component
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
-public class HourlyRemindJob implements Job, QuartzJobsList {
+public class HourlyRemindJob implements Job, QuartzJobs {
 	private final TelegramSender telegram;
 	private final Repo repo;
 

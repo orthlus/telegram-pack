@@ -2,7 +2,7 @@ package main.non_telegram.git;
 
 
 import lombok.extern.slf4j.Slf4j;
-import main.common.QuartzJobsList;
+import main.common.QuartzJobs;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -35,7 +35,7 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 @Slf4j
 @Component
 @DisallowConcurrentExecution
-public class GitJob implements Job, QuartzJobsList {
+public class GitJob implements Job, QuartzJobs {
 	@Value("${app.git.login}")
 	private String login;
 	@Value("${app.git.password}")
