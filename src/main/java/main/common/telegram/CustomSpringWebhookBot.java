@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
 
@@ -57,33 +56,21 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 		send(msg(text));
 	}
 
-	public Message sendWithOutPreview(String text) {
-		return send(msg(text).disableWebPagePreview(true));
-	}
-
-	private Message send(SendMessage message) {
+	private void send(SendMessage message) {
 		try {
-			return execute(message);
+			execute(message);
 		} catch (TelegramApiException e) {
 			log.error("{} - Error send message '{}'", this.getClass().getName(), message.getText(), e);
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void send(String text, ReplyKeyboard keyboard) {
-		send(msg(text).replyMarkup(keyboard));
-	}
-
-	public Message send(SendMessage.SendMessageBuilder sendMessageBuilder) {
-		return send(sendMessageBuilder.build());
+	public void send(SendMessage.SendMessageBuilder sendMessageBuilder) {
+		send(sendMessageBuilder.build());
 	}
 
 	public SendMessage.SendMessageBuilder msg(String text) {
 		return SendMessage.builder().chatId(getAdminId()).text(text);
-	}
-
-	public void deleteMessage(Update update) {
-		deleteMessage(update.getMessage().getChatId(), update.getMessage().getMessageId());
 	}
 
 	public void deleteMessage(CallbackQuery callbackQuery) {
@@ -97,7 +84,6 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 	public void deleteMessage(long chatId, int messageId) {
 		try {
 			execute(new DeleteMessage(String.valueOf(chatId), messageId));
-			log.debug("{} - Deleted message, chat {} messageId {}", this.getClass().getName(), chatId, messageId);
 		} catch (TelegramApiException e) {
 			log.error("{} - Error delete message, chat {} messageId {}", this.getClass().getName(), chatId, messageId, e);
 		}

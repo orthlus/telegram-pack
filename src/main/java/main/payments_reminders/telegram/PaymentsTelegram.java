@@ -5,14 +5,13 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.Command;
 import main.common.telegram.CustomSpringWebhookBot;
+import main.payments_reminders.UserState;
 import main.payments_reminders.entity.Remind;
-import main.payments_reminders.entity.RemindToSend;
 import main.payments_reminders.entity.RemindWithoutId;
 import main.payments_reminders.reminds.RemindsService;
 import main.payments_reminders.reminds.Repo;
 import main.payments_reminders.telegram.callback.CallbackDataMapper;
 import main.payments_reminders.telegram.callback.CallbackType;
-import main.payments_reminders.UserState;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -30,17 +29,14 @@ import static main.payments_reminders.UserState.*;
 @Component
 public class PaymentsTelegram extends CustomSpringWebhookBot {
 	public PaymentsTelegram(PaymentsBotConfig botConfig,
-							KeyboardsProvider keyboards,
 							RemindsService remindsService,
 							CallbackDataMapper mapper, Repo repo) {
 		super(botConfig);
-		this.keyboards = keyboards;
 		this.remindsService = remindsService;
 		this.mapper = mapper;
 		this.repo = repo;
 	}
 
-	private final KeyboardsProvider keyboards;
 	private final RemindsService remindsService;
 	private final CallbackDataMapper mapper;
 	private final Repo repo;
@@ -57,11 +53,6 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 	}
 
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
-
-	public void sendRemind(RemindToSend remind) {
-		String msg = remind.getName();
-		send(msg, keyboards.getRemindButtons(remind));
-	}
 
 	@Override
 	public void onWebhookUpdate(Update update) {

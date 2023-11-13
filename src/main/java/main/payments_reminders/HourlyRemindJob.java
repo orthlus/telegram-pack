@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import main.common.QuartzJobsList;
 import main.payments_reminders.entity.RemindToSend;
 import main.payments_reminders.reminds.Repo;
-import main.payments_reminders.telegram.PaymentsTelegram;
+import main.payments_reminders.telegram.TelegramSender;
 import org.jooq.lambda.tuple.Tuple2;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import static main.common.QuartzUtils.buildJob;
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
 public class HourlyRemindJob implements Job, QuartzJobsList {
-	private final PaymentsTelegram telegram;
+	private final TelegramSender telegram;
 	private final Repo repo;
 
 	private void remind() {
