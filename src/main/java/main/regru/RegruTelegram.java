@@ -4,6 +4,8 @@ import main.common.telegram.BotConfig;
 import main.common.telegram.CustomSpringWebhookBot;
 import main.regru.common.ChatState;
 import main.regru.common.RR;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Comparator;
@@ -26,28 +28,29 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 		this.domainName = domainName;
 	}
 
-	public void onWebhookUpdate(Update update) {
-		if (!update.hasMessage()) return;
-		if (!update.getMessage().hasText()) return;
+	public BotApiMethod<?> onWebhookUpdate(Update update) {
+		if (!update.hasMessage()) return null;
+		if (!update.getMessage().hasText()) return null;
 
 		if (update.getMessage().getText().startsWith("/")) {
-			handleCommand(update);
+			return handleCommand(update);
 		} else {
-			handleText(update);
+			return handleText(update);
 		}
 	}
 
-	private void handleText(Update update) {
+	private BotApiMethod<?> handleText(Update update) {
+		SendMessage result = null;
 		String text = update.getMessage().getText();
 		switch (chatState.currentState.get()) {
-			case NOTHING_WAIT -> send("работает");
+			case NOTHING_WAIT -> result = send("работает");
 			case WAIT_IP_TO_ADD -> {
 				if (isValidIp(text)) {
 					chatState.currentState.set(WAIT_DOMAIN_NAME_TO_ADD);
 					chatState.addValue(WAIT_IP_TO_ADD, text);
-					send("domain:");
+					result = send("domain:");
 				} else {
-					send("invalid, try again\nip:");
+					result = send("invalid, try again\nip:");
 				}
 			}
 			case WAIT_DOMAIN_NAME_TO_ADD -> {
@@ -56,22 +59,21 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 					boolean add = regRuService.addSubdomain(rr, domainName);
 					if (add) {
 						chatState.currentState.set(NOTHING_WAIT);
-						send("::ok::\n/list");
-						sendList();
+						result = send("::ok::\n/list");
 					} else {
-						send("error :( need logs");
+						result = send("error :( need logs");
 					}
 				} else {
-					send("invalid, try again\ndomain:");
+					result = send("invalid, try again\ndomain:");
 				}
 			}
 			case WAIT_IP_TO_DELETE -> {
 				if (isValidIp(text)) {
 					chatState.currentState.set(WAIT_DOMAIN_NAME_TO_DELETE);
 					chatState.addValue(WAIT_IP_TO_DELETE, text);
-					send("domain:");
+					result = send("domain:");
 				} else {
-					send("invalid, try again\nip:");
+					result = send("invalid, try again\nip:");
 				}
 			}
 			case WAIT_DOMAIN_NAME_TO_DELETE -> {
@@ -80,36 +82,41 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 					boolean delete = regRuService.deleteSubdomain(rr, domainName);
 					if (delete) {
 						chatState.currentState.set(NOTHING_WAIT);
-						send("::ok::\n/list");
-						sendList();
+						result = send("::ok::\n/list");
 					} else {
-						send("error :( need logs");
+						result = send("error :( need logs");
 					}
 				} else {
-					send("invalid, try again\ndomain:");
+					result = send("invalid, try again\ndomain:");
 				}
 			}
 		}
+		return result;
 	}
 
-	private void handleCommand(Update update) {
+	private BotApiMethod<?> handleCommand(Update update) {
 		String text = update.getMessage().getText();
 		switch (text) {
-			case "/start" -> send("Тут можно управлять поддоменами домена " + domainName);
-			case "/list" -> sendList();
+			case "/start" -> {
+				return send("Тут можно управлять поддоменами домена " + domainName);
+			}
+			case "/list" -> {
+				return sendList();
+			}
 			case "/add" -> {
-				send("ip:");
 				chatState.currentState.set(WAIT_IP_TO_ADD);
+				return send("ip:");
 			}
 			case "/delete" -> {
-				send("ip:");
 				chatState.currentState.set(WAIT_IP_TO_DELETE);
+				return send("ip:");
 			}
 			case "/cancel" -> {
-				send("canceled");
 				chatState.currentState.set(NOTHING_WAIT);
+				return send("canceled");
 			}
 		}
+		return null;
 	}
 
 	private boolean isValidDomain(String domainStr) {
@@ -120,7 +127,7 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 		return isInetAddress(ipStr);
 	}
 
-	private void sendList() {
+	private SendMessage sendList() {
 		StringBuilder msgContent = new StringBuilder("Список поддоменов и адресов домена %s:\n".formatted(domainName));
 		regRuService.getSubdomainsList(domainName)
 				.stream()
@@ -132,6 +139,6 @@ public class RegruTelegram extends CustomSpringWebhookBot {
 					msgContent.append("\n");
 				});
 		msgContent.deleteCharAt(msgContent.length() - 1);
-		send(msgContent.toString());
+		return send(msgContent.toString());
 	}
 }

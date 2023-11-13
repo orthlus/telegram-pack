@@ -10,6 +10,8 @@ import main.main_tech.monitoring.MonitoringService;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.wg.WgService;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
@@ -57,55 +59,58 @@ public class Telegram extends CustomSpringWebhookBot {
 	private final MonitoringService monitoring;
 
 	@Override
-	public void onWebhookUpdate(Update update) {
+	public BotApiMethod<?> onWebhookUpdate(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
 			if (commandsMap.containsKey(messageText)) {
-				handleCommand(messageText);
+				return handleCommand(messageText);
 			} else {
-				handleText(messageText);
+				return handleText();
 			}
 		}
+		return null;
 	}
 
-	private void handleText(String messageText) {
-		send("работает. команды:\n" + String.join("\n", commandsMap.keySet()));
+	private BotApiMethod<?> handleText() {
+		return send("работает. команды:\n" + String.join("\n", commandsMap.keySet()));
 	}
 
-	private void handleCommand(String messageText) {
+	private BotApiMethod<?> handleCommand(String messageText) {
+		SendMessage result = null;
 		switch (commandsMap.get(messageText)) {
 			case UPDATE_MONITORING_FROM_DB -> {
 				monitoring.updateMonitoringDataFromDb();
-				send("Ok");
+				result = send("Ok");
 			}
 			case SERVERS -> {
 				String text = naming.formatDomains(inventoryService.getServers());
-				send(msg(text).parseMode("html"));
+				result = send(msg(text).parseMode("html"));
 			}
 			case UPDATE_SERVERS_FROM_RUVDS -> {
 				inventoryService.updateServersFromRuvds(ruvdsApi.getServers());
-				send("Ok");
+				result = send("Ok");
 			}
 			case RUVDS_SERVERS -> {
 				String text = naming.formatDomainsRuvds(ruvdsApi.getServers());
-				send(msg(text).parseMode("html"));
+				result = send(msg(text).parseMode("html"));
 			}
 			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 			case WG_STAT_DIFF -> {
 				String text = wg.getPrettyDiff();
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 				wg.saveCurrentItems();
 			}
 			case WG_UPDATE_USERS -> {
 				wg.updateUsers();
-				send("Ok");
+				result = send("Ok");
 			}
-			case GET_CODE -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
-			case GET_NEW_HOST -> send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
+			case GET_CODE -> result = send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
+			case GET_NEW_HOST -> result = send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
 		}
+		return result;
 	}
 }

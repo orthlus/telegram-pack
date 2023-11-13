@@ -14,6 +14,7 @@ import main.payments_reminders.telegram.callback.CallbackDataMapper;
 import main.payments_reminders.telegram.callback.CallbackType;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -55,27 +56,27 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	@Override
-	public void onWebhookUpdate(Update update) {
+	public BotApiMethod<?> onWebhookUpdate(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
 			if (commandsMap.containsKey(messageText)) {
-				handleCommand(messageText);
+				return handleCommand(messageText);
 			} else {
-				handleText(messageText);
+				return handleText(messageText);
 			}
 		} else if (update.hasCallbackQuery()) {
-			handleCallback(update);
+			return handleCallback(update);
 		}
+		return null;
 	}
 
-	private void handleCallback(Update update) {
+	private BotApiMethod<?> handleCallback(Update update) {
 		CallbackQuery callbackQuery = update.getCallbackQuery();
 
 		Optional<CallbackType> valueOp = mapper.getTypeFromQuery(callbackQuery);
 		if (valueOp.isEmpty()) {
-			send("Что-то пошло не так, попробуйте заново (неизвестный callback)");
-			return;
+			return send("Что-то пошло не так, попробуйте заново (неизвестный callback)");
 		}
 
 		switch (valueOp.get()) {
@@ -85,40 +86,40 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 					Tuple2<Remind, Integer> t = tupleOp.get();
 					try {
 						remindsService.addHoldOnRemind(t.v1, t.v2);
-						deleteMessage(callbackQuery);
+						return send("Ок");
 					} catch (RuntimeException e) {
-						send("Что-то пошло не так, попробуйте заново");
+						return send("Что-то пошло не так, попробуйте заново");
 					}
 				} else {
-					send("Что-то пошло не так, попробуйте заново");
+					return send("Что-то пошло не так, попробуйте заново");
 				}
 			}
 			case SUBMIT_PAYMENT -> {
 				Optional<Remind> remindOp = mapper.getRemindFromCallback(callbackQuery);
 				if (remindOp.isEmpty())
-					send("Что-то пошло не так, попробуйте заново");
+					return send("Что-то пошло не так, попробуйте заново");
 				else {
 					remindsService.submitRemind(remindOp.get());
-					deleteMessage(callbackQuery);
-					send("%s - завершено".formatted(remindOp.get().getName()));
+					return send("%s - завершено".formatted(remindOp.get().getName()));
 				}
 			}
 		}
+		return null;
 	}
 
-	private void handleText(String messageText) {
+	private BotApiMethod<?> handleText(String messageText) {
 		switch (state.get()) {
-			case NOTHING_WAIT -> send("Используйте команды: \n" + String.join("\n", commandsMap.keySet()));
+			case NOTHING_WAIT -> {
+				return send("Используйте команды: \n" + String.join("\n", commandsMap.keySet()));
+			}
 			case WAIT_NEW_REMIND_DATA -> {
 				try {
 					RemindWithoutId remind = remindsService.parseNewRemind(messageText);
 					repo.addRemind(remind);
-					send("Ок: \n%s\n/list".formatted(remind));
-					handleCommand("/list");
 					state.set(NOTHING_WAIT);
+					return send("Ок: \n%s\n/list".formatted(remind));
 				} catch (RuntimeException e) {
-					send("Что-то пошло не так, попробуйте заново. \n(дата от 1 до 31, час от 0 до 23)");
-					handleCommand("/new_remind");
+					return send("Что-то пошло не так, попробуйте заново. \n(дата от 1 до 31, час от 0 до 23)\n/new_remind");
 				}
 			}
 			case WAIT_DELETE_REMIND_ID -> {
@@ -126,21 +127,21 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 					long id = parseLong(messageText.trim());
 					repo.deleteRemind(id);
 					state.set(NOTHING_WAIT);
-					send("Ок\n/list");
-					handleCommand("/list");
+					return send("Ок\n/list");
 				} catch (Exception e) {
 					log.error("Error delete remind", e);
-					send("error");
+					return send("error");
 				}
 			}
 		}
+		return null;
 	}
 
-	private void handleCommand(String messageText) {
+	private BotApiMethod<?> handleCommand(String messageText) {
 		switch (messageText) {
 			case "/start" -> {
 				state.set(NOTHING_WAIT);
-				send("""
+				return send("""
 						Привет! В этого бота можно записать
 						даты оплаты счетов или передачи показаний счётчиков,
 						и бот напомнит о них в нужные дни.
@@ -152,11 +153,11 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 						.stream()
 						.map(Remind::toString)
 						.collect(Collectors.joining("\n"));
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				return send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 			case "/new_remind" -> {
 				state.set(WAIT_NEW_REMIND_DATA);
-				send("""
+				return send("""
 						Новое напоминание:
 						
 						имя
@@ -167,8 +168,9 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 			}
 			case "/delete_remind" -> {
 				state.set(WAIT_DELETE_REMIND_ID);
-				send("id для удаления платежа:");
+				return send("id для удаления платежа:");
 			}
 		}
+		return null;
 	}
 }

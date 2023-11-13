@@ -8,6 +8,8 @@ import main.common.telegram.CustomSpringWebhookBot;
 import main.debts.entity.Expense;
 import main.debts.entity.Income;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.LocalDate;
@@ -54,31 +56,32 @@ public class Telegram extends CustomSpringWebhookBot {
 	}
 
 	@Override
-	public void onWebhookUpdate(Update update) {
+	public BotApiMethod<?> onWebhookUpdate(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
 			if (commandsMap.containsKey(messageText)) {
-				handleCommand(messageText);
+				return handleCommand(messageText);
 			} else {
-				handleText(messageText);
+				return handleText(messageText);
 			}
 		}
+		return null;
 	}
 
-	private void handleText(String messageText) {
+	private BotApiMethod<?> handleText(String messageText) {
+		SendMessage result = null;
 		switch (state.get()) {
-			case NOTHING_WAIT -> send("Неожиданно!");
+			case NOTHING_WAIT -> result = send("Неожиданно!");
 			case WAIT_NEW_INCOME -> {
 				try {
 					IncomeDto data = parseIncome(messageText);
 					repo.addIncome(data.amount, data.day);
 					state.set(NOTHING_WAIT);
-					send("Ок\n/incomes");
-					handleCommand("/incomes");
+					result = send("Ок\n/incomes");
 				} catch (Exception e) {
 					log.error("error new income", e);
-					send("Еще раз");
+					result = send("Еще раз");
 				}
 			}
 			case WAIT_NEW_EXPENSE -> {
@@ -86,11 +89,10 @@ public class Telegram extends CustomSpringWebhookBot {
 					ExpenseDto data = parseExpense(messageText);
 					repo.addExpense(data.name, data.amount, data.day, data.expire);
 					state.set(NOTHING_WAIT);
-					send("Ок\n/expenses");
-					handleCommand("/expenses");
+					result = send("Ок\n/expenses");
 				} catch (Exception e) {
 					log.error("error new expense", e);
-					send("Еще раз");
+					result = send("Еще раз");
 				}
 			}
 			case WAIT_DELETE_INCOME_ID -> {
@@ -98,11 +100,10 @@ public class Telegram extends CustomSpringWebhookBot {
 					int id = parseInt(messageText.trim());
 					repo.deleteIncome(id);
 					state.set(NOTHING_WAIT);
-					send("Ок\n/incomes");
-					handleCommand("/incomes");
+					result = send("Ок\n/incomes");
 				} catch (Exception e) {
 					log.error("Error delete income", e);
-					send("error");
+					result = send("error");
 				}
 			}
 			case WAIT_DELETE_EXPENSE_ID -> {
@@ -110,11 +111,10 @@ public class Telegram extends CustomSpringWebhookBot {
 					int id = parseInt(messageText.trim());
 					repo.deleteExpense(id);
 					state.set(NOTHING_WAIT);
-					send("Ок\n/expenses");
-					handleCommand("/expenses");
+					result = send("Ок\n/expenses");
 				} catch (Exception e) {
 					log.error("Error delete expense", e);
-					send("error");
+					result = send("error");
 				}
 			}
 			case EXPENSES_FOR_DATE_WAIT_DATE_VALUE -> {
@@ -122,13 +122,14 @@ public class Telegram extends CustomSpringWebhookBot {
 					Set<Expense> expenses = repo.getExpenses(parseDate(messageText));
 					String text = calculateExpenses(expenses);
 					state.set(NOTHING_WAIT);
-					send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+					result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 				} catch (Exception e) {
 					log.error("error EXPENSES_FOR_DATE", e);
-					send("Еще раз");
+					result = send("Еще раз");
 				}
 			}
 		}
+		return result;
 	}
 
 	record ExpenseDto(String name, int amount, int day, LocalDate expire){}
@@ -169,23 +170,24 @@ public class Telegram extends CustomSpringWebhookBot {
 		return new IncomeDto(amount, day);
 	}
 
-	private void handleCommand(String messageText) {
+	private BotApiMethod<?> handleCommand(String messageText) {
+		SendMessage result = null;
 		switch (commandsMap.get(messageText)) {
 			case START -> {
 				state.set(NOTHING_WAIT);
-				send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
+				result = send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
 			}
 			case ADD_INCOME -> {
 				state.set(WAIT_NEW_INCOME);
-				send("Новый доход: сумма и день месяца\n\n1000 25");
+				result = send("Новый доход: сумма и день месяца\n\n1000 25");
 			}
 			case DELETE_INCOME -> {
 				state.set(WAIT_DELETE_INCOME_ID);
-				send("id для удаления дохода:");
+				result = send("id для удаления дохода:");
 			}
 			case ADD_EXPENSE -> {
 				state.set(WAIT_NEW_EXPENSE);
-				send("""
+				result = send("""
 						Новый расход:
 						
 						название
@@ -195,7 +197,7 @@ public class Telegram extends CustomSpringWebhookBot {
 			}
 			case DELETE_EXPENSE -> {
 				state.set(WAIT_DELETE_EXPENSE_ID);
-				send("id для удаления расхода:");
+				result = send("id для удаления расхода:");
 			}
 			case INCOMES -> {
 				Set<Income> incomes = repo.getIncomes();
@@ -207,18 +209,19 @@ public class Telegram extends CustomSpringWebhookBot {
 						.map(Income::toString)
 						.collect(joining("\n"));
 				String text = "%s\n==========\nИтого: %d".formatted(list, sum);
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 			case EXPENSES -> {
 				Set<Expense> expenses = repo.getExpenses();
 				String text = calculateExpenses(expenses);
-				send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 			}
 			case EXPENSES_FOR_DATE -> {
 				state.set(EXPENSES_FOR_DATE_WAIT_DATE_VALUE);
-				send("на какую дату?\n" + String.join(" / ", dateParsePatterns));
+				result = send("на какую дату?\n" + String.join(" / ", dateParsePatterns));
 			}
 		}
+		return result;
 	}
 
 	private String calculateExpenses(Set<Expense> expenses) {

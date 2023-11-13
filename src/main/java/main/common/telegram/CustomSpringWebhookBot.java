@@ -4,11 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
 
 import static main.common.telegram.TelegramPropsProvider.getAdminId;
@@ -23,14 +19,13 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 		this.botConfig = botConfig;
 	}
 
-	public abstract void onWebhookUpdate(Update update);
+	public abstract BotApiMethod<?> onWebhookUpdate(Update update);
 
 	@Override
 	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 		if (!isAdmin(update)) return null;
 
-		onWebhookUpdate(update);
-		return null;
+		return onWebhookUpdate(update);
 	}
 
 	@Override
@@ -52,40 +47,15 @@ public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
 			return false;
 	}
 
-	public void send(String text) {
-		send(msg(text));
+	public SendMessage send(String text) {
+		return send(msg(text));
 	}
 
-	private void send(SendMessage message) {
-		try {
-			execute(message);
-		} catch (TelegramApiException e) {
-			log.error("{} - Error send message '{}'", this.getClass().getName(), message.getText(), e);
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void send(SendMessage.SendMessageBuilder sendMessageBuilder) {
-		send(sendMessageBuilder.build());
+	public SendMessage send(SendMessage.SendMessageBuilder sendMessageBuilder) {
+		return sendMessageBuilder.build();
 	}
 
 	public SendMessage.SendMessageBuilder msg(String text) {
 		return SendMessage.builder().chatId(getAdminId()).text(text);
-	}
-
-	public void deleteMessage(CallbackQuery callbackQuery) {
-		deleteMessage(callbackQuery.getMessage().getChatId(), callbackQuery.getMessage().getMessageId());
-	}
-
-	public void deleteMessage(Message message) {
-		deleteMessage(message.getChatId(), message.getMessageId());
-	}
-
-	public void deleteMessage(long chatId, int messageId) {
-		try {
-			execute(new DeleteMessage(String.valueOf(chatId), messageId));
-		} catch (TelegramApiException e) {
-			log.error("{} - Error delete message, chat {} messageId {}", this.getClass().getName(), chatId, messageId, e);
-		}
 	}
 }
