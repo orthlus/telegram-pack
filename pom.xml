@@ -13,7 +13,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring.boot.starter.version>2.7.13</spring.boot.starter.version>
+        <spring.boot.starter.version>3.1.5</spring.boot.starter.version>
         <telegrambots.version>6.7.0</telegrambots.version>
         <jackson.version>2.15.2</jackson.version>
         <jooq.version>3.17.6</jooq.version>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>1.4.11</version>
         </dependency>
 
         <dependency>

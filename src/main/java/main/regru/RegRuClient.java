@@ -13,7 +13,7 @@ import main.regru.common.dto.DomainsList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 
 import static org.mapstruct.factory.Mappers.getMapper;

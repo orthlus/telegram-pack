@@ -12,7 +12,7 @@ import main.habr.rss.RssMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
