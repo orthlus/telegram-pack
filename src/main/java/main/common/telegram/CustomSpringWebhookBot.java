@@ -1,21 +1,20 @@
 package main.common.telegram;
 
 import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.starter.SpringWebhookBot;
 
 import static main.common.telegram.TelegramPropsProvider.getAdminId;
 import static main.common.telegram.TelegramPropsProvider.getAppBaseUrl;
 
 @Slf4j
-public abstract class CustomSpringWebhookBot extends SpringWebhookBot {
+public abstract class CustomSpringWebhookBot extends TelegramWebhookBot {
 	private final BotConfig botConfig;
 
 	public CustomSpringWebhookBot(BotConfig botConfig) {
-		super(new SetWebhook(getAppBaseUrl() + botConfig.getNickname()), botConfig.getToken());
+		super(botConfig.getToken());
 		this.botConfig = botConfig;
 	}
 
