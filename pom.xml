@@ -154,7 +154,6 @@
     </dependencies>
 
     <build>
-        <finalName>aelaort-telegram-pack</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -177,7 +176,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -202,7 +201,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
 
             <plugin>
                 <groupId>org.flywaydb</groupId>
@@ -210,16 +209,19 @@
                 <version>9.16.3</version>
             </plugin>
 
-            <!--<plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.starter.version}</version>
                 <executions>
                     <execution>
-                        <goals><goal>repackage</goal></goals>
+                        <goals><goal>build-image-no-fork</goal></goals>
                     </execution>
                 </executions>
-            </plugin>-->
+                <configuration>
+                    <imageName>aelaort-telegram-pack</imageName>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.jooq</groupId>
