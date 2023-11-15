@@ -6,14 +6,13 @@
 
     <groupId>art.aelaort</groupId>
     <artifactId>aelaort-telegram-pack</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>latest</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring.boot.starter.version>3.1.5</spring.boot.starter.version>
         <telegrambots.version>6.7.0</telegrambots.version>
         <jackson.version>2.15.2</jackson.version>
         <jooq.version>3.17.6</jooq.version>
@@ -188,7 +187,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.starter.version}</version>
                 <executions>
                     <execution>
                         <goals><goal>build-image-no-fork</goal></goals>
