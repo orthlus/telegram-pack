@@ -197,6 +197,14 @@
                 </configuration>
             </plugin>
 
+            <!--<plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <configuration>
+                    <imageName>aelaort-telegram-pack</imageName>
+                </configuration>
+            </plugin>-->
+
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
