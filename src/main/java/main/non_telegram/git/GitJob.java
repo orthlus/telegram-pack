@@ -1,23 +1,21 @@
 package main.non_telegram.git;
 
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import main.common.QuartzJobs;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.jooq.lambda.tuple.Tuple2;
-import org.quartz.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.*;
@@ -29,13 +27,11 @@ import static java.util.Locale.ENGLISH;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static main.Main.zone;
-import static main.common.QuartzUtils.buildJob;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 
 @Slf4j
 @Component
-@DisallowConcurrentExecution
-public class GitJob implements Job, QuartzJobs {
+public class GitJob {
 	@Value("${app.git.login}")
 	private String login;
 	@Value("${app.git.password}")
@@ -49,23 +45,9 @@ public class GitJob implements Job, QuartzJobs {
 		createDirectory(Path.of(gitLocalPath));
 	}
 
-	@Override
-	public List<Tuple2<JobDetail, Trigger>> getJobs() {
-		return List.of(
-				buildJob(GitJob.class, "0 0 4 * * ?")
-		);
-	}
-
-	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		try {
-			execute();
-		} catch (GitAPIException | IOException | NoSuchElementException | InterruptedException e) {
-			log.error("Error git job", e);
-		}
-	}
-
-	private void execute() throws GitAPIException, IOException, InterruptedException {
+	@Scheduled(cron = "0 0 4 * * ?")
+	@Retryable(backoff = @Backoff(delay = 60000))
+	public void execute() throws GitAPIException, IOException, InterruptedException {
 		CredentialsProvider cred = creds();
 
 		Path repoLocalPath = Path.of(gitLocalPath);

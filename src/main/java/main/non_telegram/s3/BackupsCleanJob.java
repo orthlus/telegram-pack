@@ -5,26 +5,20 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import lombok.extern.slf4j.Slf4j;
 import main.Main;
-import main.common.QuartzJobs;
 import main.main_tech.S3Client;
-import org.jooq.lambda.tuple.Tuple2;
-import org.quartz.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static main.common.QuartzUtils.buildJob;
-import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
 
 @Slf4j
 @Component
-@DisallowConcurrentExecution
-public class BackupsCleanJob extends S3Client implements Job, QuartzJobs {
+public class BackupsCleanJob extends S3Client {
 	@Value("${main_tech.backups.cleaner.id}")
 	private String id;
 	@Value("${main_tech.backups.cleaner.key}")
@@ -42,8 +36,8 @@ public class BackupsCleanJob extends S3Client implements Job, QuartzJobs {
 	@Value("${main_tech.backups.cleaner.groups}")
 	private String[] groups;
 
-	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	@Scheduled(fixedRate = 4, timeUnit = TimeUnit.DAYS)
+	public void execute() {
 		AmazonS3 s3 = client();
 
 		ObjectListing objects = s3.listObjects(bucket);
@@ -80,10 +74,5 @@ public class BackupsCleanJob extends S3Client implements Job, QuartzJobs {
 
 	private AmazonS3 client() {
 		return client(id, key, url, region);
-	}
-
-	@Override
-	public List<Tuple2<JobDetail, Trigger>> getJobs() {
-		return List.of(buildJob(BackupsCleanJob.class, repeatHourlyForever(96)));
 	}
 }

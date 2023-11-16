@@ -1,31 +1,26 @@
-package main.habr.quartz;
+package main.habr;
 
 import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.common.QuartzJobs;
-import main.habr.HabrClient;
-import main.habr.HabrRepo;
-import main.habr.Telegram;
-import org.jooq.lambda.tuple.Tuple2;
-import org.quartz.*;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
-
-import static main.common.QuartzUtils.buildJob;
 
 @Slf4j
 @Component
-@DisallowConcurrentExecution
 @RequiredArgsConstructor
-public class ScanJob implements Job, QuartzJobs {
+public class ScanJob {
 	private final HabrClient habrClient;
 	private final Telegram telegram;
 	private final HabrRepo repo;
 
-	private void scanNewPosts() {
+	@Scheduled(cron = "0 0 0/3 ? * *", zone = "Europe/Moscow")
+	@Retryable(backoff = @Backoff(delay = 60_000))
+	public void scanNewPosts() {
 		Set<String> posts = habrClient.getPostsFromRss();
 		Set<String> news = habrClient.getNewsFromRss();
 		Set<String> lastPosts = repo.getLastRssPosts();
@@ -47,22 +42,5 @@ public class ScanJob implements Job, QuartzJobs {
 
 	private String telegramMsg(String url) {
 		return "Новый пост с аббревиатурой:\n" + url;
-	}
-
-	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		try {
-			scanNewPosts();
-		} catch (Exception e) {
-			log.error("scan error", e);
-			throw new JobExecutionException(e);
-		}
-	}
-
-	@Override
-	public List<Tuple2<JobDetail, Trigger>> getJobs() {
-		return List.of(
-				buildJob(ScanJob.class, "0 0 0/3 ? * *")
-		);
 	}
 }

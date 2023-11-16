@@ -1,61 +1,28 @@
 package main.main_tech;
 
 import lombok.RequiredArgsConstructor;
-import main.common.QuartzJobs;
-import org.jooq.lambda.tuple.Tuple2;
-import org.quartz.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class Jobs implements QuartzJobs {
+public class Jobs {
+	@Value("${main_tech.alarm.url}")
+	private String url;
 	private final TelegramSender telegram;
 
-	@Override
-	public List<Tuple2<JobDetail, Trigger>> getJobs() {
-		return List.of(
-//				buildJob(DailyJob1.class, "30 29 11 ? * 2-6"),
-//				buildJob(DailyCleanJob1.class, "0 35 11 ? * 2-6"),
-//				buildJob(DailyJob2.class, "30 29 12 ? * 2-6"),
-//				buildJob(DailyCleanJob2.class, "0 35 12 ? * 2-6")
-		);
+	@Scheduled(cron = "30 29 11 ? * 2-6", zone = "Europe/Moscow")
+	@Retryable(maxAttempts = 10, backoff = @Backoff(delay = 500))
+	public void send() {
+		telegram.sendAlarm1(url);
 	}
 
-	@Component
-	@DisallowConcurrentExecution
-	public class DailyJob1 implements Job {
-		@Override
-		public void execute(JobExecutionContext context) {
-			telegram.sendAlarm1("Видеочат (в маленьком чате)");
-		}
-	}
-
-	@Component
-	@DisallowConcurrentExecution
-	public class DailyCleanJob1 implements Job {
-		@Override
-		public void execute(JobExecutionContext context) {
-			telegram.deleteLastAlarmMessage1();
-		}
-	}
-
-	@Component
-	@DisallowConcurrentExecution
-	public class DailyJob2 implements Job {
-		@Override
-		public void execute(JobExecutionContext context) {
-			telegram.sendAlarm2("Голосовой чат (ссылка в общем чате)");
-		}
-	}
-
-	@Component
-	@DisallowConcurrentExecution
-	public class DailyCleanJob2 implements Job {
-		@Override
-		public void execute(JobExecutionContext context) {
-			telegram.deleteLastAlarmMessage2();
-		}
+	@Scheduled(cron = "0 35 11 ? * 2-6", zone = "Europe/Moscow")
+	@Retryable(maxAttempts = 10)
+	public void clean() {
+		telegram.deleteLastAlarmMessage1();
 	}
 }
