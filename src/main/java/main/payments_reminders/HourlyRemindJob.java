@@ -19,7 +19,7 @@ public class HourlyRemindJob {
 	private final TelegramSender telegram;
 	private final Repo repo;
 
-	@Scheduled(cron = "0 0 * * * ?", zone = "Europe/Moscow")
+	@Scheduled(cron = "0 0 * * * *", zone = "Europe/Moscow")
 	@Retryable(backoff = @Backoff(delay = 10_000, maxDelay = 120_000), maxAttempts = 20)
 	public void remind() {
 		List<RemindToSend> reminds = repo.getRemindsForNow();

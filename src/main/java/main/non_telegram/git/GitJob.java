@@ -45,7 +45,7 @@ public class GitJob {
 		createDirectory(Path.of(gitLocalPath));
 	}
 
-	@Scheduled(cron = "0 0 4 * * ?")
+	@Scheduled(cron = "0 0 4 * * *")
 	@Retryable(backoff = @Backoff(delay = 60000))
 	public void execute() throws GitAPIException, IOException, InterruptedException {
 		CredentialsProvider cred = creds();

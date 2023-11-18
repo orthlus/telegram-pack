@@ -14,13 +14,13 @@ public class Jobs {
 	private String url;
 	private final TelegramSender telegram;
 
-	@Scheduled(cron = "30 29 11 ? * 2-6", zone = "Europe/Moscow")
+	@Scheduled(cron = "30 29 11 * * MON-FRI", zone = "Europe/Moscow")
 	@Retryable(maxAttempts = 10, backoff = @Backoff(delay = 500))
 	public void send() {
 		telegram.sendAlarm1(url);
 	}
 
-	@Scheduled(cron = "0 35 11 ? * 2-6", zone = "Europe/Moscow")
+	@Scheduled(cron = "0 35 11 * * MON-FRI", zone = "Europe/Moscow")
 	@Retryable(maxAttempts = 10)
 	public void clean() {
 		telegram.deleteLastAlarmMessage1();
