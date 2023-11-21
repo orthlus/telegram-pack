@@ -63,11 +63,6 @@
             <artifactId>jooq-meta</artifactId>
             <version>${jooq.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-codegen</artifactId>
-            <version>${jooq.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.jooq</groupId>
