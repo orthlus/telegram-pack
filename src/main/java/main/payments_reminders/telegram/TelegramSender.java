@@ -1,6 +1,7 @@
 package main.payments_reminders.telegram;
 
 import main.payments_reminders.entity.RemindToSend;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -14,8 +15,11 @@ import static main.common.telegram.TelegramPropsProvider.getAdminId;
 @Component
 public class TelegramSender extends DefaultAbsSender {
 	private final KeyboardsProvider keyboards;
-	protected TelegramSender(PaymentsBotConfig bot, KeyboardsProvider keyboards) {
-		super(new DefaultBotOptions(), bot.getToken());
+	protected TelegramSender(
+			@Value("${payments.telegram.bot.token}")
+			String token,
+			KeyboardsProvider keyboards) {
+		super(new DefaultBotOptions(), token);
 		this.keyboards = keyboards;
 	}
 

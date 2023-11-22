@@ -3,10 +3,9 @@ package main.main_tech.inventory;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.ruvds.api.RuvdsServer;
 import main.main_tech.ruvds.api.ServerMapper;
-import main.regru.PrivateBotConfig;
-import main.regru.PublicBotConfig;
 import main.regru.RegRuService;
 import main.regru.common.RR;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -22,12 +21,14 @@ import static org.mapstruct.factory.Mappers.getMapper;
 public class InventoryService {
 	private final Repo repo;
 	private final RegRuService regRuService;
-	private final PrivateBotConfig privateBotConfig;
-	private final PublicBotConfig publicBotConfig;
+	@Value("${main_tech.regru.domains}")
+	private String[] domains;
 
 	public Set<Server> getServers() {
-		Map<String, String> domainByIpMap = requestDomainsByIpMap(privateBotConfig.getDomainName());
-		domainByIpMap.putAll(requestDomainsByIpMap(publicBotConfig.getDomainName()));
+		Map<String, String> domainByIpMap = new HashMap<>();
+		for (String domain : domains) {
+			domainByIpMap.putAll(requestDomainsByIpMap(domain));
+		}
 
 		ServerMapper mapper = getMapper(ServerMapper.class);
 

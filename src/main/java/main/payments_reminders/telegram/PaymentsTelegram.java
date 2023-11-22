@@ -2,9 +2,10 @@ package main.payments_reminders.telegram;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.Command;
-import main.common.telegram.CustomSpringWebhookBot;
+import main.common.telegram.DefaultWebhookBot;
 import main.payments_reminders.UserState;
 import main.payments_reminders.entity.Remind;
 import main.payments_reminders.entity.RemindWithoutId;
@@ -13,6 +14,7 @@ import main.payments_reminders.reminds.Repo;
 import main.payments_reminders.telegram.callback.CallbackDataMapper;
 import main.payments_reminders.telegram.callback.CallbackType;
 import org.jooq.lambda.tuple.Tuple2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -28,16 +30,11 @@ import static main.payments_reminders.UserState.*;
 
 @Slf4j
 @Component
-public class PaymentsTelegram extends CustomSpringWebhookBot {
-	public PaymentsTelegram(PaymentsBotConfig botConfig,
-							RemindsService remindsService,
-							CallbackDataMapper mapper, Repo repo) {
-		super(botConfig);
-		this.remindsService = remindsService;
-		this.mapper = mapper;
-		this.repo = repo;
-	}
-
+@RequiredArgsConstructor
+public class PaymentsTelegram implements DefaultWebhookBot {
+	@Getter
+	@Value("${payments.telegram.bot.nickname}")
+	private String nickname;
 	private final RemindsService remindsService;
 	private final CallbackDataMapper mapper;
 	private final Repo repo;
@@ -56,7 +53,7 @@ public class PaymentsTelegram extends CustomSpringWebhookBot {
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	@Override
-	public BotApiMethod<?> onWebhookUpdate(Update update) {
+	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 

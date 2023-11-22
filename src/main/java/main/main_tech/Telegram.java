@@ -2,13 +2,15 @@ package main.main_tech;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import main.common.telegram.Command;
-import main.common.telegram.CustomSpringWebhookBot;
+import main.common.telegram.DefaultWebhookBot;
 import main.main_tech.inventory.InventoryService;
 import main.main_tech.inventory.NamingService;
 import main.main_tech.monitoring.MonitoringService;
 import main.main_tech.ruvds.api.RuvdsApi;
 import main.main_tech.wg.WgService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,7 +19,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.Map;
 
 @Component
-public class Telegram extends CustomSpringWebhookBot {
+@RequiredArgsConstructor
+public class Telegram implements DefaultWebhookBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -35,22 +38,9 @@ public class Telegram extends CustomSpringWebhookBot {
 
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
-	public Telegram(Config botConfig,
-					RuvdsApi ruvdsApi,
-					WgService wg,
-					RuvdsEmailClient ruvdsEmailClient,
-					InventoryService inventoryService,
-					NamingService naming,
-					MonitoringService monitoring) {
-		super(botConfig);
-		this.ruvdsApi = ruvdsApi;
-		this.wg = wg;
-		this.ruvdsEmailClient = ruvdsEmailClient;
-		this.inventoryService = inventoryService;
-		this.naming = naming;
-		this.monitoring = monitoring;
-	}
-
+	@Getter
+	@Value("${main_tech.telegram.bot.nickname}")
+	private String nickname;
 	private final RuvdsApi ruvdsApi;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
@@ -59,7 +49,7 @@ public class Telegram extends CustomSpringWebhookBot {
 	private final MonitoringService monitoring;
 
 	@Override
-	public BotApiMethod<?> onWebhookUpdate(Update update) {
+	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 

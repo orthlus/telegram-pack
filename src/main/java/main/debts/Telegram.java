@@ -2,11 +2,13 @@ package main.debts;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.Command;
-import main.common.telegram.CustomSpringWebhookBot;
+import main.common.telegram.DefaultWebhookBot;
 import main.debts.entity.Expense;
 import main.debts.entity.Income;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -30,7 +32,8 @@ import static main.debts.UserState.*;
 
 @Slf4j
 @Component
-public class Telegram extends CustomSpringWebhookBot {
+@RequiredArgsConstructor
+public class Telegram implements DefaultWebhookBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -45,18 +48,16 @@ public class Telegram extends CustomSpringWebhookBot {
 		final String command;
 	}
 
+	@Getter
+	@Value("${debts.telegram.bot.nickname}")
+	private String nickname;
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final Repo repo;
 	private final String[] dateParsePatterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy", "yyyy-MM-dd"};
 
-	public Telegram(Config botConfig, Repo repo) {
-		super(botConfig);
-		this.repo = repo;
-	}
-
 	@Override
-	public BotApiMethod<?> onWebhookUpdate(Update update) {
+	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
