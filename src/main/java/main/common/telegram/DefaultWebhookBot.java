@@ -11,6 +11,10 @@ public interface DefaultWebhookBot {
 
 	String getNickname();
 
+	default SendMessage sendInMonospace(String text) {
+		return send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+	}
+
 	default SendMessage send(String text) {
 		return send(msg(text));
 	}

@@ -2,7 +2,9 @@ package main.debts;
 
 import lombok.RequiredArgsConstructor;
 import main.debts.entity.Expense;
+import main.debts.entity.ExpenseDto;
 import main.debts.entity.Income;
+import main.debts.entity.IncomeDto;
 import main.tables.DebtsExpenses;
 import main.tables.DebtsIncome;
 import org.jooq.DSLContext;
@@ -31,10 +33,10 @@ public class DebtsRepo {
 	}
 
 	@CacheEvict(value = "incomes", allEntries = true)
-	public void addIncome(int amount, int day) {
+	public void addIncome(IncomeDto data) {
 		db.insertInto(di)
 				.columns(di.AMOUNT, di.DAY_OF_MONTH)
-				.values(amount, day)
+				.values(data.amount(), data.day())
 				.execute();
 	}
 
@@ -52,13 +54,13 @@ public class DebtsRepo {
 	}
 
 	@CacheEvict(value = "expenses", allEntries = true)
-	public void addExpense(String name, int amount, int day, LocalDate expireDate) {
+	public void addExpense(ExpenseDto data) {
 		db.insertInto(de)
 				.columns(de.EXP_NAME,
 						de.AMOUNT,
 						de.DAY_OF_MONTH,
 						de.EXPIRE_DATE)
-				.values(name, amount, day, expireDate)
+				.values(data.name(), data.amount(), data.day(), data.expire())
 				.execute();
 	}
 
