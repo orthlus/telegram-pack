@@ -167,18 +167,19 @@ public class NamingService {
 
 	private String format(RuvdsServer s) {
 		String name = dropDomains(s.name());
+		String str = """
+				<b>%s</b>
+				  <code>%d cpu %.1f Gb %d Gb$$$</code>
+				  <code>%s</code>""";
+		str = str.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.id());
+
 		if (s.additionalDriveGb() == null) {
-			return """
-					<b>%s</b>
-					  <code>%d cpu %.1f Gb %d Gb</code>
-					  <code>%s</code>"""
-					.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.id());
+			str = str.replace("$$$", "");
 		} else {
-			return """
-					<b>%s</b>
-					  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
-					  <code>%s</code>"""
-					.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.additionalDriveGb(), s.id());
+			str = str.replace("$$$", " (%d Gb)");
+			str = str.formatted(s.additionalDriveGb());
 		}
+
+		return str;
 	}
 }
