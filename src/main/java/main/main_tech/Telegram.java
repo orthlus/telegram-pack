@@ -67,40 +67,38 @@ public class Telegram implements DefaultWebhookBot {
 	}
 
 	private BotApiMethod<?> handleCommand(String messageText) {
-		SendMessage result = null;
-		switch (commandsMap.get(messageText)) {
+		return switch (commandsMap.get(messageText)) {
 			case UPDATE_MONITORING_FROM_DB -> {
 				monitoring.updateMonitoringDataFromDb();
-				result = send("Ok");
+				yield send("Ok");
 			}
 			case SERVERS -> {
 				String text = naming.formatDomains(inventoryService.getServers());
-				result = send(msg(text).parseMode("html"));
+				yield send(msg(text).parseMode("html"));
 			}
 			case UPDATE_SERVERS_FROM_RUVDS -> {
 				inventoryService.updateServersFromRuvds(ruvdsApi.getServers());
-				result = send("Ok");
+				yield send("Ok");
 			}
 			case RUVDS_SERVERS -> {
 				String text = naming.formatDomainsRuvds(ruvdsApi.getServers());
-				result = send(msg(text).parseMode("html"));
+				yield send(msg(text).parseMode("html"));
 			}
 			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
-				result = sendInMonospace(text);
+				yield sendInMonospace(text);
 			}
 			case WG_STAT_DIFF -> {
 				String text = wg.getPrettyDiff();
-				result = sendInMonospace(text);
 				wg.saveCurrentItems();
+				yield sendInMonospace(text);
 			}
 			case WG_UPDATE_USERS -> {
 				wg.updateUsers();
-				result = send("Ok");
+				yield send("Ok");
 			}
-			case GET_CODE -> result = sendInMonospace(ruvdsEmailClient.getCode());
-			case GET_NEW_HOST -> result = sendInMonospace(ruvdsEmailClient.getNewHost());
-		}
-		return result;
+			case GET_CODE -> sendInMonospace(ruvdsEmailClient.getCode());
+			case GET_NEW_HOST -> sendInMonospace(ruvdsEmailClient.getNewHost());
+		};
 	}
 }

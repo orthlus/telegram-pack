@@ -57,81 +57,78 @@ public class DebtsTelegram implements DefaultWebhookBot {
 	}
 
 	private BotApiMethod<?> handleText(String messageText) {
-		SendMessage result = null;
-		switch (state.get()) {
-			case NOTHING_WAIT -> result = send("Неожиданно!");
+		return switch (state.get()) {
+			case NOTHING_WAIT -> send("Неожиданно!");
 			case WAIT_NEW_INCOME -> {
 				try {
 					service.addIncome(messageText);
 					state.set(NOTHING_WAIT);
-					result = send("Ок\n/incomes");
+					yield send("Ок\n/incomes");
 				} catch (Exception e) {
 					log.error("error new income", e);
-					result = send("Еще раз");
+					yield send("Еще раз");
 				}
 			}
 			case WAIT_NEW_EXPENSE -> {
 				try {
 					service.addExpense(messageText);
 					state.set(NOTHING_WAIT);
-					result = send("Ок\n/expenses");
+					yield send("Ок\n/expenses");
 				} catch (Exception e) {
 					log.error("error new expense", e);
-					result = send("Еще раз");
+					yield send("Еще раз");
 				}
 			}
 			case WAIT_DELETE_INCOME_ID -> {
 				try {
 					service.deleteIncome(messageText);
 					state.set(NOTHING_WAIT);
-					result = send("Ок\n/incomes");
+					yield send("Ок\n/incomes");
 				} catch (Exception e) {
 					log.error("Error delete income", e);
-					result = send("error");
+					yield send("error");
 				}
 			}
 			case WAIT_DELETE_EXPENSE_ID -> {
 				try {
 					service.deleteExpense(messageText);
 					state.set(NOTHING_WAIT);
-					result = send("Ок\n/expenses");
+					yield send("Ок\n/expenses");
 				} catch (Exception e) {
 					log.error("Error delete expense", e);
-					result = send("error");
+					yield send("error");
 				}
 			}
 			case EXPENSES_FOR_DATE_WAIT_DATE_VALUE -> {
 				try {
 					String text = service.getExpensesTextByDate(messageText);
 					state.set(NOTHING_WAIT);
-					result = sendInMonospace(text);
+					yield sendInMonospace(text);
 				} catch (Exception e) {
 					log.error("error EXPENSES_FOR_DATE", e);
-					result = send("Еще раз");
+					yield send("Еще раз");
 				}
 			}
-		}
-		return result;
+		};
 	}
 
 	private BotApiMethod<?> handleCommand(String messageText) {
-		SendMessage result = null;
-		switch (commandsMap.get(messageText)) {
+		return switch (commandsMap.get(messageText)) {
 			case START -> {
 				state.set(NOTHING_WAIT);
-				result = send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
+				yield send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
 			}
 			case ADD_INCOME -> {
 				state.set(WAIT_NEW_INCOME);
-				result = send("Новый доход: сумма и день месяца\n\n1000 25");
+				yield send("Новый доход: сумма и день месяца\n\n1000 25");
 			}
 			case DELETE_INCOME -> {
 				state.set(WAIT_DELETE_INCOME_ID);
-				result = send("id для удаления дохода:");
+				yield send("id для удаления дохода:");
 			}
 			case ADD_EXPENSE -> {
 				state.set(WAIT_NEW_EXPENSE);
-				result = send("""
+				yield send("""
 						Новый расход:
 						
 						название
@@ -141,21 +138,20 @@ public class DebtsTelegram implements DefaultWebhookBot {
 			}
 			case DELETE_EXPENSE -> {
 				state.set(WAIT_DELETE_EXPENSE_ID);
-				result = send("id для удаления расхода:");
+				yield send("id для удаления расхода:");
 			}
 			case INCOMES -> {
 				String text = service.getIncomesText();
-				result = sendInMonospace(text);
+				yield sendInMonospace(text);
 			}
 			case EXPENSES -> {
 				String text = service.getExpensesText();
-				result = sendInMonospace(text);
+				yield sendInMonospace(text);
 			}
 			case EXPENSES_FOR_DATE -> {
 				state.set(EXPENSES_FOR_DATE_WAIT_DATE_VALUE);
-				result = send("на какую дату?\n" + String.join(" / ", service.getDateParsePatterns()));
+				yield send("на какую дату?\n" + String.join(" / ", service.getDateParsePatterns()));
 			}
-		}
-		return result;
+		};
 	}
 }

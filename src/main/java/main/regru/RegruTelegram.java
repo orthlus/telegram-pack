@@ -1,5 +1,8 @@
 package main.regru;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import main.common.telegram.Command;
 import main.common.telegram.DefaultWebhookBot;
 import main.regru.common.ChatState;
 import main.regru.common.RR;
@@ -8,13 +11,26 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Comparator;
+import java.util.Map;
 
 import static com.google.common.net.InetAddresses.isInetAddress;
 import static main.regru.common.ChatStates.*;
 
 abstract class RegruTelegram implements DefaultWebhookBot {
+	@AllArgsConstructor
+	@Getter
+	private enum Commands implements Command {
+		START("/start"),
+		LIST("/list"),
+		ADD("/add"),
+		DELETE("/delete"),
+		CANCEL("/cancel");
+		final String command;
+	}
+
 	private final RegRuService regRuService;
 	private final ChatState chatState;
+	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	public RegruTelegram(RegRuService regRuService, ChatState chatState) {
 		this.regRuService = regRuService;
@@ -27,91 +43,84 @@ abstract class RegruTelegram implements DefaultWebhookBot {
 		if (!update.hasMessage()) return null;
 		if (!update.getMessage().hasText()) return null;
 
+		String messageText = update.getMessage().getText();
+
 		if (update.getMessage().getText().startsWith("/")) {
-			return handleCommand(update);
+			return handleCommand(messageText);
 		} else {
-			return handleText(update);
+			return handleText(messageText);
 		}
 	}
 
-	private BotApiMethod<?> handleText(Update update) {
-		SendMessage result = null;
-		String text = update.getMessage().getText();
-		switch (chatState.currentState.get()) {
-			case NOTHING_WAIT -> result = send("работает");
+	private BotApiMethod<?> handleText(String messageText) {
+		return switch (chatState.currentState.get()) {
+			case NOTHING_WAIT -> send("работает");
 			case WAIT_IP_TO_ADD -> {
-				if (isValidIp(text)) {
+				if (isValidIp(messageText)) {
 					chatState.currentState.set(WAIT_DOMAIN_NAME_TO_ADD);
-					chatState.addValue(WAIT_IP_TO_ADD, text);
-					result = send("domain:");
+					chatState.addValue(WAIT_IP_TO_ADD, messageText);
+					yield send("domain:");
 				} else {
-					result = send("invalid, try again\nip:");
+					yield send("invalid, try again\nip:");
 				}
 			}
 			case WAIT_DOMAIN_NAME_TO_ADD -> {
-				if (isValidDomain(text)) {
-					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_ADD), text);
+				if (isValidDomain(messageText)) {
+					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_ADD), messageText);
 					boolean add = regRuService.addSubdomain(rr, getDomainName());
 					if (add) {
 						chatState.currentState.set(NOTHING_WAIT);
-						result = send("::ok::\n/list");
+						yield send("::ok::\n/list");
 					} else {
-						result = send("error :( need logs");
+						yield send("error :( need logs");
 					}
 				} else {
-					result = send("invalid, try again\ndomain:");
+					yield send("invalid, try again\ndomain:");
 				}
 			}
 			case WAIT_IP_TO_DELETE -> {
-				if (isValidIp(text)) {
+				if (isValidIp(messageText)) {
 					chatState.currentState.set(WAIT_DOMAIN_NAME_TO_DELETE);
-					chatState.addValue(WAIT_IP_TO_DELETE, text);
-					result = send("domain:");
+					chatState.addValue(WAIT_IP_TO_DELETE, messageText);
+					yield send("domain:");
 				} else {
-					result = send("invalid, try again\nip:");
+					yield send("invalid, try again\nip:");
 				}
 			}
 			case WAIT_DOMAIN_NAME_TO_DELETE -> {
-				if (isValidDomain(text)) {
-					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_DELETE), text);
+				if (isValidDomain(messageText)) {
+					RR rr = new RR(chatState.getAndDeleteValue(WAIT_IP_TO_DELETE), messageText);
 					boolean delete = regRuService.deleteSubdomain(rr, getDomainName());
 					if (delete) {
 						chatState.currentState.set(NOTHING_WAIT);
-						result = send("::ok::\n/list");
+						yield send("::ok::\n/list");
 					} else {
-						result = send("error :( need logs");
+						yield send("error :( need logs");
 					}
 				} else {
-					result = send("invalid, try again\ndomain:");
+					yield send("invalid, try again\ndomain:");
 				}
 			}
-		}
-		return result;
+		};
 	}
 
-	private BotApiMethod<?> handleCommand(Update update) {
-		String text = update.getMessage().getText();
-		switch (text) {
-			case "/start" -> {
-				return send("Тут можно управлять поддоменами домена " + getDomainName());
-			}
-			case "/list" -> {
-				return sendList();
-			}
-			case "/add" -> {
+	private BotApiMethod<?> handleCommand(String messageText) {
+		return switch (commandsMap.get(messageText)) {
+			case START -> send("Тут можно управлять поддоменами домена " + getDomainName());
+			case LIST -> sendList();
+			case ADD -> {
 				chatState.currentState.set(WAIT_IP_TO_ADD);
-				return send("ip:");
+				yield send("ip:");
 			}
-			case "/delete" -> {
+			case DELETE -> {
 				chatState.currentState.set(WAIT_IP_TO_DELETE);
-				return send("ip:");
+				yield send("ip:");
 			}
-			case "/cancel" -> {
+			case CANCEL -> {
 				chatState.currentState.set(NOTHING_WAIT);
-				return send("canceled");
+				yield send("canceled");
 			}
-		}
-		return null;
+		};
 	}
 
 	private boolean isValidDomain(String domainStr) {

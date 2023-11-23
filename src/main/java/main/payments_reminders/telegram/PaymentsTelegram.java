@@ -76,47 +76,44 @@ public class PaymentsTelegram implements DefaultWebhookBot {
 			return send("Что-то пошло не так, попробуйте заново (неизвестный callback)");
 		}
 
-		switch (valueOp.get()) {
+		return switch (valueOp.get()) {
 			case HOLD_ON_PAYMENT_SELECT_DAYS -> {
 				Optional<Tuple2<Remind, Integer>> tupleOp = mapper.getRemindAndDaysFromCallback(callbackQuery);
 				if (tupleOp.isPresent()) {
 					Tuple2<Remind, Integer> t = tupleOp.get();
 					try {
 						remindsService.addHoldOnRemind(t.v1, t.v2);
-						return send("Ок");
+						yield send("Ок");
 					} catch (RuntimeException e) {
-						return send("Что-то пошло не так, попробуйте заново");
+						yield send("Что-то пошло не так, попробуйте заново");
 					}
 				} else {
-					return send("Что-то пошло не так, попробуйте заново");
+					yield send("Что-то пошло не так, попробуйте заново");
 				}
 			}
 			case SUBMIT_PAYMENT -> {
 				Optional<Remind> remindOp = mapper.getRemindFromCallback(callbackQuery);
 				if (remindOp.isEmpty())
-					return send("Что-то пошло не так, попробуйте заново");
+					yield send("Что-то пошло не так, попробуйте заново");
 				else {
 					remindsService.submitRemind(remindOp.get());
-					return send("%s - завершено".formatted(remindOp.get().getName()));
+					yield send("%s - завершено".formatted(remindOp.get().getName()));
 				}
 			}
-		}
-		return null;
+		};
 	}
 
 	private BotApiMethod<?> handleText(String messageText) {
-		switch (state.get()) {
-			case NOTHING_WAIT -> {
-				return send("Используйте команды: \n" + String.join("\n", commandsMap.keySet()));
-			}
+		return switch (state.get()) {
+			case NOTHING_WAIT -> send("Используйте команды: \n" + String.join("\n", commandsMap.keySet()));
 			case WAIT_NEW_REMIND_DATA -> {
 				try {
 					RemindWithoutId remind = remindsService.parseNewRemind(messageText);
 					repo.addRemind(remind);
 					state.set(NOTHING_WAIT);
-					return send("Ок: \n%s\n/list".formatted(remind));
+					yield send("Ок: \n%s\n/list".formatted(remind));
 				} catch (RuntimeException e) {
-					return send("Что-то пошло не так, попробуйте заново. \n(дата от 1 до 31, час от 0 до 23)\n/new_remind");
+					yield send("Что-то пошло не так, попробуйте заново. \n(дата от 1 до 31, час от 0 до 23)\n/new_remind");
 				}
 			}
 			case WAIT_DELETE_REMIND_ID -> {
@@ -124,37 +121,36 @@ public class PaymentsTelegram implements DefaultWebhookBot {
 					long id = parseLong(messageText.trim());
 					repo.deleteRemind(id);
 					state.set(NOTHING_WAIT);
-					return send("Ок\n/list");
+					yield send("Ок\n/list");
 				} catch (Exception e) {
 					log.error("Error delete remind", e);
-					return send("error");
+					yield send("error");
 				}
 			}
-		}
-		return null;
+		};
 	}
 
 	private BotApiMethod<?> handleCommand(String messageText) {
-		switch (messageText) {
-			case "/start" -> {
+		return switch (commandsMap.get(messageText)) {
+			case START -> {
 				state.set(NOTHING_WAIT);
-				return send("""
+				yield send("""
 						Привет! В этого бота можно записать
 						даты оплаты счетов или передачи показаний счётчиков,
 						и бот напомнит о них в нужные дни.
 						Команды:
 						%s""".formatted(String.join("\n", commandsMap.keySet())));
 			}
-			case "/list" -> {
+			case LIST -> {
 				String text = repo.getReminds()
 						.stream()
 						.map(Remind::toString)
 						.collect(Collectors.joining("\n"));
-				return sendInMonospace(text);
+				yield sendInMonospace(text);
 			}
-			case "/new_remind" -> {
+			case NEW_REMIND -> {
 				state.set(WAIT_NEW_REMIND_DATA);
-				return send("""
+				yield send("""
 						Новое напоминание:
 						
 						имя
@@ -163,11 +159,10 @@ public class PaymentsTelegram implements DefaultWebhookBot {
 						час дня (0-23)
 						""");
 			}
-			case "/delete_remind" -> {
+			case DELETE_REMIND -> {
 				state.set(WAIT_DELETE_REMIND_ID);
-				return send("id для удаления платежа:");
+				yield send("id для удаления платежа:");
 			}
-		}
-		return null;
+		};
 	}
 }
