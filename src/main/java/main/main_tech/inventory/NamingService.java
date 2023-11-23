@@ -134,20 +134,24 @@ public class NamingService {
 	}
 
 	private String format(ServerDomains s) {
-		String domains = String.join("\n  ", s.domains());
 		String name = dropDomains(s.name());
 		String str = """
 				<b>%s</b>
-				  <code>%s</code>:<code>%d</code>
-				  <b>%s</b>
+				  <code>%s</code>:<code>%d</code>$$$$
 				  <code>%d cpu %.1f Gb %d Gb$$$</code>
 				  <code>%s</code>, <u>%s</u>""";
 		str = str.formatted(
 							name,
 							s.address(), s.sshPort(),
-							domains,
 							s.cpu(), s.ram(), s.drive(),
 							s.os(), s.hostingName());
+		if (s.domains().isEmpty()) {
+			str = str.replace("$$$$", "");
+		} else {
+			str = str.replace("$$$$", "\n  <b>%s</b>");
+			str = str.formatted(String.join("\n  ", s.domains()));
+		}
+
 		if (s.addDrive() == null) {
 			str = str.replace("$$$", "");
 		} else {
