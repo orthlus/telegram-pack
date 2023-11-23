@@ -14,6 +14,7 @@ import static main.Tables.TECH_INVENTORY_DOMAINS_RECORDS;
 import static main.Tables.TECH_INVENTORY_SERVERS;
 import static org.jooq.Records.mapping;
 import static org.jooq.impl.DSL.concat;
+import static org.jooq.impl.DSL.groupConcat;
 
 @Component
 @RequiredArgsConstructor
@@ -41,27 +42,28 @@ public class Repo {
 		}
 	}
 
-	public Set<Server> getServersWithDomains() {
+	public Set<ServerDomainsAgg> getServersWithDomains() {
 		return db.select(
 						tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
-						concat(concat(tidr.SUB_DOMAIN, "."), tidr.CORE_DOMAIN),
+						groupConcat(concat(concat(tidr.SUB_DOMAIN, "."), tidr.CORE_DOMAIN)),
 						tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
 						tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
 						tis.HOSTING_NAME)
 				.from(tis)
 				.leftJoin(tidr)
 					.on(tis.ADDRESS.eq(tidr.ADDRESS))
-				.fetchSet(mapping(Server::new));
+				.groupBy(tis)
+				.fetchSet(mapping(ServerDomainsAgg::new));
 	}
 
-	public Set<ServerDTO> getServers() {
+	public Set<Server> getServers() {
 		return db.select(
 				tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
 				tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
 				tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
 				tis.HOSTING_NAME)
 				.from(tis)
-				.fetchSet(mapping(ServerDTO::new));
+				.fetchSet(mapping(Server::new));
 	}
 
 	public void setSshPortById(int serverId, int sshPort) {

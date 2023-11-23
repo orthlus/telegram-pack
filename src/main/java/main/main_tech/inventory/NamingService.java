@@ -69,14 +69,14 @@ public class NamingService {
 		return sb.toString();
 	}
 
-	public String formatDomains(Set<Server> servers) {
-		List<Server> list = sort(servers);
-		List<Server>[] lists = new List[domains.length + 1];
+	public String formatDomains(Set<ServerDomains> servers) {
+		List<ServerDomains> list = sort(servers);
+		List<ServerDomains>[] lists = new List[domains.length + 1];
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < domains.length; i++) {
 			lists[i] = new ArrayList<>(list.size());
-			for (Server server : list) {
+			for (ServerDomains server : list) {
 				if (server.name().contains(domains[i])) {
 					lists[i].add(server);
 				}
@@ -84,7 +84,7 @@ public class NamingService {
 		}
 
 		lists[lists.length - 1] = new ArrayList<>(list.size());
-		for (Server server : list) {
+		for (ServerDomains server : list) {
 			if (notContainsDomain(server.name())) {
 				lists[lists.length - 1].add(server);
 			}
@@ -115,7 +115,7 @@ public class NamingService {
 				.collect(joining("\n"));
 	}
 
-	private String formatAndJoin(List<Server> servers) {
+	private String formatAndJoin(List<ServerDomains> servers) {
 		return servers.stream()
 				.map(this::format)
 				.collect(joining("\n"));
@@ -127,13 +127,14 @@ public class NamingService {
 		return list;
 	}
 
-	private List<Server> sort(Set<Server> set) {
-		List<Server> list = new ArrayList<>(set);
+	private List<ServerDomains> sort(Set<ServerDomains> set) {
+		List<ServerDomains> list = new ArrayList<>(set);
 		list.sort(comparing(server -> dropDomains(server.name())));
 		return list;
 	}
 
-	private String format(Server s) {
+	private String format(ServerDomains s) {
+		String domains = String.join("\n  ", s.domains());
 		String name = dropDomains(s.name());
 		if (s.addDrive() == null) {
 			return """
@@ -145,7 +146,7 @@ public class NamingService {
 					.formatted(
 							name,
 							s.address(), s.sshPort(),
-							s.domainName(),
+							domains,
 							s.cpu(), s.ram(), s.drive(),
 							s.os(), s.hostingName());
 		} else {
@@ -158,7 +159,7 @@ public class NamingService {
 					.formatted(
 							name,
 							s.address(), s.sshPort(),
-							s.domainName(),
+							domains,
 							s.cpu(), s.ram(), s.drive(), s.addDrive(),
 							s.os(), s.hostingName());
 		}

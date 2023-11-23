@@ -1,10 +1,13 @@
 package main.main_tech.inventory;
 
-public record Server(
+import java.util.Set;
+
+public record ServerDomains(
 		int id,
 		String address,
 		Integer sshPort,
 		String name,
+		Set<String> domains,
 		Integer cpu,
 		Double ram,
 		Integer drive,
