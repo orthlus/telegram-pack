@@ -33,7 +33,7 @@ import static main.debts.UserState.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class Telegram implements DefaultWebhookBot {
+public class DebtsTelegram implements DefaultWebhookBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -53,7 +53,8 @@ public class Telegram implements DefaultWebhookBot {
 	private String nickname;
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
-	private final Repo repo;
+	private final DebtsRepo repo;
+	private final DebtsService service;
 	private final String[] dateParsePatterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy", "yyyy-MM-dd"};
 
 	@Override
@@ -256,6 +257,8 @@ public class Telegram implements DefaultWebhookBot {
 		} else {
 			text += "Итого: " + sum;
 		}
+		int nextSixMonth = service.calculateSumExpensesForNextSixMonth();
+		text += "\nНакопить: " + service.formatMoneyNumber(nextSixMonth);
 
 		return text;
 	}

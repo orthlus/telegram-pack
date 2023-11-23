@@ -20,7 +20,7 @@ import static org.jooq.Records.mapping;
 
 @Component
 @RequiredArgsConstructor
-public class Repo {
+public class DebtsRepo {
 	private final DSLContext db;
 	private final DebtsIncome di = DEBTS_INCOME;
 	private final DebtsExpenses de = DEBTS_EXPENSES;
