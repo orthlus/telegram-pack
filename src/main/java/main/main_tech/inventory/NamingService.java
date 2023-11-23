@@ -136,33 +136,25 @@ public class NamingService {
 	private String format(ServerDomains s) {
 		String domains = String.join("\n  ", s.domains());
 		String name = dropDomains(s.name());
-		if (s.addDrive() == null) {
-			return """
+		String str = """
 				<b>%s</b>
 				  <code>%s</code>:<code>%d</code>
 				  <b>%s</b>
-				  <code>%d cpu %.1f Gb %d Gb</code>
-				  <code>%s</code>, <u>%s</u>"""
-					.formatted(
+				  <code>%d cpu %.1f Gb %d Gb$$$</code>
+				  <code>%s</code>, <u>%s</u>""";
+		str = str.formatted(
 							name,
 							s.address(), s.sshPort(),
 							domains,
 							s.cpu(), s.ram(), s.drive(),
 							s.os(), s.hostingName());
+		if (s.addDrive() == null) {
+			str = str.replace("$$$", "");
 		} else {
-			return """
-				<b>%s</b>
-				  <code>%s</code>:<code>%d</code>
-				  <b>%s</b>
-				  <code>%d cpu %.1f Gb %d Gb (%d Gb)</code>
-				  <code>%s</code>, <u>%s</u>"""
-					.formatted(
-							name,
-							s.address(), s.sshPort(),
-							domains,
-							s.cpu(), s.ram(), s.drive(), s.addDrive(),
-							s.os(), s.hostingName());
+			str = str.replace("$$$", " (%d Gb)");
+			str = str.formatted(s.addDrive());
 		}
+		return str;
 	}
 
 	private String format(RuvdsServer s) {
