@@ -150,7 +150,7 @@ public class PaymentsTelegram implements DefaultWebhookBot {
 						.stream()
 						.map(Remind::toString)
 						.collect(Collectors.joining("\n"));
-				return send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				return sendInMonospace(text);
 			}
 			case "/new_remind" -> {
 				state.set(WAIT_NEW_REMIND_DATA);

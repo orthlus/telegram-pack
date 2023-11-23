@@ -87,19 +87,19 @@ public class Telegram implements DefaultWebhookBot {
 			}
 			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
-				result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				result = sendInMonospace(text);
 			}
 			case WG_STAT_DIFF -> {
 				String text = wg.getPrettyDiff();
-				result = send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
+				result = sendInMonospace(text);
 				wg.saveCurrentItems();
 			}
 			case WG_UPDATE_USERS -> {
 				wg.updateUsers();
 				result = send("Ok");
 			}
-			case GET_CODE -> result = send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getCode())).parseMode("html"));
-			case GET_NEW_HOST -> result = send(msg("<code>%s</code>".formatted(ruvdsEmailClient.getNewHost())).parseMode("html"));
+			case GET_CODE -> result = sendInMonospace(ruvdsEmailClient.getCode());
+			case GET_NEW_HOST -> result = sendInMonospace(ruvdsEmailClient.getNewHost());
 		}
 		return result;
 	}
