@@ -20,8 +20,10 @@ public interface ServerMapper {
 	ServerDomains map(ServerDomainsAgg s);
 
 	default Set<String> parseDomains(String domainsStr) {
-		Set<String> resultDomains = new HashSet<>();
-		if (domainsStr != null && domainsStr.contains(",")) {
+		if (domainsStr == null) return Set.of();
+
+		if (domainsStr.contains(",")) {
+			Set<String> resultDomains = new HashSet<>();
 			String[] domains = domainsStr.split(",");
 			for (String domain : domains) {
 				if (domain.startsWith("@.")) {
@@ -32,8 +34,10 @@ public interface ServerMapper {
 					resultDomains.add(domain);
 				}
 			}
+			return resultDomains;
+		} else {
+			return Set.of(domainsStr);
 		}
-		return resultDomains;
 	}
 
 	ServerDomainsAgg map(Server s, String domainName);
