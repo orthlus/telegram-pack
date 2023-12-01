@@ -45,7 +45,7 @@ public class DebtsService {
 		String list = incomes.stream()
 				.map(Income::toString)
 				.collect(joining("\n"));
-		return  "%s\n==========\nИтого: %d".formatted(list, sum);
+		return "%s\n==========\nИтого: %d".formatted(list, sum);
 	}
 
 	public String getExpensesText() {
@@ -109,15 +109,11 @@ public class DebtsService {
 	}
 
 	private String calculateExpenses(Set<Expense> expenses) {
-		int sum = expenses.stream()
-				.map(Expense::amount)
-				.mapToInt(Integer::intValue)
-				.sum();
-		String list = expenses
+		String text = expenses
 				.stream()
 				.map(Expense::toString)
-				.collect(joining("\n"));
-		String text = list + "\n==========\n";
+				.collect(joining("\n"))
+				+ "\n==========\n";
 
 		List<Income> incomes = new ArrayList<>(repo.getIncomes());
 		if (incomes.size() == 2) {
@@ -132,11 +128,15 @@ public class DebtsService {
 					.mapToInt(Expense::amount)
 					.sum();
 			text += """
-							Итого: %d
-							траты с 1-ой получки - %d
-							траты со 2-ой получки - %d"""
+					Итого: %d
+					траты с 1-ой получки - %d
+					траты со 2-ой получки - %d"""
 					.formatted(sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
 		} else {
+			int sum = expenses.stream()
+					.map(Expense::amount)
+					.mapToInt(Integer::intValue)
+					.sum();
 			text += "Итого: " + sum;
 		}
 		int nextSixMonth = calculateSumExpensesForNextSixMonth();
