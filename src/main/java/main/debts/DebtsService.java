@@ -117,8 +117,12 @@ public class DebtsService {
 
 		List<Income> incomes = new ArrayList<>(repo.getIncomes());
 		if (incomes.size() == 2) {
-			int day1 = min(incomes.get(0).day(), incomes.get(1).day());
-			int day2 = max(incomes.get(0).day(), incomes.get(1).day());
+			Income income1 = incomes.get(0);
+			Income income2 = incomes.get(1);
+
+			int day1 = min(income1.day(), income2.day());
+			int day2 = max(income1.day(), income2.day());
+
 			int sumAfterDay1 = expenses.stream()
 					.filter(e -> e.day() >= day1 && e.day() < day2)
 					.mapToInt(Expense::amount)
