@@ -3,4 +3,5 @@ target
 *.iml
 jooq-config.xml
 *production.properties
+*test.properties
 deploy.bat
