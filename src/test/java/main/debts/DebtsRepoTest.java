@@ -18,6 +18,6 @@ class DebtsRepoTest {
 
 	@Test
 	public void getExpenses() {
-		System.out.println(debtsService.getExpensesText());
+//		System.out.println(debtsService.getExpensesText());
 	}
 }
