@@ -5,18 +5,15 @@ import main.main_tech.inventory.ServerDomains;
 import main.main_tech.inventory.ServerDomainsAgg;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ServerMapper {
-	ServerMapper Instance = Mappers.getMapper(ServerMapper.class);
-
 	Set<ServerDomains> mapAggServers(Set<ServerDomainsAgg> s);
 
-	@Mapping(target = "domains", expression = "java(Instance.parseDomains(s.domainName()))")
+	@Mapping(target = "domains", expression = "java(parseDomains(s.domainName()))")
 	ServerDomains map(ServerDomainsAgg s);
 
 	default Set<String> parseDomains(String domainsStr) {
@@ -52,6 +49,6 @@ public interface ServerMapper {
 	Set<RuvdsServer> map(Set<ServerRaw> s);
 
 	default Set<RuvdsServer> map(ServersRaw serversRaw) {
-		return Instance.map(serversRaw.getServerRaws());
+		return map(serversRaw.getServerRaws());
 	}
 }

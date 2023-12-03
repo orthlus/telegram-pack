@@ -11,14 +11,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import static main.payments_reminders.telegram.callback.CallbackType.HOLD_ON_PAYMENT_SELECT_DAYS;
 import static main.payments_reminders.telegram.callback.CallbackType.SUBMIT_PAYMENT;
-import static org.mapstruct.factory.Mappers.getMapper;
 
 
 @Component
 @RequiredArgsConstructor
 public class KeyboardsProvider implements TgKeyboard {
 	private final CallbackDataMapper dataMapper;
-	private final CallbackTypeMapper typeMapper = getMapper(CallbackTypeMapper.class);
+	private final CallbackTypeMapper typeMapper;
 
 	private String toJson(CallbackData data) {
 		return dataMapper.dataToJson(data);

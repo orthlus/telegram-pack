@@ -7,7 +7,7 @@ import main.regru.common.RR;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface RRMapper {
 	@Mapping(target = "subdomain", source = "rr.domain")
 	@Mapping(target = "ipaddr", source = "rr.ip")

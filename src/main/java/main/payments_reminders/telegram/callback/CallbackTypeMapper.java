@@ -4,7 +4,7 @@ import main.payments_reminders.entity.RemindToSend;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CallbackTypeMapper {
 	@Mapping(target = "typeId", source = "callbackType.id")
 	@Mapping(target = "remindId", source = "remind.id")

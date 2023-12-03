@@ -8,13 +8,11 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
 @Component
 @RequiredArgsConstructor
 public class InventoryService {
 	private final Repo repo;
-	private final ServerMapper mapper = getMapper(ServerMapper.class);
+	private final ServerMapper mapper;
 
 	public Set<ServerDomains> getServers() {
 		return mapper.mapAggServers(repo.getServersWithDomains());

@@ -3,6 +3,7 @@ package main.regru;
 import feign.Feign;
 import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.regru.common.Add;
@@ -13,17 +14,14 @@ import main.regru.common.dto.DomainsList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.util.List;
-
-import static org.mapstruct.factory.Mappers.getMapper;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RegRuClient {
 	private RegRuHttp client;
-	private final RRMapper mapper = getMapper(RRMapper.class);
+	private final RRMapper mapper;
 
 	@Value("${regru.api.url}")
 	private String baseUrl;
