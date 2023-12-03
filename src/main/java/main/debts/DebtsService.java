@@ -181,7 +181,7 @@ public class DebtsService {
 
 	private String appendNextSixMonthExpenses(String text) {
 		int nextSixMonth = calculateSumExpensesForNextSixMonth();
-		return text + ("\nНакопить: " + formatMoneyNumber(nextSixMonth));
+		return text + "\nНакопить: " + formatMoneyNumber(nextSixMonth);
 	}
 
 	private Predicate<Expense> getExpr(int caseNumber, int day1, int day2) {
