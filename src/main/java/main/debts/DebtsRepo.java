@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import static main.Main.zone;
@@ -65,11 +66,11 @@ public class DebtsRepo {
 	}
 
 	@Cacheable(value = "expenses")
-	public Set<Expense> getExpenses() {
+	public List<Expense> getExpenses() {
 		return getExpenses(LocalDate.now(zone));
 	}
 
-	public Set<Expense> getExpenses(LocalDate date) {
+	public List<Expense> getExpenses(LocalDate date) {
 		return db.select(de.ID,
 						de.EXP_NAME,
 						de.AMOUNT,
@@ -78,6 +79,6 @@ public class DebtsRepo {
 				.from(de)
 				.where(de.EXPIRE_DATE.greaterOrEqual(date))
 				.orderBy(de.DAY_OF_MONTH, de.EXP_NAME)
-				.fetchSet(mapping(Expense::new));
+				.fetch(mapping(Expense::new));
 	}
 }

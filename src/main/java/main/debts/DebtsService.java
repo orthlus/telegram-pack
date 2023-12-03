@@ -12,16 +12,19 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.time.LocalDate.parse;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.rangeClosed;
 
 @Component
@@ -32,7 +35,7 @@ public class DebtsService {
 	private final String[] dateParsePatterns = {"dd.MM.yy", "dd,MM,yy", "dd MM yy", "yyyy-MM-dd"};
 
 	public String getExpensesTextByDate(String messageText) {
-		Set<Expense> expenses = repo.getExpenses(parseDate(messageText));
+		List<Expense> expenses = repo.getExpenses(parseDate(messageText));
 		return calculateExpenses(expenses);
 	}
 
@@ -49,7 +52,7 @@ public class DebtsService {
 	}
 
 	public String getExpensesText() {
-		Set<Expense> expenses = repo.getExpenses();
+		List<Expense> expenses = repo.getExpenses();
 		return calculateExpenses(expenses);
 	}
 
@@ -108,45 +111,95 @@ public class DebtsService {
 		return new IncomeDto(amount, day);
 	}
 
-	private String calculateExpenses(Set<Expense> expenses) {
+	private String calculateExpenses(List<Expense> expenses) {
+		List<Income> incomes = new ArrayList<>(repo.getIncomes());
+
+		if (incomes.size() == 2) {
+			return calculateExpensesWithGroup(expenses, incomes);
+		} else {
+			return calculateExpensesByDefault(expenses);
+		}
+	}
+
+	private String calculateExpensesWithGroup(List<Expense> expenses, List<Income> incomes) {
+		Income income1 = incomes.get(0);
+		Income income2 = incomes.get(1);
+
+		int day1 = min(income1.day(), income2.day());
+		int day2 = max(income1.day(), income2.day());
+
+		List<Expense> grouped1 = filterAndGroupExpenses(expenses, getExpr(1, day1, day2));
+		List<Expense> grouped2 = filterAndGroupExpenses(expenses, getExpr(2, day1, day2));
+
+		grouped1.addAll(grouped2);
+
+		String mainContent = grouped1.stream()
+				.map(Expense::toString)
+				.collect(joining("\n"));
+
+		int sumAfterDay1 = expenses.stream()
+				.filter(getExpr(1, day1, day2))
+				.mapToInt(Expense::amount)
+				.sum();
+		int sumAfterDay2 = expenses.stream()
+				.filter(getExpr(2, day1, day2))
+				.mapToInt(Expense::amount)
+				.sum();
+		String text = """
+				%s
+				Итого: %d
+				траты с 1-ой получки - %d
+				траты со 2-ой получки - %d"""
+				.formatted(mainContent, sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
+		return appendNextSixMonthExpenses(text);
+	}
+
+	private List<Expense> filterAndGroupExpenses(List<Expense> expenses, Predicate<Expense> expensePredicate) {
+		List<Expense> list = expenses.stream()
+				.filter(expensePredicate)
+				.collect(toMap(Expense::name, Function.identity(), this::expenseMerge))
+				.values()
+				.stream()
+				.sorted()
+				.toList();
+		return new ArrayList<>(list);
+	}
+
+	private String calculateExpensesByDefault(List<Expense> expenses) {
+		int sum = expenses.stream()
+				.map(Expense::amount)
+				.mapToInt(Integer::intValue)
+				.sum();
 		String text = expenses
 				.stream()
 				.map(Expense::toString)
 				.collect(joining("\n"))
-				+ "\n==========\n";
+				+ "\n==========\n"
+				+ "Итого: " + sum;
+		return appendNextSixMonthExpenses(text);
+	}
 
-		List<Income> incomes = new ArrayList<>(repo.getIncomes());
-		if (incomes.size() == 2) {
-			Income income1 = incomes.get(0);
-			Income income2 = incomes.get(1);
-
-			int day1 = min(income1.day(), income2.day());
-			int day2 = max(income1.day(), income2.day());
-
-			int sumAfterDay1 = expenses.stream()
-					.filter(e -> e.day() >= day1 && e.day() < day2)
-					.mapToInt(Expense::amount)
-					.sum();
-			int sumAfterDay2 = expenses.stream()
-					.filter(e -> e.day() >= day2 || e.day() < day1)
-					.mapToInt(Expense::amount)
-					.sum();
-			text += """
-					Итого: %d
-					траты с 1-ой получки - %d
-					траты со 2-ой получки - %d"""
-					.formatted(sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
-		} else {
-			int sum = expenses.stream()
-					.map(Expense::amount)
-					.mapToInt(Integer::intValue)
-					.sum();
-			text += "Итого: " + sum;
-		}
+	private String appendNextSixMonthExpenses(String text) {
 		int nextSixMonth = calculateSumExpensesForNextSixMonth();
-		text += "\nНакопить: " + formatMoneyNumber(nextSixMonth);
+		return text + ("\nНакопить: " + formatMoneyNumber(nextSixMonth));
+	}
 
-		return text;
+	private Predicate<Expense> getExpr(int caseNumber, int day1, int day2) {
+		return switch (caseNumber) {
+			case 1 -> e -> e.day() >= day1 && e.day() < day2;
+			case 2 -> e -> e.day() >= day2 || e.day() < day1;
+			default -> throw new IllegalStateException("Unexpected value: " + caseNumber);
+		};
+	}
+
+	private Expense expenseMerge(Expense e1, Expense e2) {
+		if (!e1.name().equals(e2.name())) throw new IllegalArgumentException("expenses should be with same 'name'");
+
+		return new Expense(e1.id(),
+				e1.name(),
+				e1.amount() + e2.amount(),
+				min(e1.day(), e2.day()),
+				Collections.max(asList(e1.expireDate(), e2.expireDate())));
 	}
 
 	private int calculateSumExpensesForNextSixMonth() {
@@ -155,7 +208,7 @@ public class DebtsService {
 
 		return dates.stream()
 				.map(repo::getExpenses)
-				.flatMap(Set::stream)
+				.flatMap(List::stream)
 				.mapToInt(Expense::amount)
 				.sum();
 	}
