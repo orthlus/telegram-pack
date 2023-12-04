@@ -1,5 +1,9 @@
 package main.payments_reminders.telegram.callback;
 
+import art.aelaort.telegram.callback.models.CallbackData;
+import art.aelaort.telegram.callback.models.RemindCallback;
+import art.aelaort.telegram.callback.models.RemindDaysCallback;
+import art.aelaort.telegram.callback.models.SomeCallback;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

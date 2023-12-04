@@ -1,9 +1,9 @@
 package main.payments_reminders.telegram;
 
+import art.aelaort.telegram.callback.models.CallbackData;
 import lombok.RequiredArgsConstructor;
 import main.common.telegram.TgKeyboard;
 import main.payments_reminders.entity.RemindToSend;
-import main.payments_reminders.telegram.callback.CallbackData;
 import main.payments_reminders.telegram.callback.CallbackDataMapper;
 import main.payments_reminders.telegram.callback.CallbackTypeMapper;
 import org.springframework.stereotype.Component;

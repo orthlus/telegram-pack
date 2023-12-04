@@ -135,6 +135,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
         </dependency>
+        <dependency>
+            <groupId>art.aelaort</groupId>
+            <artifactId>aelaort-telegram-models</artifactId>
+            <version>2.0</version>
+        </dependency>
     </dependencies>
 
     <build>

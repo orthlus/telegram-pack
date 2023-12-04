@@ -1,5 +1,8 @@
 package main.payments_reminders.telegram.callback;
 
+import art.aelaort.telegram.callback.models.RemindCallback;
+import art.aelaort.telegram.callback.models.RemindDaysCallback;
+import art.aelaort.telegram.callback.models.SomeCallback;
 import main.payments_reminders.entity.RemindToSend;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
