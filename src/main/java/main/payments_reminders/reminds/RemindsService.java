@@ -1,9 +1,9 @@
 package main.payments_reminders.reminds;
 
+import art.aelaort.telegram.entity.Remind;
+import art.aelaort.telegram.entity.RemindWithoutId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.payments_reminders.entity.Remind;
-import main.payments_reminders.entity.RemindWithoutId;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Component;
 

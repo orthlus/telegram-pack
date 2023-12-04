@@ -1,15 +1,15 @@
 package main.payments_reminders.telegram.callback;
 
+import art.aelaort.telegram.callback.CallbackType;
 import art.aelaort.telegram.callback.models.CallbackData;
 import art.aelaort.telegram.callback.models.RemindCallback;
 import art.aelaort.telegram.callback.models.RemindDaysCallback;
 import art.aelaort.telegram.callback.models.SomeCallback;
+import art.aelaort.telegram.entity.Remind;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import main.payments_reminders.entity.Remind;
 import main.payments_reminders.reminds.Repo;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class CallbackDataMapper {
 
 	public Optional<CallbackType> getTypeFromQuery(CallbackQuery callbackQuery) {
 		try {
-			val someCallback = mapper.readValue(callbackQuery.getData(), SomeCallback.class);
+			SomeCallback someCallback = mapper.readValue(callbackQuery.getData(), SomeCallback.class);
 			return Optional.of(typesById.get(someCallback.typeId()));
 		} catch (JsonProcessingException e) {
 			log.error("Error parsing callback type from query: {}", callbackQuery.getData(), e);

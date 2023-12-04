@@ -1,30 +1,22 @@
 package main.payments_reminders.reminds;
 
+import art.aelaort.telegram.entity.Remind;
+import art.aelaort.telegram.entity.RemindWithoutId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.Main;
-import main.payments_reminders.entity.Remind;
-import main.payments_reminders.entity.RemindToSend;
-import main.payments_reminders.entity.RemindWithoutId;
 import main.tables.PaymentsHoldsOnReminders;
 import main.tables.PaymentsReminders;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.DatePart;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 import static main.Tables.PAYMENTS_HOLDS_ON_REMINDERS;
 import static main.tables.PaymentsReminders.PAYMENTS_REMINDERS;
 import static org.jooq.Records.mapping;
-import static org.jooq.impl.DSL.coalesce;
-import static org.jooq.impl.DSL.extract;
 
 @Slf4j
 @Component
@@ -91,25 +83,6 @@ public class Repo {
 				.orderBy(pr.START_DAY_OF_MONTH)
 				.fetchSet(mapping(Remind::new));
 
-	}
-
-	public List<RemindToSend> getRemindsForNow() {
-		LocalDateTime now = LocalDateTime.now(Main.zone);
-
-		Condition startDayEq = pr.START_DAY_OF_MONTH.lessOrEqual(extract(now, DatePart.DAY));
-		Condition endDayEq = pr.END_DAY_OF_MONTH.greaterOrEqual(extract(now, DatePart.DAY));
-		Condition timeEq = pr.HOUR_OF_DAY_TO_FIRE.eq(extract(now, DatePart.HOUR));
-		Condition holdDateEq = phor.HOLD_END_DT.lessOrEqual(now.toLocalDate());
-
-		return db.select(pr.ID, pr.REMIND_NAME)
-				.from(pr)
-				.leftJoin(phor)
-				.on(pr.ID.eq(phor.REMIND_ID))
-				.where(startDayEq
-						.and(endDayEq)
-						.and(timeEq)
-						.and(coalesce(holdDateEq, true)))
-				.fetch(mapping(RemindToSend::new));
 	}
 
 	@Cacheable("reminds")

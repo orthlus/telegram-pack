@@ -138,7 +138,7 @@
         <dependency>
             <groupId>art.aelaort</groupId>
             <artifactId>aelaort-telegram-models</artifactId>
-            <version>2.0</version>
+            <version>4.0</version>
         </dependency>
     </dependencies>
 
