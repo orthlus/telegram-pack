@@ -1,4 +1,4 @@
-package main.payments_reminders.reminds;
+package main.payments_reminders;
 
 import art.aelaort.telegram.entity.Remind;
 import art.aelaort.telegram.entity.RemindWithoutId;

@@ -1,4 +1,4 @@
-package main.payments_reminders.telegram.callback;
+package main.payments_reminders;
 
 import art.aelaort.telegram.callback.CallbackType;
 import art.aelaort.telegram.callback.models.CallbackData;
@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.payments_reminders.reminds.Repo;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
