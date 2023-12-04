@@ -53,15 +53,6 @@ public class CallbackDataMapper {
 		}
 	}
 
-	public String dataToJson(CallbackData data) {
-		try {
-			return mapper.writeValueAsString(data);
-		} catch (JsonProcessingException e) {
-			log.error("Error serialize callback data {}", data, e);
-			throw new RuntimeException(e);
-		}
-	}
-
 	private <T extends CallbackData> Optional<T> getDataFromQuery(CallbackQuery query, Class<T> clazz) {
 		if (getTypeFromQuery(query).isPresent()) {
 			return fromJson(query.getData(), clazz);

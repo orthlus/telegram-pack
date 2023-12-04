@@ -1,10 +1,12 @@
 package main.payments_reminders.telegram;
 
 import art.aelaort.telegram.callback.models.CallbackData;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.TgKeyboard;
 import main.payments_reminders.entity.RemindToSend;
-import main.payments_reminders.telegram.callback.CallbackDataMapper;
 import main.payments_reminders.telegram.callback.CallbackTypeMapper;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -12,15 +14,20 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import static main.payments_reminders.telegram.callback.CallbackType.HOLD_ON_PAYMENT_SELECT_DAYS;
 import static main.payments_reminders.telegram.callback.CallbackType.SUBMIT_PAYMENT;
 
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class KeyboardsProvider implements TgKeyboard {
-	private final CallbackDataMapper dataMapper;
 	private final CallbackTypeMapper typeMapper;
+	private final ObjectMapper mapper = new ObjectMapper();
 
-	private String toJson(CallbackData data) {
-		return dataMapper.dataToJson(data);
+	public String toJson(CallbackData data) {
+		try {
+			return mapper.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error serialize callback data {}", data, e);
+			throw new RuntimeException(e);
+		}
 	}
 
 	public InlineKeyboardMarkup getRemindButtons(RemindToSend remind) {
