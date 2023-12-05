@@ -51,6 +51,11 @@ public class DebtsService {
 		return "%s\n==========\nИтого: %d".formatted(list, sum);
 	}
 
+	public String getExpensesDetailsText() {
+		List<Expense> expenses = repo.getExpenses();
+		return calculateExpensesByDefault(expenses);
+	}
+
 	public String getExpensesText() {
 		List<Expense> expenses = repo.getExpenses();
 		return calculateExpenses(expenses);

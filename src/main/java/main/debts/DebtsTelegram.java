@@ -31,6 +31,7 @@ public class DebtsTelegram implements DefaultWebhookBot {
 		DELETE_EXPENSE("/delete_expense"),
 		INCOMES("/incomes"),
 		EXPENSES("/expenses"),
+		EXPENSES_DETAILS("/expenses_details"),
 		EXPENSES_FOR_DATE("/expenses_for_date");
 		final String command;
 	}
@@ -146,6 +147,10 @@ public class DebtsTelegram implements DefaultWebhookBot {
 			}
 			case EXPENSES -> {
 				String text = service.getExpensesText();
+				yield sendInMonospace(text);
+			}
+			case EXPENSES_DETAILS -> {
+				String text = service.getExpensesDetailsText();
 				yield sendInMonospace(text);
 			}
 			case EXPENSES_FOR_DATE -> {
