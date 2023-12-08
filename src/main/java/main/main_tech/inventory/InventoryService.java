@@ -24,8 +24,8 @@ public class InventoryService {
 
 	public String getStringListForMonitoring() {
 		return repo.getServers().stream()
-				.filter(Server::activeMonitoring)
-				.map(server -> server.address() + ":" + server.sshPort())
+				.filter(Server::isActiveMonitoring)
+				.map(server -> server.getAddress() + ":" + server.getSshPort())
 				.collect(Collectors.joining("\n"))
 				+ "\n";
 	}

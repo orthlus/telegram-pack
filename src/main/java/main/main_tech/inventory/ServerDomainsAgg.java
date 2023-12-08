@@ -1,18 +1,23 @@
 package main.main_tech.inventory;
 
-public record ServerDomainsAgg(
-		int id,
-		String address,
-		Integer sshPort,
-		String name,
-		String domainName,
-		Integer cpu,
-		Double ram,
-		Integer drive,
-		Integer addDrive,
-		String hostingId,
-		String os,
-		boolean activeMonitoring,
-		String hostingName
-) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class ServerDomainsAgg {
+	private int id;
+	private String address;
+	private Integer sshPort;
+	private String name;
+	private Integer cpu;
+	private Double ram;
+	private Integer drive;
+	private Integer addDrive;
+	private String hostingId;
+	private String os;
+	private boolean activeMonitoring;
+	private String hostingName;
+
+	private String domainName;
 }

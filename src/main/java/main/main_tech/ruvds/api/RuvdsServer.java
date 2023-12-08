@@ -1,21 +1,26 @@
 package main.main_tech.ruvds.api;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import main.main_tech.ServerWithName;
 
-public record RuvdsServer(
-		String name,
-		long id,
-		int cpu,
-		double ramGb,
-		int driveGb,
-		int driveTariffId,
-		Integer additionalDriveGb,
-		Integer additionalDriveTariffId,
-		ServerStatus status,
-		int createProgress,
-		int tariffId,
-		int paymentPeriod,
-		Integer osId,
-		int ip
-) implements ServerWithName {
+@Getter
+@Accessors(fluent = true)
+@AllArgsConstructor
+public class RuvdsServer implements ServerWithName {
+	private String name;
+	private long id;
+	private int cpu;
+	private double ramGb;
+	private int driveGb;
+	private int driveTariffId;
+	private Integer additionalDriveGb;
+	private Integer additionalDriveTariffId;
+	private ServerStatus status;
+	private int createProgress;
+	private int tariffId;
+	private int paymentPeriod;
+	private Integer osId;
+	private int ip;
 }

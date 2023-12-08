@@ -45,10 +45,11 @@ public class Repo {
 	public Set<ServerDomainsAgg> getServersWithDomains() {
 		return db.select(
 						tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
-						groupConcat(concat(concat(tidr.SUB_DOMAIN, "."), tidr.CORE_DOMAIN)),
 						tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
 						tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
-						tis.HOSTING_NAME)
+						tis.HOSTING_NAME,
+						groupConcat(concat(concat(tidr.SUB_DOMAIN, "."), tidr.CORE_DOMAIN))
+				)
 				.from(tis)
 				.leftJoin(tidr)
 					.on(tis.ADDRESS.eq(tidr.ADDRESS))

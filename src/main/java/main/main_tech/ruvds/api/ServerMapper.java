@@ -13,7 +13,7 @@ import java.util.Set;
 public interface ServerMapper {
 	Set<ServerDomains> mapAggServers(Set<ServerDomainsAgg> s);
 
-	@Mapping(target = "domains", expression = "java(parseDomains(s.domainName()))")
+	@Mapping(target = "domains", expression = "java(parseDomains(s.getDomainName()))")
 	ServerDomains map(ServerDomainsAgg s);
 
 	default Set<String> parseDomains(String domainsStr) {
