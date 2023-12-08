@@ -1,5 +1,7 @@
 package main.main_tech.ruvds.api;
 
+import main.main_tech.ServerWithName;
+
 public record RuvdsServer(
 		String name,
 		long id,
@@ -15,5 +17,5 @@ public record RuvdsServer(
 		int paymentPeriod,
 		Integer osId,
 		int ip
-) {
+) implements ServerWithName {
 }

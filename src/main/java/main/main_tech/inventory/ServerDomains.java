@@ -1,5 +1,7 @@
 package main.main_tech.inventory;
 
+import main.main_tech.ServerWithName;
+
 import java.util.Set;
 
 public record ServerDomains(
@@ -16,5 +18,5 @@ public record ServerDomains(
 		String os,
 		boolean activeMonitoring,
 		String hostingName
-) {
+) implements ServerWithName {
 }

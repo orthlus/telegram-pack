@@ -1,5 +1,6 @@
 package main.main_tech.inventory;
 
+import main.main_tech.ServerWithName;
 import main.main_tech.ruvds.api.RuvdsServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ public class NamingService {
 	}
 
 	public String formatDomainsRuvds(Set<RuvdsServer> servers) {
-		List<RuvdsServer> list = sortRuvds(servers);
+		List<RuvdsServer> list = sort(servers);
 		List<RuvdsServer>[] lists = new List[domains.length + 1];
 		StringBuilder sb = new StringBuilder();
 
@@ -121,16 +122,10 @@ public class NamingService {
 				.collect(joining("\n"));
 	}
 
-	private List<RuvdsServer> sortRuvds(Set<RuvdsServer> set) {
-		List<RuvdsServer> list = new ArrayList<>(set);
-		list.sort(comparing(ruvdsServer -> dropDomains(ruvdsServer.name())));
-		return list;
-	}
-
-	private List<ServerDomains> sort(Set<ServerDomains> set) {
-		List<ServerDomains> list = new ArrayList<>(set);
-		list.sort(comparing(server -> dropDomains(server.name())));
-		return list;
+	private <T extends ServerWithName> List<T> sort(Set<T> set) {
+		return set.stream()
+				.sorted(comparing(server -> dropDomains(server.name())))
+				.toList();
 	}
 
 	private String format(ServerDomains s) {
