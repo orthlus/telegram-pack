@@ -1,9 +1,8 @@
-package main.main_tech.ruvds.api;
+package main.main_tech.servers.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import main.main_tech.ServerWithName;
 
 @Getter
 @Accessors(fluent = true)

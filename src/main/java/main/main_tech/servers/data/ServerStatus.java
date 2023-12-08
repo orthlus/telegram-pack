@@ -1,4 +1,4 @@
-package main.main_tech.ruvds.api;
+package main.main_tech.servers.data;
 
 public enum ServerStatus {
 	initializing,

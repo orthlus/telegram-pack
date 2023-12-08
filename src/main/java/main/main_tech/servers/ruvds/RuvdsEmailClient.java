@@ -1,4 +1,4 @@
-package main.main_tech;
+package main.main_tech.servers.ruvds;
 
 import com.google.common.collect.Sets;
 import com.sun.mail.util.MailSSLSocketFactory;

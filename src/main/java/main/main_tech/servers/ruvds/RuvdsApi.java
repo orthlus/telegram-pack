@@ -1,10 +1,11 @@
-package main.main_tech.ruvds.api;
+package main.main_tech.servers.ruvds;
 
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.main_tech.servers.data.RuvdsServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

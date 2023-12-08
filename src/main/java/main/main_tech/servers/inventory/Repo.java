@@ -1,7 +1,9 @@
-package main.main_tech.inventory;
+package main.main_tech.servers.inventory;
 
 import lombok.RequiredArgsConstructor;
-import main.main_tech.ruvds.api.RuvdsServer;
+import main.main_tech.servers.data.InventoryServer;
+import main.main_tech.servers.data.InventoryServerDomainsString;
+import main.main_tech.servers.data.RuvdsServer;
 import main.tables.TechInventoryDomainsRecords;
 import main.tables.TechInventoryServers;
 import org.jooq.Condition;
@@ -42,7 +44,7 @@ public class Repo {
 		}
 	}
 
-	public Set<ServerDomainsAgg> getServersWithDomains() {
+	public Set<InventoryServerDomainsString> getServersWithDomains() {
 		return db.select(
 						tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
 						tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
@@ -54,17 +56,17 @@ public class Repo {
 				.leftJoin(tidr)
 					.on(tis.ADDRESS.eq(tidr.ADDRESS))
 				.groupBy(tis)
-				.fetchSet(mapping(ServerDomainsAgg::new));
+				.fetchSet(mapping(InventoryServerDomainsString::new));
 	}
 
-	public Set<Server> getServers() {
+	public Set<InventoryServer> getServers() {
 		return db.select(
 				tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
 				tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
 				tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
 				tis.HOSTING_NAME)
 				.from(tis)
-				.fetchSet(mapping(Server::new));
+				.fetchSet(mapping(InventoryServer::new));
 	}
 
 	public void setSshPortById(int serverId, int sshPort) {

@@ -1,7 +1,8 @@
-package main.main_tech.inventory;
+package main.main_tech.servers.inventory;
 
-import main.main_tech.ServerWithName;
-import main.main_tech.ruvds.api.RuvdsServer;
+import main.main_tech.servers.data.ServerWithName;
+import main.main_tech.servers.data.InventoryServerWithDomains;
+import main.main_tech.servers.data.RuvdsServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -70,14 +71,14 @@ public class NamingService {
 		return sb.toString();
 	}
 
-	public String formatDomains(Set<ServerDomains> servers) {
-		List<ServerDomains> list = sort(servers);
-		List<ServerDomains>[] lists = new List[domains.length + 1];
+	public String formatDomains(Set<InventoryServerWithDomains> servers) {
+		List<InventoryServerWithDomains> list = sort(servers);
+		List<InventoryServerWithDomains>[] lists = new List[domains.length + 1];
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < domains.length; i++) {
 			lists[i] = new ArrayList<>(list.size());
-			for (ServerDomains server : list) {
+			for (InventoryServerWithDomains server : list) {
 				if (server.name().contains(domains[i])) {
 					lists[i].add(server);
 				}
@@ -85,7 +86,7 @@ public class NamingService {
 		}
 
 		lists[lists.length - 1] = new ArrayList<>(list.size());
-		for (ServerDomains server : list) {
+		for (InventoryServerWithDomains server : list) {
 			if (notContainsDomain(server.name())) {
 				lists[lists.length - 1].add(server);
 			}
@@ -116,7 +117,7 @@ public class NamingService {
 				.collect(joining("\n"));
 	}
 
-	private String formatAndJoin(List<ServerDomains> servers) {
+	private String formatAndJoin(List<InventoryServerWithDomains> servers) {
 		return servers.stream()
 				.map(this::format)
 				.collect(joining("\n"));
@@ -128,7 +129,7 @@ public class NamingService {
 				.toList();
 	}
 
-	private String format(ServerDomains s) {
+	private String format(InventoryServerWithDomains s) {
 		String name = dropDomains(s.name());
 		String str = """
 				<b>%s</b>

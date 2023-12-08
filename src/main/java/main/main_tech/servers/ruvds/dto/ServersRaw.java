@@ -1,4 +1,4 @@
-package main.main_tech.ruvds.api;
+package main.main_tech.servers.ruvds.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

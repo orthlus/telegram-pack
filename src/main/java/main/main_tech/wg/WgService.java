@@ -2,9 +2,9 @@ package main.main_tech.wg;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.main_tech.wg.m.Item;
-import main.main_tech.wg.m.Raw;
-import main.main_tech.wg.m.User;
+import main.main_tech.wg.data.Item;
+import main.main_tech.wg.data.Raw;
+import main.main_tech.wg.data.User;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -1,16 +1,11 @@
-package main.main_tech.inventory;
+package main.main_tech.servers.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.experimental.Accessors;
-import main.main_tech.ServerWithName;
-
-import java.util.Set;
 
 @Getter
-@Accessors(fluent = true)
 @AllArgsConstructor
-public final class ServerDomains implements ServerWithName {
+public class InventoryServer {
 	private int id;
 	private String address;
 	private Integer sshPort;
@@ -23,6 +18,4 @@ public final class ServerDomains implements ServerWithName {
 	private String os;
 	private boolean activeMonitoring;
 	private String hostingName;
-
-	private Set<String> domains;
 }

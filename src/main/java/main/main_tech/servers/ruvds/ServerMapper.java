@@ -1,8 +1,11 @@
-package main.main_tech.ruvds.api;
+package main.main_tech.servers.ruvds;
 
-import main.main_tech.inventory.Server;
-import main.main_tech.inventory.ServerDomains;
-import main.main_tech.inventory.ServerDomainsAgg;
+import main.main_tech.servers.data.InventoryServerDomainsString;
+import main.main_tech.servers.data.InventoryServer;
+import main.main_tech.servers.data.InventoryServerWithDomains;
+import main.main_tech.servers.data.RuvdsServer;
+import main.main_tech.servers.ruvds.dto.ServerRaw;
+import main.main_tech.servers.ruvds.dto.ServersRaw;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -11,10 +14,10 @@ import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface ServerMapper {
-	Set<ServerDomains> mapAggServers(Set<ServerDomainsAgg> s);
+	Set<InventoryServerWithDomains> mapAggServers(Set<InventoryServerDomainsString> s);
 
 	@Mapping(target = "domains", expression = "java(parseDomains(s.getDomainName()))")
-	ServerDomains map(ServerDomainsAgg s);
+	InventoryServerWithDomains map(InventoryServerDomainsString s);
 
 	default Set<String> parseDomains(String domainsStr) {
 		if (domainsStr == null) return Set.of();
@@ -37,7 +40,7 @@ public interface ServerMapper {
 		}
 	}
 
-	ServerDomainsAgg map(Server s, String domainName);
+	InventoryServerDomainsString map(InventoryServer s, String domainName);
 
 	@Mapping(target = "additionalDriveGb", source = "additionalDrive")
 	@Mapping(target = "driveGb", source = "drive")

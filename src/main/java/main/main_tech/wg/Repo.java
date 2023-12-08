@@ -1,8 +1,8 @@
 package main.main_tech.wg;
 
 import lombok.RequiredArgsConstructor;
-import main.main_tech.wg.m.Item;
-import main.main_tech.wg.m.User;
+import main.main_tech.wg.data.Item;
+import main.main_tech.wg.data.User;
 import main.tables.WgLastStat;
 import main.tables.WgUsers;
 import main.tables.records.WgLastStatRecord;

@@ -1,7 +1,7 @@
-package main.main_tech.monitoring;
+package main.main_tech.servers.monitoring;
 
 import lombok.RequiredArgsConstructor;
-import main.main_tech.inventory.InventoryService;
+import main.main_tech.servers.inventory.InventoryService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

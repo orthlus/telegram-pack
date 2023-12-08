@@ -1,11 +1,11 @@
-package main.main_tech.inventory;
+package main.main_tech.servers.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ServerDomainsAgg {
+public class InventoryServerDomainsString {
 	private int id;
 	private String address;
 	private Integer sshPort;
