@@ -14,7 +14,11 @@ public class AddAndDeleteDomainResponse {
 
 	public boolean isResultSuccess() {
 		String success = "success";
-		return result.equals(success) && answer.domains.get(0).result.equals(success);
+		try {
+			return result.equals(success) && answer.domains.get(0).result.equals(success);
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
