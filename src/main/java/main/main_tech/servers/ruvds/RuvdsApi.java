@@ -1,36 +1,38 @@
 package main.main_tech.servers.ruvds;
 
-import feign.Feign;
-import feign.jackson.JacksonDecoder;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import main.main_tech.servers.data.RuvdsServer;
+import main.main_tech.servers.ruvds.dto.ServersRaw;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Set;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RuvdsApi {
-	@Value("${main_tech.ruvds.api.url}")
-	private String url;
-	@Value("${main_tech.ruvds.api.token}")
-	private String token;
-	private RuvdsHttp client;
+	private WebClient client;
 	private final ServerMapper mapper;
 
-	@PostConstruct
-	private void init() {
-		client = Feign.builder()
-				.decoder(new JacksonDecoder())
-				.requestInterceptor(template -> template.header("Authorization", "Bearer " + token))
-				.target(RuvdsHttp.class, url);
+	@Autowired
+	private void init(
+			@Value("${main_tech.ruvds.api.url}") String url,
+			@Value("${main_tech.ruvds.api.token}") String token
+	) {
+		client = WebClient.builder()
+				.baseUrl(url)
+				.defaultHeaders(h -> h.setBearerAuth(token))
+				.build();
 	}
 
 	public Set<RuvdsServer> getServers() {
-		return mapper.map(client.servers());
+		return client.get()
+				.uri("/servers")
+				.retrieve()
+				.bodyToMono(ServersRaw.class)
+				.map(mapper::map)
+				.block();
 	}
 }
