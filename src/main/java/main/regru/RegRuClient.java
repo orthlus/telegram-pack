@@ -1,61 +1,31 @@
 package main.regru;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.regru.common.RR;
 import main.regru.common.dto.AddAndDeleteDomainResponse;
 import main.regru.common.dto.DomainsList;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
 
 import java.util.List;
 
-import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.springframework.web.reactive.function.BodyInserters.fromFormData;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RegRuClient {
-	@Value("${regru.api.url}")
-	private String baseUrl;
 	@Value("${regru.account.user}")
 	private String login;
 	@Value("${regru.account.password}")
 	private String password;
 
-	private WebClient client;
-
-	@PostConstruct
-	private void init() {
-		HttpClient httpClient = HttpClient.create()
-				.option(CONNECT_TIMEOUT_MILLIS, ((int) MINUTES.toMillis(2)));
-		client = WebClient.builder()
-				.baseUrl(baseUrl)
-				.clientConnector(new ReactorClientHttpConnector(httpClient))
-				.defaultHeaders(h -> h.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
-				.exchangeStrategies(ExchangeStrategies.builder().codecs(configurer -> {
-					ObjectMapper mapper = new ObjectMapper();
-					mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-					MimeType mimeType = MimeTypeUtils.parseMimeType(MediaType.TEXT_PLAIN_VALUE);
-					Jackson2JsonDecoder codec = new Jackson2JsonDecoder(mapper, mimeType);
-					configurer.customCodecs().register(codec);
-				}).build())
-				.build();
-	}
+	@Qualifier("regruWebClient")
+	private final WebClient client;
 
 	private BodyInserters.FormInserter<String> basicFormData(String domainName) {
 		return fromFormData("username", login)
