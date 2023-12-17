@@ -2,6 +2,7 @@ package main.domains;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import main.common.telegram.Command;
 import main.common.telegram.DefaultWebhookBot;
 import main.domains.common.ChatState;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static com.google.common.net.InetAddresses.isInetAddress;
 import static main.domains.common.ChatStates.*;
 
+@RequiredArgsConstructor
 abstract class RegruTelegram implements DefaultWebhookBot {
 	@AllArgsConstructor
 	@Getter
@@ -31,11 +33,6 @@ abstract class RegruTelegram implements DefaultWebhookBot {
 	private final RegRuService regRuService;
 	private final ChatState chatState;
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
-
-	public RegruTelegram(RegRuService regRuService, ChatState chatState) {
-		this.regRuService = regRuService;
-		this.chatState = chatState;
-	}
 
 	abstract String getDomainName();
 
