@@ -1,10 +1,10 @@
-package main.regru;
+package main.domains;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.regru.common.RR;
-import main.regru.common.dto.AddAndDeleteDomainResponse;
-import main.regru.common.dto.DomainsList;
+import main.domains.common.RR;
+import main.domains.common.dto.AddAndDeleteDomainResponse;
+import main.domains.common.dto.DomainsList;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

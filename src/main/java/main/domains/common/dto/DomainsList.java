@@ -1,4 +1,4 @@
-package main.regru.common.dto;
+package main.domains.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

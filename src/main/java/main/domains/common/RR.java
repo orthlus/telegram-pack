@@ -1,4 +1,4 @@
-package main.regru.common;
+package main.domains.common;
 
 public record RR(String ip, String domain) {
 }

@@ -1,7 +1,7 @@
-package main.regru;
+package main.domains;
 
 import lombok.Getter;
-import main.regru.common.ChatState;
+import main.domains.common.ChatState;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

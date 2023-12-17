@@ -1,4 +1,4 @@
-package main.regru.common;
+package main.domains.common;
 
 public enum ChatStates {
 	NOTHING_WAIT,

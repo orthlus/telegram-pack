@@ -1,7 +1,7 @@
-package main.regru;
+package main.domains;
 
 import lombok.RequiredArgsConstructor;
-import main.regru.common.RR;
+import main.domains.common.RR;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

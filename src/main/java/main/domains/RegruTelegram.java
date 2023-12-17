@@ -1,11 +1,11 @@
-package main.regru;
+package main.domains;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import main.common.telegram.Command;
 import main.common.telegram.DefaultWebhookBot;
-import main.regru.common.ChatState;
-import main.regru.common.RR;
+import main.domains.common.ChatState;
+import main.domains.common.RR;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 import static com.google.common.net.InetAddresses.isInetAddress;
-import static main.regru.common.ChatStates.*;
+import static main.domains.common.ChatStates.*;
 
 abstract class RegruTelegram implements DefaultWebhookBot {
 	@AllArgsConstructor

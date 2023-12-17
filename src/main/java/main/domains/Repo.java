@@ -1,7 +1,7 @@
-package main.regru;
+package main.domains;
 
 import lombok.RequiredArgsConstructor;
-import main.regru.common.RR;
+import main.domains.common.RR;
 import main.tables.TechInventoryDomainsRecords;
 import main.tables.records.TechInventoryDomainsRecordsRecord;
 import org.jooq.DSLContext;

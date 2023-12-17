@@ -1,4 +1,4 @@
-package main.regru.common;
+package main.domains.common;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static main.regru.common.ChatStates.NOTHING_WAIT;
+import static main.domains.common.ChatStates.NOTHING_WAIT;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
