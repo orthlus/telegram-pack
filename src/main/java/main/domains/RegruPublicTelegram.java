@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class RegruPublicTelegram extends RegruTelegram {
-	@Value("${regru.pub.telegram.bot.nickname}")
+	@Value("${domains.2.telegram.bot.nickname}")
 	private String nickname;
-	@Value("${regru.pub.domain.name}")
+	@Value("${domains.2.domain.name}")
 	private String domainName;
 
 	public RegruPublicTelegram(RegRuService regRuService, ChatState chatState) {
