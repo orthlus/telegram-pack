@@ -28,7 +28,6 @@ public class WebClientConfigurations {
 	}
 
 	@Bean
-	@Qualifier("regruWebClient")
 	public WebClient regruWebClient(
 			@Value("${regru.api.url}") String baseUrl
 	) {
@@ -47,7 +46,6 @@ public class WebClientConfigurations {
 	}
 
 	@Bean
-	@Qualifier("wgWebClient")
 	public WebClient wgWebClient(
 			@Value("${main_tech.api.url}") String url,
 			@Value("${main_tech.api.user}") String user,
@@ -61,7 +59,6 @@ public class WebClientConfigurations {
 	}
 
 	@Bean
-	@Qualifier("ruvdsWebClient")
 	public WebClient ruvdsWebClient(
 			@Value("${main_tech.ruvds.api.url}") String url,
 			@Value("${main_tech.ruvds.api.token}") String token
