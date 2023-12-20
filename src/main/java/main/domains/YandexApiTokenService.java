@@ -21,7 +21,7 @@ public class YandexApiTokenService {
 	@Value("${yandex.dns.key-id}")
 	private String keyId;
 
-	private LocalDateTime tokenReleaseTime;
+	private LocalDateTime tokenReleaseTime = LocalDateTime.now().minusDays(1);
 	private String iamToken;
 
 	public String getIAMToken() {
@@ -33,9 +33,7 @@ public class YandexApiTokenService {
 	}
 
 	private boolean isTokenNotFresh() {
-		return tokenReleaseTime != null &&
-				tokenReleaseTime.plusMinutes(30)
-						.isBefore(LocalDateTime.now(Main.zone));
+		return tokenReleaseTime.plusMinutes(30).isBefore(LocalDateTime.now(Main.zone));
 	}
 
 	private void updateIAMToken() {
