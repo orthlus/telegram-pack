@@ -28,6 +28,27 @@ public class WebClientConfigurations {
 	}
 
 	@Bean
+	public WebClient yandexIAMWebClient(
+			@Value("${yandex.iam.api.url}") String baseUrl
+	) {
+		return WebClient.builder()
+				.baseUrl(baseUrl)
+				.clientConnector(clientWithTimeout(1, MINUTES))
+				.build();
+	}
+
+	@Bean
+	public WebClient yandexDNSWebClient(
+			@Value("${yandex.dns.api.url}") String baseUrl
+	) {
+		return WebClient.builder()
+				.baseUrl(baseUrl)
+				.clientConnector(clientWithTimeout(1, MINUTES))
+				.defaultHeaders(h -> h.setContentType(MediaType.APPLICATION_JSON))
+				.build();
+	}
+
+	@Bean
 	public WebClient regruWebClient(
 			@Value("${regru.api.url}") String baseUrl
 	) {
