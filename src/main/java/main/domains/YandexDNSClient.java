@@ -32,8 +32,8 @@ public abstract class YandexDNSClient implements DNSClientOperations {
 		return client.get()
 				.uri(uriBuilder -> uriBuilder
 						.path(listRecordSetsUrl())
-						.queryParam("type", "A")
-						.build())
+						.queryParam("filter", "{filter}")
+						.build("type='A'"))
 				.headers(this::bearerToken)
 				.retrieve()
 				.bodyToMono(ListRecordSetsResponse.class)
