@@ -2,6 +2,7 @@ package main.domains;
 
 import lombok.RequiredArgsConstructor;
 import main.Main;
+import main.domains.common.dto.yandex.auth.IAMTokenResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -49,8 +50,10 @@ public class YandexApiTokenService {
 				.bodyValue("""
 						{"jwt": "%s"}""".formatted(jwtToken))
 				.retrieve()
-				.bodyToMono(String.class)
-				.block();
+				.bodyToMono(IAMTokenResponse.class)
+				.blockOptional()
+				.orElseThrow(() -> new RuntimeException("empty iam token"))
+				.getIamToken();
 	}
 
 	private String jwtToken() {
