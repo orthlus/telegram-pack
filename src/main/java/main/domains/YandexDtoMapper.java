@@ -11,11 +11,11 @@ import java.util.stream.Stream;
 
 @Component
 public class YandexDtoMapper {
-	public List<RR> map(List<AdditionOrDeletion> additionOrDeletions) {
+	private List<RR> map(List<AdditionOrDeletion> additionOrDeletions) {
 		return additionOrDeletions.stream().flatMap(this::map).toList();
 	}
 
-	public AdditionOrDeletion map(RR rr) {
+	private AdditionOrDeletion map(RR rr) {
 		return AdditionOrDeletion.builder()
 				.type("A")
 				.ttl("600")
@@ -24,7 +24,7 @@ public class YandexDtoMapper {
 				.build();
 	}
 
-	public Stream<RR> map(AdditionOrDeletion aod) {
+	private Stream<RR> map(AdditionOrDeletion aod) {
 		return aod.getData()
 				.stream()
 				.map(o -> new RR(o, aod.getName()));
