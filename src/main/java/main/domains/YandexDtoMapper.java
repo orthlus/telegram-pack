@@ -7,11 +7,12 @@ import main.domains.common.dto.yandex.UpdateDNSRecordsRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class YandexDtoMapper {
 	public List<RR> map(List<AdditionOrDeletion> additionOrDeletions) {
-		return additionOrDeletions.stream().map(this::map).toList();
+		return additionOrDeletions.stream().flatMap(this::map).toList();
 	}
 
 	public AdditionOrDeletion map(RR rr) {
@@ -23,8 +24,10 @@ public class YandexDtoMapper {
 				.build();
 	}
 
-	public RR map(AdditionOrDeletion aod) {
-		return new RR(aod.getData().get(0), aod.getName());
+	public Stream<RR> map(AdditionOrDeletion aod) {
+		return aod.getData()
+				.stream()
+				.map(o -> new RR(o, aod.getName()));
 	}
 
 	public List<RR> dnsResponseToRRs(ListRecordSetsResponse listResponse) {
