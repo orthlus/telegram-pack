@@ -11,8 +11,16 @@ import java.util.stream.Stream;
 
 @Component
 public class YandexDtoMapper {
-	private List<RR> map(List<AdditionOrDeletion> additionOrDeletions) {
-		return additionOrDeletions.stream().flatMap(this::map).toList();
+	public UpdateDNSRecordsRequest add(RR rr) {
+		return UpdateDNSRecordsRequest.builder()
+				.additions(List.of(map(rr)))
+				.build();
+	}
+
+	public UpdateDNSRecordsRequest delete(RR rr) {
+		return UpdateDNSRecordsRequest.builder()
+				.deletions(List.of(map(rr)))
+				.build();
 	}
 
 	private AdditionOrDeletion map(RR rr) {
@@ -24,25 +32,18 @@ public class YandexDtoMapper {
 				.build();
 	}
 
-	private Stream<RR> map(AdditionOrDeletion aod) {
-		return aod.getData()
-				.stream()
-				.map(o -> new RR(o, aod.getName()));
-	}
 
 	public List<RR> dnsResponseToRRs(ListRecordSetsResponse listResponse) {
 		return map(listResponse.getRecordSets());
 	}
 
-	public UpdateDNSRecordsRequest add(RR rr) {
-		return UpdateDNSRecordsRequest.builder()
-				.additions(List.of(map(rr)))
-				.build();
+	private List<RR> map(List<AdditionOrDeletion> additionOrDeletions) {
+		return additionOrDeletions.stream().flatMap(this::map).toList();
 	}
 
-	public UpdateDNSRecordsRequest delete(RR rr) {
-		return UpdateDNSRecordsRequest.builder()
-				.deletions(List.of(map(rr)))
-				.build();
+	private Stream<RR> map(AdditionOrDeletion aod) {
+		return aod.getData()
+				.stream()
+				.map(o -> new RR(o, aod.getName()));
 	}
 }
