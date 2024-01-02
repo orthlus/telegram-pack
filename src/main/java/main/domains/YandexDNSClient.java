@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.domains.common.RR;
 import main.domains.common.dto.yandex.ListRecordSetsResponse;
-import main.domains.common.dto.yandex.UpdateDNSRecordsRequest;
 import main.domains.common.dto.yandex.UpdateDNSRecordsResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -37,7 +36,7 @@ public abstract class YandexDNSClient implements DNSClientOperations {
 				.headers(this::bearerToken)
 				.retrieve()
 				.bodyToMono(ListRecordSetsResponse.class)
-				.map(mapper::map)
+				.map(mapper::dnsResponseToRRs)
 				.block();
 	}
 
@@ -49,7 +48,7 @@ public abstract class YandexDNSClient implements DNSClientOperations {
 				.bodyValue(mapper.add(rr))
 				.retrieve()
 				.bodyToMono(UpdateDNSRecordsResponse.class)
-				.map(YandexDNSClient::updateResponseHandling)
+				.map(YandexDNSClient::handleUpdateResponse)
 				.block());
 	}
 
@@ -61,11 +60,11 @@ public abstract class YandexDNSClient implements DNSClientOperations {
 				.bodyValue(mapper.delete(rr))
 				.retrieve()
 				.bodyToMono(UpdateDNSRecordsResponse.class)
-				.map(YandexDNSClient::updateResponseHandling)
+				.map(YandexDNSClient::handleUpdateResponse)
 				.block());
 	}
 
-	private static boolean updateResponseHandling(UpdateDNSRecordsResponse resp) {
+	private static boolean handleUpdateResponse(UpdateDNSRecordsResponse resp) {
 		if (resp.getError() != null) {
 			log.error("update subdomain error: {}", resp.getError().getMessage());
 			return false;
