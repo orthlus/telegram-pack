@@ -37,7 +37,11 @@ public abstract class YandexDNSClient implements DNSClientOperations {
 				.retrieve()
 				.bodyToMono(ListRecordSetsResponse.class)
 				.map(mapper::dnsResponseToRRs)
-				.block();
+				.defaultIfEmpty(List.of())
+				.block()
+				.stream()
+				.map(this::clearSubdomainName)
+				.toList();
 	}
 
 	@Override
@@ -82,5 +86,12 @@ public abstract class YandexDNSClient implements DNSClientOperations {
 
 	private void bearerToken(HttpHeaders h) {
 		h.setBearerAuth(tokenService.getIAMToken());
+	}
+
+	private RR clearSubdomainName(RR rr) {
+		String domain = rr.domain()
+				.replaceAll("\\.$", "")
+				.replace("." + getDomainName(), "");
+		return rr.withDomain(domain);
 	}
 }
