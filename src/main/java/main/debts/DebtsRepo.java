@@ -65,6 +65,10 @@ public class DebtsRepo {
 				.execute();
 	}
 
+	@CacheEvict(value = "expenses", allEntries = true)
+	public void clearExpensesCache() {
+	}
+
 	@Cacheable(value = "expenses")
 	public List<Expense> getExpenses() {
 		return getExpenses(LocalDate.now(zone));

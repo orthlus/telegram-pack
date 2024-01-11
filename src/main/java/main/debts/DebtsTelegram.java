@@ -150,6 +150,7 @@ public class DebtsTelegram implements DefaultWebhookBot {
 				yield sendInMonospace(text);
 			}
 			case EXPENSES_DETAILS -> {
+				service.clearExpensesCache();
 				String text = service.getExpensesDetailsText();
 				yield sendInMonospace(text);
 			}
