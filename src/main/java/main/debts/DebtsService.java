@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -139,10 +136,10 @@ public class DebtsService {
 
 		List<Expense> grouped1 = filterAndGroupExpenses(expenses, getExpr(1, day1, day2));
 		List<Expense> grouped2 = filterAndGroupExpenses(expenses, getExpr(2, day1, day2));
-
 		grouped1.addAll(grouped2);
 
 		String mainContent = grouped1.stream()
+				.sorted()
 				.map(Expense::toString)
 				.collect(joining("\n"));
 
@@ -164,13 +161,12 @@ public class DebtsService {
 	}
 
 	private List<Expense> filterAndGroupExpenses(List<Expense> expenses, Predicate<Expense> expensePredicate) {
-		List<Expense> list = expenses.stream()
+		Collection<Expense> list = expenses.stream()
 				.filter(expensePredicate)
-				.collect(toMap(Expense::name, Function.identity(), this::expenseMerge))
-				.values()
-				.stream()
-				.sorted()
-				.toList();
+				.collect(toMap(Expense::name,
+						Function.identity(),
+						this::expenseMerge))
+				.values();
 		return new ArrayList<>(list);
 	}
 
