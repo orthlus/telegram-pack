@@ -157,7 +157,7 @@ public class DebtsService {
 				траты с 1-ой получки - %d
 				траты со 2-ой получки - %d"""
 				.formatted(mainContent, sumAfterDay1 + sumAfterDay2, sumAfterDay1, sumAfterDay2);
-		return appendNextSixMonthExpenses(text);
+		return appendNext3MonthExpenses(text);
 	}
 
 	private List<Expense> filterAndGroupExpenses(List<Expense> expenses, Predicate<Expense> expensePredicate) {
@@ -181,11 +181,11 @@ public class DebtsService {
 				.collect(joining("\n"))
 				+ "\n==========\n"
 				+ "Итого: " + sum;
-		return appendNextSixMonthExpenses(text);
+		return appendNext3MonthExpenses(text);
 	}
 
-	private String appendNextSixMonthExpenses(String text) {
-		int nextSixMonth = calculateSumExpensesForNextSixMonth();
+	private String appendNext3MonthExpenses(String text) {
+		int nextSixMonth = calculateSumExpensesForNext3Month();
 		return text + "\nНакопить: " + formatMoneyNumber(nextSixMonth);
 	}
 
@@ -207,9 +207,9 @@ public class DebtsService {
 				Collections.max(asList(e1.expireDate(), e2.expireDate())));
 	}
 
-	private int calculateSumExpensesForNextSixMonth() {
+	private int calculateSumExpensesForNext3Month() {
 		LocalDate now = LocalDate.now(Main.zone);
-		Set<LocalDate> dates = rangeClosed(1, 6).mapToObj(now::plusMonths).collect(toSet());
+		Set<LocalDate> dates = rangeClosed(1, 3).mapToObj(now::plusMonths).collect(toSet());
 
 		return dates.stream()
 				.map(repo::getExpenses)
