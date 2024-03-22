@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.Command;
-import main.common.telegram.DefaultWebhookBot;
+import main.common.telegram.DefaultLongPollingBot;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,10 +27,13 @@ import static main.payments_reminders.UserState.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PaymentsTelegram implements DefaultWebhookBot {
+public class PaymentsTelegram extends DefaultLongPollingBot {
 	@Getter
 	@Value("${payments.telegram.bot.nickname}")
 	private String nickname;
+	@Getter
+	@Value("${payments.telegram.bot.token}")
+	private String token;
 	private final RemindsService remindsService;
 	private final CallbackDataMapper mapper;
 	private final Repo repo;

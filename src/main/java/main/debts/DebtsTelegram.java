@@ -5,11 +5,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.Command;
-import main.common.telegram.DefaultWebhookBot;
+import main.common.telegram.DefaultLongPollingBot;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
@@ -20,7 +19,7 @@ import static main.debts.UserState.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DebtsTelegram implements DefaultWebhookBot {
+public class DebtsTelegram extends DefaultLongPollingBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -39,6 +38,9 @@ public class DebtsTelegram implements DefaultWebhookBot {
 	@Getter
 	@Value("${debts.telegram.bot.nickname}")
 	private String nickname;
+	@Getter
+	@Value("${debts.telegram.bot.token}")
+	private String token;
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final DebtsService service;

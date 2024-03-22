@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import main.common.telegram.Command;
-import main.common.telegram.DefaultWebhookBot;
+import main.common.telegram.DefaultLongPollingBot;
 import main.main_tech.servers.inventory.InventoryService;
 import main.main_tech.servers.inventory.NamingService;
 import main.main_tech.servers.monitoring.MonitoringService;
-import main.main_tech.servers.ruvds.RuvdsEmailClient;
 import main.main_tech.servers.ruvds.RuvdsApi;
+import main.main_tech.servers.ruvds.RuvdsEmailClient;
 import main.main_tech.wg.WgService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class Telegram implements DefaultWebhookBot {
+public class Telegram extends DefaultLongPollingBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -41,6 +41,9 @@ public class Telegram implements DefaultWebhookBot {
 	@Getter
 	@Value("${main_tech.telegram.bot.nickname}")
 	private String nickname;
+	@Getter
+	@Value("${main_tech.telegram.bot.token}")
+	private String token;
 	private final RuvdsApi ruvdsApi;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
