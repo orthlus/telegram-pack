@@ -1,12 +1,15 @@
 package main.common.telegram;
 
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static main.common.telegram.TelegramPropsProvider.getAdminId;
 
+@Slf4j
 @SuppressWarnings("deprecation")
 public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 	@SuppressWarnings("UnusedReturnValue")
@@ -18,7 +21,12 @@ public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update update) {
-		onWebhookUpdateReceived(update);
+		BotApiMethod<?> botApiMethod = onWebhookUpdateReceived(update);
+		try {
+			execute(botApiMethod);
+		} catch (TelegramApiException e) {
+			log.error("telegram execute error", e);
+		}
 	}
 
 	@Override
