@@ -1,17 +1,9 @@
 package main.common;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -25,45 +17,6 @@ public class WebClientConfigurations {
 	private ReactorClientHttpConnector clientWithTimeout(int n, TimeUnit timeUnit) {
 		HttpClient httpClient = HttpClient.create().option(CONNECT_TIMEOUT_MILLIS, ((int) timeUnit.toMillis(n)));
 		return new ReactorClientHttpConnector(httpClient);
-	}
-
-	@Bean
-	public WebClient yandexIAMWebClient(
-			@Value("${yandex.iam.api.url}") String baseUrl
-	) {
-		return WebClient.builder()
-				.baseUrl(baseUrl)
-				.clientConnector(clientWithTimeout(1, MINUTES))
-				.build();
-	}
-
-	@Bean
-	public WebClient yandexDNSWebClient(
-			@Value("${yandex.dns.api.url}") String baseUrl
-	) {
-		return WebClient.builder()
-				.baseUrl(baseUrl)
-				.clientConnector(clientWithTimeout(1, MINUTES))
-				.defaultHeaders(h -> h.setContentType(MediaType.APPLICATION_JSON))
-				.build();
-	}
-
-	@Bean
-	public WebClient regruWebClient(
-			@Value("${regru.api.url}") String baseUrl
-	) {
-		return WebClient.builder()
-				.baseUrl(baseUrl)
-				.clientConnector(clientWithTimeout(2, MINUTES))
-				.defaultHeaders(h -> h.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
-				.exchangeStrategies(ExchangeStrategies.builder().codecs(configurer -> {
-					ObjectMapper mapper = new ObjectMapper();
-					mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-					MimeType mimeType = MimeTypeUtils.parseMimeType(MediaType.TEXT_PLAIN_VALUE);
-					Jackson2JsonDecoder codec = new Jackson2JsonDecoder(mapper, mimeType);
-					configurer.customCodecs().register(codec);
-				}).build())
-				.build();
 	}
 
 	@Bean
