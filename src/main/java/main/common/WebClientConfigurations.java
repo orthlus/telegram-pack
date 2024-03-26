@@ -1,34 +1,24 @@
 package main.common;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.concurrent.TimeUnit;
-
-import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import java.time.Duration;
 
 @Configuration
 public class WebClientConfigurations {
-	private ReactorClientHttpConnector clientWithTimeout(int n, TimeUnit timeUnit) {
-		HttpClient httpClient = HttpClient.create().option(CONNECT_TIMEOUT_MILLIS, ((int) timeUnit.toMillis(n)));
-		return new ReactorClientHttpConnector(httpClient);
-	}
-
 	@Bean
-	public WebClient wgWebClient(
+	public RestTemplate wgRestTemplate(
+			RestTemplateBuilder builder,
 			@Value("${main_tech.api.url}") String url,
 			@Value("${main_tech.api.user}") String user,
-			@Value("${main_tech.api.secret}") String password
-	) {
-		return WebClient.builder()
-				.baseUrl(url)
-				.defaultHeaders(h -> h.setBasicAuth(user, password))
-				.clientConnector(clientWithTimeout(2, MINUTES))
+			@Value("${main_tech.api.secret}") String password) {
+		return builder.basicAuthentication(user, password)
+				.rootUri(url)
+				.setConnectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
 }
