@@ -3,6 +3,7 @@ package main;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cache.annotation.EnableCaching;
@@ -22,6 +23,7 @@ public class Main {
 	public static final ZoneId zone = ZoneId.of("Europe/Moscow");
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Main.class)
+				.web(WebApplicationType.NONE)
 				.beanNameGenerator(new CustomGenerator())
 				.run(args);
 	}
