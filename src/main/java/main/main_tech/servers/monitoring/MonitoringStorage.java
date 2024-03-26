@@ -1,6 +1,7 @@
 package main.main_tech.servers.monitoring;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -10,6 +11,7 @@ import main.main_tech.S3Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,14 +35,15 @@ public class MonitoringStorage extends S3Client {
 			TransferManager tm = TransferManagerBuilder.standard()
 					.withS3Client(s3)
 					.build();
-			Path file = Path.of("/tmp/"+ UUID.randomUUID());
-			Files.writeString(file, fileContent);
-			Upload upload = tm.upload(bucket, fileId, file.toFile());
+			byte[] bytes = fileContent.getBytes();
+			ByteArrayInputStream fileData = new ByteArrayInputStream(bytes);
+			ObjectMetadata objectMetadata = new ObjectMetadata();
+			objectMetadata.setContentLength(bytes.length);
+			Upload upload = tm.upload(bucket, fileId, fileData, objectMetadata);
 			upload.waitForCompletion();
 			tm.shutdownNow();
 			s3.shutdown();
-			Files.deleteIfExists(file);
-		} catch (InterruptedException | IOException e) {
+		} catch (InterruptedException e) {
 			log.error("s3 error - upload file {}/{}", bucket, fileId, e);
 			throw new RuntimeException(e);
 		}
