@@ -31,15 +31,4 @@ public class WebClientConfigurations {
 				.clientConnector(clientWithTimeout(2, MINUTES))
 				.build();
 	}
-
-	@Bean
-	public WebClient ruvdsWebClient(
-			@Value("${main_tech.ruvds.api.url}") String url,
-			@Value("${main_tech.ruvds.api.token}") String token
-	) {
-		return WebClient.builder()
-				.baseUrl(url)
-				.defaultHeaders(h -> h.setBearerAuth(token))
-				.build();
-	}
 }

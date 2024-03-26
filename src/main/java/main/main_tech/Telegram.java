@@ -8,7 +8,6 @@ import main.common.telegram.DefaultLongPollingBot;
 import main.main_tech.servers.inventory.InventoryService;
 import main.main_tech.servers.inventory.NamingService;
 import main.main_tech.servers.monitoring.MonitoringService;
-import main.main_tech.servers.ruvds.RuvdsApi;
 import main.main_tech.servers.ruvds.RuvdsEmailClient;
 import main.main_tech.wg.WgService;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,13 +25,10 @@ public class Telegram extends DefaultLongPollingBot {
 	private enum Commands implements Command {
 		UPDATE_MONITORING_FROM_DB("/update_monitoring_from_db"),
 		SERVERS("/servers"),
-		UPDATE_SERVERS_FROM_RUVDS("/update_servers_from_ruvds"),
-		RUVDS_SERVERS("/ruvds_servers"),
 		WG_STAT_DIFF("/wg_stat_diff"),
 		WG_STAT_CURRENT("/wg_stat_current"),
 		WG_UPDATE_USERS("/wg_update_users"),
-		GET_CODE("/get_code"),
-		GET_NEW_HOST("/get_new_host");
+		GET_CODE("/get_code");
 		final String command;
 	}
 
@@ -44,7 +40,6 @@ public class Telegram extends DefaultLongPollingBot {
 	@Getter
 	@Value("${main_tech.telegram.bot.token}")
 	private String token;
-	private final RuvdsApi ruvdsApi;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
 	private final InventoryService inventoryService;
@@ -79,14 +74,6 @@ public class Telegram extends DefaultLongPollingBot {
 				String text = naming.formatDomains(inventoryService.getServers());
 				yield send(msg(text).parseMode("html"));
 			}
-			case UPDATE_SERVERS_FROM_RUVDS -> {
-				inventoryService.updateServersFromRuvds(ruvdsApi.getServers());
-				yield send("Ok");
-			}
-			case RUVDS_SERVERS -> {
-				String text = naming.formatDomainsRuvds(ruvdsApi.getServers());
-				yield send(msg(text).parseMode("html"));
-			}
 			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
 				yield sendInMonospace(text);
@@ -101,7 +88,6 @@ public class Telegram extends DefaultLongPollingBot {
 				yield send("Ok");
 			}
 			case GET_CODE -> sendInMonospace(ruvdsEmailClient.getCode());
-			case GET_NEW_HOST -> sendInMonospace(ruvdsEmailClient.getNewHost());
 		};
 	}
 }

@@ -49,34 +49,6 @@ public class RuvdsEmailClient {
 		}
 	}
 
-	public String getNewHost() {
-		try {
-			return getNewHost(getLastNewRuvdsMessage(buildStore()));
-		} catch (MessagingException | IOException e) {
-			log.error("Error getting ruvds new host", e);
-			return "Ошибка получения кредов хоста";
-		} catch (NoNewMessagesException e) {
-			return "Нет новых сообщений";
-		}
-	}
-
-	private String getNewHost(Message message) throws MessagingException, IOException {
-		String body = message.getContent().toString();
-		if (!body.contains("Пароль к серверу:")) throw new NoNewMessagesException();
-
-		String ipPattern1 = "IP-адрес:</td><td style=\"padding-left:10px;\"><div><b>";
-		String ipPattern2 = "</b></div></td></tr>";
-
-		String ip = body.split(ipPattern1)[1].split(ipPattern2)[0];
-
-		String passwordPattern1 = "Пароль к серверу:</td><td style=\"padding-left:10px;\"><div><b>";
-		String passwordPattern2 = "</b></div></td></tr></tbody></table>";
-
-		String password = body.split(passwordPattern1)[1].split(passwordPattern2)[0];
-
-		return "%s %s".formatted(ip, password);
-	}
-
 	public String getCode() {
 		try {
 			return getCode(getLastNewRuvdsMessage(buildStore()));

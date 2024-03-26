@@ -1,11 +1,8 @@
 package main.main_tech.servers.ruvds;
 
-import main.main_tech.servers.data.InventoryServerDomainsString;
 import main.main_tech.servers.data.InventoryServer;
+import main.main_tech.servers.data.InventoryServerDomainsString;
 import main.main_tech.servers.data.InventoryServerWithDomains;
-import main.main_tech.servers.data.RuvdsServer;
-import main.main_tech.servers.ruvds.dto.ServerRaw;
-import main.main_tech.servers.ruvds.dto.ServersRaw;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -41,17 +38,4 @@ public interface ServerMapper {
 	}
 
 	InventoryServerDomainsString map(InventoryServer s, String domainName);
-
-	@Mapping(target = "additionalDriveGb", source = "additionalDrive")
-	@Mapping(target = "driveGb", source = "drive")
-	@Mapping(target = "ramGb", source = "ram")
-	@Mapping(target = "id", source = "virtualServerId")
-	@Mapping(target = "name", source = "userComment")
-	RuvdsServer map(ServerRaw s);
-
-	Set<RuvdsServer> map(Set<ServerRaw> s);
-
-	default Set<RuvdsServer> map(ServersRaw serversRaw) {
-		return map(serversRaw.getServerRaws());
-	}
 }

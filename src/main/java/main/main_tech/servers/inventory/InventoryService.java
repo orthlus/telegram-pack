@@ -3,7 +3,6 @@ package main.main_tech.servers.inventory;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.servers.data.InventoryServer;
 import main.main_tech.servers.data.InventoryServerWithDomains;
-import main.main_tech.servers.data.RuvdsServer;
 import main.main_tech.servers.ruvds.ServerMapper;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +17,6 @@ public class InventoryService {
 
 	public Set<InventoryServerWithDomains> getServers() {
 		return mapper.mapAggServers(repo.getServersWithDomains());
-	}
-
-	public void updateServersFromRuvds(Set<RuvdsServer> ruvdsServers) {
-		repo.updateServers(ruvdsServers);
 	}
 
 	public String getStringListForMonitoring() {

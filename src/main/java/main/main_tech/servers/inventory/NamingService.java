@@ -1,8 +1,7 @@
 package main.main_tech.servers.inventory;
 
-import main.main_tech.servers.data.ServerWithName;
 import main.main_tech.servers.data.InventoryServerWithDomains;
-import main.main_tech.servers.data.RuvdsServer;
+import main.main_tech.servers.data.ServerWithName;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,46 +28,6 @@ public class NamingService {
 			s = s.replace(domain, "").trim();
 		}
 		return s;
-	}
-
-	public String formatDomainsRuvds(Set<RuvdsServer> servers) {
-		List<RuvdsServer> list = sort(servers);
-		List<RuvdsServer>[] lists = new List[domains.length + 1];
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < domains.length; i++) {
-			lists[i] = new ArrayList<>(list.size());
-			for (RuvdsServer server : list) {
-				if (server.name().contains(domains[i])) {
-					lists[i].add(server);
-				}
-			}
-		}
-
-		lists[lists.length - 1] = new ArrayList<>(list.size());
-		for (RuvdsServer server : list) {
-			if (notContainsDomain(server.name())) {
-				lists[lists.length - 1].add(server);
-			}
-		}
-
-		for (int i = 0; i < domains.length; i++) {
-			sb.append("<b>")
-					.append(domains[i])
-					.append(":</b>\n");
-			sb.append(formatAndJoinRuvds(lists[i]));
-			sb.append("\n\n");
-		}
-
-		if (!lists[lists.length - 1].isEmpty()) {
-			sb.append("<b>unknown domains:</b>\n");
-			sb.append(formatAndJoinRuvds(lists[lists.length - 1]));
-		} else {
-			sb.deleteCharAt(sb.length() - 1);
-			sb.deleteCharAt(sb.length() - 1);
-		}
-
-		return sb.toString();
 	}
 
 	public String formatDomains(Set<InventoryServerWithDomains> servers) {
@@ -111,12 +70,6 @@ public class NamingService {
 		return sb.toString();
 	}
 
-	private String formatAndJoinRuvds(List<RuvdsServer> servers) {
-		return servers.stream()
-				.map(this::format)
-				.collect(joining("\n"));
-	}
-
 	private String formatAndJoin(List<InventoryServerWithDomains> servers) {
 		return servers.stream()
 				.map(this::format)
@@ -154,24 +107,6 @@ public class NamingService {
 			str = str.replace("$$$", " (%d Gb)");
 			str = str.formatted(s.addDrive());
 		}
-		return str;
-	}
-
-	private String format(RuvdsServer s) {
-		String name = dropDomains(s.name());
-		String str = """
-				<b>%s</b>
-				  <code>%d cpu %.1f Gb %d Gb$$$</code>
-				  <code>%s</code>""";
-		str = str.formatted(name, s.cpu(), s.ramGb(), s.driveGb(), s.id());
-
-		if (s.additionalDriveGb() == null) {
-			str = str.replace("$$$", "");
-		} else {
-			str = str.replace("$$$", " (%d Gb)");
-			str = str.formatted(s.additionalDriveGb());
-		}
-
 		return str;
 	}
 }

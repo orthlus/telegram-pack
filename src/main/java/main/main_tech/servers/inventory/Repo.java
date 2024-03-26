@@ -3,10 +3,8 @@ package main.main_tech.servers.inventory;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.servers.data.InventoryServer;
 import main.main_tech.servers.data.InventoryServerDomainsString;
-import main.main_tech.servers.data.RuvdsServer;
 import main.tables.TechInventoryDomainsRecords;
 import main.tables.TechInventoryServers;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 
@@ -24,25 +22,6 @@ public class Repo {
 	private final DSLContext db;
 	private final TechInventoryServers tis = TECH_INVENTORY_SERVERS;
 	private final TechInventoryDomainsRecords tidr = TECH_INVENTORY_DOMAINS_RECORDS;
-
-	public void updateServer(RuvdsServer o) {
-		Condition condition = tis.HOSTING_ID.eq(String.valueOf(o.id()))
-				.and(tis.HOSTING_NAME.eq("ruvds"));
-		db.update(tis)
-				.set(tis.CPU, o.cpu())
-				.set(tis.RAM, o.ramGb())
-				.set(tis.DRIVE, o.driveGb())
-				.set(tis.ADD_DRIVE, o.additionalDriveGb())
-				.set(tis.NAME, o.name())
-				.where(condition)
-				.execute();
-	}
-
-	public void updateServers(Set<RuvdsServer> ruvdsServers) {
-		for (RuvdsServer ruvdsServer : ruvdsServers) {
-			updateServer(ruvdsServer);
-		}
-	}
 
 	public Set<InventoryServerDomainsString> getServersWithDomains() {
 		return db.select(
