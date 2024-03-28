@@ -140,7 +140,7 @@ public class DebtsService {
 
 		String mainContent = grouped1.stream()
 				.sorted()
-				.map(Expense::toString)
+				.map(Expense::toStringExcludeId)
 				.collect(joining("\n"));
 
 		int sumAfterDay1 = expenses.stream()

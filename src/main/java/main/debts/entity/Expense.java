@@ -23,6 +23,10 @@ public record Expense(int id, String name, int amount, int day, LocalDate expire
 		return Integer.compare(day, o.day);
 	}
 
+	public String toStringExcludeId() {
+		return "%-6s %-5d at %2d - %s".formatted(name, amount, day, expireDate);
+	}
+
 	@Override
 	public String toString() {
 		return "%03d %-6s %-5d at %2d - %s".formatted(id, name, amount, day, expireDate);
