@@ -149,12 +149,12 @@ public class DebtsTelegram extends DefaultLongPollingBot {
 			}
 			case EXPENSES -> {
 				String text = service.getExpensesText();
-				yield sendInMonospace(text);
+				yield sendInCode(text);
 			}
 			case EXPENSES_DETAILS -> {
 				service.clearExpensesCache();
 				String text = service.getExpensesDetailsText();
-				yield sendInMonospace(text);
+				yield sendInCode(text);
 			}
 			case EXPENSES_FOR_DATE -> {
 				state.set(EXPENSES_FOR_DATE_WAIT_DATE_VALUE);

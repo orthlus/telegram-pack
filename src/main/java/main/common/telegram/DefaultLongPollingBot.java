@@ -39,6 +39,10 @@ public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 		return getNickname();
 	}
 
+	protected SendMessage sendInCode(String text) {
+		return send(msg("```sql\n%s\n```".formatted(text)).parseMode("markdown"));
+	}
+
 	protected SendMessage sendInMonospace(String text) {
 		return send(msg("<code>%s</code>".formatted(text)).parseMode("html"));
 	}
