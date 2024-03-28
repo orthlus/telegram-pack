@@ -153,6 +153,7 @@ public class DebtsService {
 				.sum();
 		String text = """
 				%s
+				==========
 				Итого: %d
 				траты с 1-ой получки - %d
 				траты со 2-ой получки - %d"""
