@@ -8,8 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
@@ -17,8 +15,6 @@ import java.time.ZoneId;
 
 @SpringBootApplication
 @EnableCaching
-@EnableScheduling
-@EnableRetry
 public class Main {
 	public static final ZoneId zone = ZoneId.of("Europe/Moscow");
 	public static void main(String[] args) {
