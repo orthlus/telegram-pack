@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class WgClient {
+//	@Qualifier("wgRestTemplate")
+//	private final RestTemplate client;
 	@Qualifier("wgRestClient")
 	private final RestClient client2;
 
@@ -18,6 +21,7 @@ public class WgClient {
 				.uri("/raw-stat")
 				.retrieve()
 				.body(String.class);
+//		return client.getForEntity("/raw-stat", String.class).getBody();
 	}
 
 	String getUsers() {
@@ -25,5 +29,8 @@ public class WgClient {
 				.uri("/users")
 				.retrieve()
 				.body(String.class);
+//		return client
+//				.getForEntity("/users", String.class)
+//				.getBody();
 	}
 }
