@@ -96,6 +96,7 @@ public class PaymentsTelegram extends DefaultLongPollingBot {
 					yield send("Что-то пошло не так, попробуйте заново");
 				else {
 					remindsService.submitRemind(remindOp.get());
+					delete(update);
 					yield send("%s - завершено".formatted(remindOp.get().getName()));
 				}
 			}

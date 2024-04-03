@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -22,6 +23,10 @@ public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(Update update) {
 		BotApiMethod<?> botApiMethod = onWebhookUpdateReceived(update);
+		execute0(botApiMethod);
+	}
+
+	private void execute0(BotApiMethod<?> botApiMethod) {
 		try {
 			execute(botApiMethod);
 		} catch (TelegramApiException e) {
@@ -57,5 +62,9 @@ public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 
 	protected SendMessage.SendMessageBuilder msg(String text) {
 		return SendMessage.builder().chatId(getAdminId()).text(text);
+	}
+
+	protected void delete(Update update) {
+		execute0(new DeleteMessage(update.getMessage().getChatId().toString(), update.getMessage().getMessageId()));
 	}
 }
