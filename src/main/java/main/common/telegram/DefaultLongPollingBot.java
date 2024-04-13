@@ -22,7 +22,10 @@ public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update update) {
-		BotApiMethod<?> botApiMethod = onWebhookUpdateReceived(update);
+		if (update.getMessage().getChatId() != getAdminId())
+			return;
+
+		BotApiMethod<?> botApiMethod = onUpdate(update);
 		execute0(botApiMethod);
 	}
 
