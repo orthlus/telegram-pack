@@ -52,7 +52,7 @@ public class PaymentsTelegram extends DefaultLongPollingBot {
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	@Override
-	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+	public BotApiMethod<?> onUpdate(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 

@@ -46,7 +46,7 @@ public class DebtsTelegram extends DefaultLongPollingBot {
 	private final DebtsService service;
 
 	@Override
-	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+	public BotApiMethod<?> onUpdate(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 

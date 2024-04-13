@@ -14,7 +14,7 @@ import static main.common.telegram.TelegramPropsProvider.getAdminId;
 @SuppressWarnings("deprecation")
 public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 	@SuppressWarnings("UnusedReturnValue")
-	public abstract BotApiMethod<?> onWebhookUpdateReceived(Update update);
+	public abstract BotApiMethod<?> onUpdate(Update update);
 
 	public abstract String getNickname();
 

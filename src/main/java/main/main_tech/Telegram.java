@@ -47,7 +47,7 @@ public class Telegram extends DefaultLongPollingBot {
 	private final MonitoringService monitoring;
 
 	@Override
-	public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+	public BotApiMethod<?> onUpdate(Update update) {
 		if (update.hasMessage()) {
 			String messageText = update.getMessage().getText();
 
