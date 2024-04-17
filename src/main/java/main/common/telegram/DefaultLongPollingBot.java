@@ -22,8 +22,13 @@ public abstract class DefaultLongPollingBot extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update update) {
-		if (update.getMessage().getChatId() != getAdminId())
+		if (update.hasMessage() &&
+				update.getMessage().getChatId() != getAdminId()
+				||
+				update.hasCallbackQuery() &&
+						update.getCallbackQuery().getMessage().getChatId() != getAdminId()) {
 			return;
+		}
 
 		BotApiMethod<?> botApiMethod = onUpdate(update);
 		execute0(botApiMethod);
