@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.telegram.telegrambots.updatesreceivers.DefaultBotSession" level="DEBUG"/>
+    <logger name="org.telegram.telegrambots.updatesreceivers.DefaultBotSession" level="OFF"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
