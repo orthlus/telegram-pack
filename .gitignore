@@ -2,7 +2,6 @@ target
 .idea
 *.iml
 jooq-config.xml
-*production.properties
 *test.properties
 deploy.bat
 secret
