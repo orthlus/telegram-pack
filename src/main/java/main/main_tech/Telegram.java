@@ -1,25 +1,29 @@
 package main.main_tech;
 
+import art.aelaort.SpringAdminBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import main.common.telegram.Command;
-import main.common.telegram.DefaultLongPollingBot;
 import main.main_tech.servers.inventory.InventoryService;
 import main.main_tech.servers.inventory.NamingService;
 import main.main_tech.servers.monitoring.MonitoringService;
 import main.main_tech.servers.ruvds.RuvdsEmailClient;
 import main.main_tech.wg.WgService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Map;
 
+import static art.aelaort.TelegramClientHelpers.execute;
+
 @Component
 @RequiredArgsConstructor
-public class Telegram extends DefaultLongPollingBot {
+public class Telegram implements SpringAdminBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -35,11 +39,13 @@ public class Telegram extends DefaultLongPollingBot {
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 
 	@Getter
-	@Value("${main_tech.telegram.bot.nickname}")
-	private String nickname;
-	@Getter
 	@Value("${main_tech.telegram.bot.token}")
-	private String token;
+	private String botToken;
+	@Getter
+	@Value("${telegram.admin.id}")
+	private long adminId;
+	@Qualifier("maintechTelegramClient")
+	private final TelegramClient telegramClient;
 	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
 	private final InventoryService inventoryService;
@@ -47,47 +53,69 @@ public class Telegram extends DefaultLongPollingBot {
 	private final MonitoringService monitoring;
 
 	@Override
-	public BotApiMethod<?> onUpdate(Update update) {
-		if (update.hasMessage()) {
+	public void consumeAdmin(Update update) {
+		if (update.hasMessage() && update.getMessage().hasText()) {
 			String messageText = update.getMessage().getText();
 
 			if (commandsMap.containsKey(messageText)) {
-				return handleCommand(messageText);
+				handleCommand(messageText);
 			} else {
-				return handleText();
+				handleText();
 			}
 		}
-		return null;
 	}
 
-	private BotApiMethod<?> handleText() {
-		return send("работает. команды:\n" + String.join("\n", commandsMap.keySet()));
+	private void handleText() {
+		send("работает. команды:\n" + String.join("\n", commandsMap.keySet()));
 	}
 
-	private BotApiMethod<?> handleCommand(String messageText) {
-		return switch (commandsMap.get(messageText)) {
+	private void handleCommand(String messageText) {
+		switch (commandsMap.get(messageText)) {
 			case UPDATE_MONITORING_FROM_DB -> {
 				monitoring.updateMonitoringDataFromDb();
-				yield send("Ok");
+				send("Ok");
 			}
 			case SERVERS -> {
 				String text = naming.formatDomains(inventoryService.getServers());
-				yield send(msg(text).parseMode("html"));
+				sendInHtml(text);
 			}
 			case WG_STAT_CURRENT -> {
 				String text = wg.getPrettyCurrent();
-				yield sendInMonospace(text);
+				sendInMonospace(text);
 			}
 			case WG_STAT_DIFF -> {
 				String text = wg.getPrettyDiff();
 				wg.saveCurrentItems();
-				yield sendInMonospace(text);
+				sendInMonospace(text);
 			}
 			case WG_UPDATE_USERS -> {
 				wg.updateUsers();
-				yield send("Ok");
+				send("Ok");
 			}
 			case GET_CODE -> sendInMonospace(ruvdsEmailClient.getCode());
-		};
+		}
+	}
+
+	private void sendInHtml(String text) {
+		execute(SendMessage.builder()
+				.chatId(adminId)
+				.text(text)
+				.parseMode("html")
+				.build(), telegramClient);
+	}
+
+	private void sendInMonospace(String text) {
+		execute(SendMessage.builder()
+				.chatId(adminId)
+				.text("<code>%s</code>".formatted(text))
+				.parseMode("html")
+				.build(), telegramClient);
+	}
+
+	private void send(String text) {
+		execute(SendMessage.builder()
+				.chatId(adminId)
+				.text(text)
+				.build(), telegramClient);
 	}
 }

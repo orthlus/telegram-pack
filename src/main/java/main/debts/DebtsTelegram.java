@@ -1,25 +1,28 @@
 package main.debts;
 
+import art.aelaort.SpringAdminBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.common.telegram.Command;
-import main.common.telegram.DefaultLongPollingBot;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static art.aelaort.TelegramClientHelpers.execute;
 import static main.debts.UserState.*;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DebtsTelegram extends DefaultLongPollingBot {
+public class DebtsTelegram implements SpringAdminBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
@@ -36,102 +39,103 @@ public class DebtsTelegram extends DefaultLongPollingBot {
 	}
 
 	@Getter
-	@Value("${debts.telegram.bot.nickname}")
-	private String nickname;
-	@Getter
 	@Value("${debts.telegram.bot.token}")
-	private String token;
+	private String botToken;
+	@Getter
+	@Value("${telegram.admin.id}")
+	private long adminId;
+	@Qualifier("debtsTelegramClient")
+	private final TelegramClient telegramClient;
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 	private final DebtsService service;
 
 	@Override
-	public BotApiMethod<?> onUpdate(Update update) {
-		if (update.hasMessage()) {
+	public void consumeAdmin(Update update) {
+		if (update.hasMessage() && update.getMessage().hasText()) {
 			String messageText = update.getMessage().getText();
 
 			if (commandsMap.containsKey(messageText)) {
-				return handleCommand(messageText);
+				handleCommand(messageText);
 			} else {
-				return handleText(messageText);
+				handleText(messageText);
 			}
 		}
-		return null;
 	}
 
-	private BotApiMethod<?> handleText(String messageText) {
-		return switch (state.get()) {
+	private void handleText(String messageText) {
+		switch (state.get()) {
 			case NOTHING_WAIT -> send("Неожиданно!");
 			case WAIT_NEW_INCOME -> {
 				try {
 					service.addIncome(messageText);
 					state.set(NOTHING_WAIT);
-					yield send("Ок\n/incomes");
+					send("Ок\n/incomes");
 				} catch (Exception e) {
 					log.error("error new income", e);
-					yield send("Еще раз");
+					send("Еще раз");
 				}
 			}
 			case WAIT_NEW_EXPENSE -> {
 				try {
 					service.addExpense(messageText);
 					state.set(NOTHING_WAIT);
-					yield send("Ок\n/expenses");
+					send("Ок\n/expenses");
 				} catch (Exception e) {
 					log.error("error new expense", e);
-					yield send("Еще раз");
+					send("Еще раз");
 				}
 			}
 			case WAIT_DELETE_INCOME_ID -> {
 				try {
 					service.deleteIncome(messageText);
 					state.set(NOTHING_WAIT);
-					yield send("Ок\n/incomes");
+					send("Ок\n/incomes");
 				} catch (Exception e) {
 					log.error("Error delete income", e);
-					yield send("error");
+					send("error");
 				}
 			}
 			case WAIT_DELETE_EXPENSE_ID -> {
 				try {
 					service.deleteExpense(messageText);
 					state.set(NOTHING_WAIT);
-					yield send("Ок\n/expenses");
+					send("Ок\n/expenses");
 				} catch (Exception e) {
 					log.error("Error delete expense", e);
-					yield send("error");
+					send("error");
 				}
 			}
 			case EXPENSES_FOR_DATE_WAIT_DATE_VALUE -> {
 				try {
 					String text = service.getExpensesTextByDate(messageText);
 					state.set(NOTHING_WAIT);
-					yield sendInMonospace(text);
+					sendInMonospace(text);
 				} catch (Exception e) {
 					log.error("error EXPENSES_FOR_DATE", e);
-					yield send("Еще раз");
+					send("Еще раз");
 				}
 			}
-		};
+		}
 	}
 
-	private BotApiMethod<?> handleCommand(String messageText) {
-		return switch (commandsMap.get(messageText)) {
+	private void handleCommand(String messageText) {
+		switch (commandsMap.get(messageText)) {
 			case START -> {
 				state.set(NOTHING_WAIT);
-				yield send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
+				send("Учёт доходов и расходов\n" + String.join("\n", commandsMap.keySet()));
 			}
 			case ADD_INCOME -> {
 				state.set(WAIT_NEW_INCOME);
-				yield send("Новый доход: сумма и день месяца\n\n1000 25");
+				send("Новый доход: сумма и день месяца\n\n1000 25");
 			}
 			case DELETE_INCOME -> {
 				state.set(WAIT_DELETE_INCOME_ID);
-				yield send("id для удаления дохода:");
+				send("id для удаления дохода:");
 			}
 			case ADD_EXPENSE -> {
 				state.set(WAIT_NEW_EXPENSE);
-				yield send("""
+				send("""
 						Новый расход:
 						
 						название
@@ -141,25 +145,48 @@ public class DebtsTelegram extends DefaultLongPollingBot {
 			}
 			case DELETE_EXPENSE -> {
 				state.set(WAIT_DELETE_EXPENSE_ID);
-				yield send("id для удаления расхода:");
+				send("id для удаления расхода:");
 			}
 			case INCOMES -> {
 				String text = service.getIncomesText();
-				yield sendInMonospace(text);
+				sendInMonospace(text);
 			}
 			case EXPENSES -> {
 				String text = service.getExpensesText();
-				yield sendInCode(text);
+				sendInCode(text);
 			}
 			case EXPENSES_DETAILS -> {
 				service.clearExpensesCache();
 				String text = service.getExpensesDetailsText();
-				yield sendInCode(text);
+				sendInCode(text);
 			}
 			case EXPENSES_FOR_DATE -> {
 				state.set(EXPENSES_FOR_DATE_WAIT_DATE_VALUE);
-				yield send("на какую дату?\n" + String.join(" / ", service.getDateParsePatterns()));
+				send("на какую дату?\n" + String.join(" / ", service.getDateParsePatterns()));
 			}
-		};
+		}
+	}
+
+	private void sendInCode(String text) {
+		execute(SendMessage.builder()
+				.chatId(adminId)
+				.text("```sql\n%s\n```".formatted(text))
+				.parseMode("markdown")
+				.build(), telegramClient);
+	}
+
+	private void sendInMonospace(String text) {
+		execute(SendMessage.builder()
+				.chatId(adminId)
+				.text("<code>%s</code>".formatted(text))
+				.parseMode("html")
+				.build(), telegramClient);
+	}
+
+	private void send(String text) {
+		execute(SendMessage.builder()
+				.chatId(adminId)
+				.text(text)
+				.build(), telegramClient);
 	}
 }

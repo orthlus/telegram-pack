@@ -59,11 +59,11 @@
             <version>0.9.14</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
             <version>${telegrambots.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jooq</artifactId>
@@ -114,6 +114,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>art.aelaort</groupId>
+            <artifactId>aelaort-telegrambots</artifactId>
+            <version>3.1</version>
         </dependency>
     </dependencies>
 
