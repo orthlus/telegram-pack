@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import main.common.telegram.Command;
 import main.main_tech.servers.inventory.InventoryService;
 import main.main_tech.servers.inventory.NamingService;
-import main.main_tech.servers.monitoring.MonitoringService;
 import main.main_tech.servers.ruvds.RuvdsEmailClient;
 import main.main_tech.wg.WgService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,7 +26,6 @@ public class Telegram implements SpringAdminBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
-		UPDATE_MONITORING_FROM_DB("/update_monitoring_from_db"),
 		SERVERS("/servers"),
 		WG_STAT_DIFF("/wg_stat_diff"),
 		WG_STAT_CURRENT("/wg_stat_current"),
@@ -50,7 +48,6 @@ public class Telegram implements SpringAdminBot {
 	private final RuvdsEmailClient ruvdsEmailClient;
 	private final InventoryService inventoryService;
 	private final NamingService naming;
-	private final MonitoringService monitoring;
 
 	@Override
 	public void consumeAdmin(Update update) {
@@ -71,10 +68,6 @@ public class Telegram implements SpringAdminBot {
 
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
-			case UPDATE_MONITORING_FROM_DB -> {
-				monitoring.updateMonitoringDataFromDb();
-				send("Ok");
-			}
 			case SERVERS -> {
 				String text = naming.formatDomains(inventoryService.getServers());
 				sendInHtml(text);

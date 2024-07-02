@@ -1,7 +1,6 @@
 package main.main_tech.servers.inventory;
 
 import lombok.RequiredArgsConstructor;
-import main.main_tech.servers.data.InventoryServer;
 import main.main_tech.servers.data.InventoryServerDomainsString;
 import main.tables.TechInventoryDomainsRecords;
 import main.tables.TechInventoryServers;
@@ -36,29 +35,5 @@ public class Repo {
 					.on(tis.ADDRESS.eq(tidr.ADDRESS))
 				.groupBy(tis)
 				.fetchSet(mapping(InventoryServerDomainsString::new));
-	}
-
-	public Set<InventoryServer> getServers() {
-		return db.select(
-				tis.ID, tis.ADDRESS, tis.SSH_PORT, tis.NAME,
-				tis.CPU, tis.RAM, tis.DRIVE, tis.ADD_DRIVE,
-				tis.HOSTING_ID, tis.OS, tis.ACTIVE_MONITORING,
-				tis.HOSTING_NAME)
-				.from(tis)
-				.fetchSet(mapping(InventoryServer::new));
-	}
-
-	public void setSshPortById(int serverId, int sshPort) {
-		db.update(tis)
-				.set(tis.SSH_PORT, sshPort)
-				.where(tis.ID.eq(serverId))
-				.execute();
-	}
-
-	public void setIpAddressById(int serverId, String ipAddress) {
-		db.update(tis)
-				.set(tis.ADDRESS, ipAddress)
-				.where(tis.ID.eq(serverId))
-				.execute();
 	}
 }
