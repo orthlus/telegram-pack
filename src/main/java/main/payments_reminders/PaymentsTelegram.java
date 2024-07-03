@@ -187,9 +187,20 @@ public class PaymentsTelegram implements SpringAdminBot {
 	}
 
 	private void delete(Update update) {
+		Long chatId;
+		Integer messageId;
+		if (update.hasMessage()) {
+			chatId = update.getMessage().getChatId();
+			messageId = update.getMessage().getMessageId();
+		} else if (update.hasCallbackQuery()) {
+			chatId = update.getCallbackQuery().getMessage().getChatId();
+			messageId = update.getCallbackQuery().getMessage().getMessageId();
+		} else {
+			throw new RuntimeException("not found what delete");
+		}
 		execute(DeleteMessage.builder()
-				.chatId(update.getMessage().getChatId())
-				.messageId(update.getMessage().getMessageId())
+				.chatId(chatId)
+				.messageId(messageId)
 				.build(), telegramClient);
 	}
 }
