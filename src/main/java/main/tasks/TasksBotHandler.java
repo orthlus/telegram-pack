@@ -28,6 +28,7 @@ public class TasksBotHandler implements SpringAdminChannelBot {
 	private long adminId;
 	@Qualifier("tasksTelegramClient")
 	private final TelegramClient telegramClient;
+	private final KeyboardsProvider keyboardsProvider;
 	@Value("${tasks.channels.main.id}")
 	private long mainTasksChannelId;
 	@Value("${tasks.channels.short.id}")
@@ -56,12 +57,14 @@ public class TasksBotHandler implements SpringAdminChannelBot {
 
 	private void mainChannel(Update update) {
 		String messageText = update.getChannelPost().getText();
+		int messageId = update.getChannelPost().getMessageId();
 		String taskName = messageText.split("\n")[0];
 		String shortenedTask = "%s: *%s*".formatted(buildTaskId(update), taskName);
 		execute(
 				SendMessage.builder()
 						.chatId(shortTasksChannelId)
 						.text(shortenedTask)
+						.replyMarkup(keyboardsProvider.finishButton(messageId))
 						.parseMode("markdown"),
 				telegramClient
 		);
