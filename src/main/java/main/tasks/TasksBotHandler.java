@@ -1,6 +1,6 @@
 package main.tasks;
 
-import art.aelaort.SpringAdminChannelBot;
+import art.aelaort.SpringAdminGroupBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import static java.lang.Math.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TasksBotHandler implements SpringAdminChannelBot {
+public class TasksBotHandler implements SpringAdminGroupBot {
 	@Getter
 	@Value("${tasks.telegram.bot.token}")
 	private String botToken;
@@ -27,60 +27,63 @@ public class TasksBotHandler implements SpringAdminChannelBot {
 	@Value("${telegram.admin.id}")
 	private long adminId;
 
-	@Value("${tasks.channels.main.id}")
-	private long mainTasksChannelId;
-	@Value("${tasks.channels.short.id}")
-	private long shortTasksChannelId;
+	@Value("${tasks.group.id}")
+	private long groupId;
+	@Value("${tasks.thread.short.id}")
+	private int threadShortId;
+	@Value("${tasks.thread.main.id}")
+	private int threadMainId;
 
 	@Qualifier("tasksTelegramClient")
 	private final TelegramClient telegramClient;
-	private final KeyboardsProvider keyboardsProvider;
 
 	@Override
-	public Set<Long> channelsIds() {
-		return Set.of(shortTasksChannelId, mainTasksChannelId);
+	public Set<Long> groupsIds() {
+		return Set.of(groupId);
 	}
 
 	@Override
 	public void consumeAdmin(Update update) {
-		if (update.hasChannelPost() && update.getChannelPost().hasText()) {
-			Long chatId = update.getChannelPost().getChatId();
-			if (chatId == mainTasksChannelId) {
-				mainChannel(update);
-			} else if (chatId == shortTasksChannelId) {
-				shortChannel(update);
+		if (update.hasMessage() && update.getMessage().hasText()) {
+			long chatId = update.getMessage().getChatId();
+			if (chatId == groupId) {
+				int threadId = update.getMessage().getMessageThreadId();
+				if (threadId == threadMainId) {
+					mainThread(update);
+				} else if (threadId == threadShortId) {
+					shortThread(update);
+				}
 			}
 		}
 	}
 
-	private void shortChannel(Update update) {
+	private void shortThread(Update update) {
 		log.info("new message in short channel: {}", update.getChannelPost().getText());
 	}
 
-	private void mainChannel(Update update) {
-		String messageText = update.getChannelPost().getText();
-		int messageId = update.getChannelPost().getMessageId();
+	private void mainThread(Update update) {
+		String messageText = update.getMessage().getText();
 		String taskName = messageText.split("\n")[0];
 		String shortenedTask = "%s: *%s*".formatted(buildTaskId(update), taskName);
 		execute(
 				SendMessage.builder()
-						.chatId(shortTasksChannelId)
+						.chatId(groupId)
+						.messageThreadId(threadShortId)
 						.text(shortenedTask)
-						.replyMarkup(keyboardsProvider.finishButton(messageId))
 						.parseMode("markdown"),
 				telegramClient
 		);
 	}
 
 	private String buildTaskId(Update update) {
-		int messageId = update.getChannelPost().getMessageId();
-		String link = getMainChannelMessageId(update);
+		int messageId = update.getMessage().getMessageId();
+		String link = getMainThreadMessageLink(update);
 		return "[#%s](%s)".formatted(messageId, link);
 	}
 
-	private String getMainChannelMessageId(Update update) {
-		int messageId = update.getChannelPost().getMessageId();
-		long channelId = abs(mainTasksChannelId) % (long) pow(10, (long) log10(abs(mainTasksChannelId)));
-		return "https://t.me/c/%d/%d".formatted(channelId, messageId);
+	private String getMainThreadMessageLink(Update update) {
+		int messageId = update.getMessage().getMessageId();
+		long cleanedGroupId = abs(groupId) % (long) pow(10, (long) log10(abs(groupId)));
+		return "https://t.me/c/%d/%d/%d".formatted(cleanedGroupId, threadMainId, messageId);
 	}
 }
