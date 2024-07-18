@@ -26,13 +26,15 @@ public class TasksBotHandler implements SpringAdminChannelBot {
 	@Getter
 	@Value("${telegram.admin.id}")
 	private long adminId;
-	@Qualifier("tasksTelegramClient")
-	private final TelegramClient telegramClient;
-	private final KeyboardsProvider keyboardsProvider;
+
 	@Value("${tasks.channels.main.id}")
 	private long mainTasksChannelId;
 	@Value("${tasks.channels.short.id}")
 	private long shortTasksChannelId;
+
+	@Qualifier("tasksTelegramClient")
+	private final TelegramClient telegramClient;
+	private final KeyboardsProvider keyboardsProvider;
 
 	@Override
 	public Set<Long> channelsIds() {
