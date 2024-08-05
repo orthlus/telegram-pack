@@ -8,9 +8,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.util.List;
 import java.util.Set;
 
 import static art.aelaort.TelegramClientHelpers.execute;
@@ -33,9 +38,12 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 	private int threadShortId;
 	@Value("${tasks.thread.main.id}")
 	private int threadMainId;
+	@Value("${tasks.thread.complete.id}")
+	private int threadCompleteId;
 
 	@Qualifier("tasksTelegramClient")
 	private final TelegramClient telegramClient;
+	private final KeyboardProvider keyboardProvider;
 
 	@Override
 	public Set<Long> groupsIds() {
@@ -54,7 +62,24 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 					shortThread(update);
 				}
 			}
+		} else if (update.hasCallbackQuery()) {
+			long chatId = update.getCallbackQuery().getMessage().getChatId();
+			if (chatId == groupId) {
+				callback(update.getCallbackQuery());
+			}
 		}
+	}
+
+	private void callback(CallbackQuery callbackQuery) {
+		List.of(
+				Integer.parseInt(callbackQuery.getData()),
+				callbackQuery.getMessage().getMessageId()
+		).forEach(messageToDeleteId -> execute(
+				DeleteMessage.builder()
+						.chatId(groupId)
+						.messageId(messageToDeleteId),
+				telegramClient
+		));
 	}
 
 	private void shortThread(Update update) {
@@ -65,7 +90,8 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 		String messageText = update.getMessage().getText();
 		String taskName = messageText.split("\n")[0];
 		String shortenedTask = "%s: *%s*".formatted(buildTaskId(update), taskName);
-		execute(
+
+		Message shortMessage = execute(
 				SendMessage.builder()
 						.chatId(groupId)
 						.messageThreadId(threadShortId)
@@ -73,6 +99,28 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 						.parseMode("markdown"),
 				telegramClient
 		);
+		Message completeMessage = execute(
+				SendMessage.builder()
+						.chatId(groupId)
+						.messageThreadId(threadCompleteId)
+						.text(shortenedTask)
+						.replyMarkup(keyboardProvider.completeTaskButton(shortMessage.getMessageId()))
+						.parseMode("markdown"),
+				telegramClient
+		);
+
+		String newShortenedTaskText = appendShortenedTask(shortenedTask, completeMessage);
+		execute(
+				EditMessageText.builder()
+						.chatId(groupId)
+						.messageId(shortMessage.getMessageId())
+						.text(newShortenedTaskText)
+						.parseMode("markdown"),
+				telegramClient);
+	}
+
+	private String appendShortenedTask(String oldText, Message completeMessage) {
+		return oldText + "       [del](%s)".formatted(getCompleteThreadMessageLink(completeMessage));
 	}
 
 	private String buildTaskId(Update update) {
@@ -81,9 +129,17 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 		return "[#%s](%s)".formatted(messageId, link);
 	}
 
+	private String getCompleteThreadMessageLink(Message completeMessage) {
+		int messageId = completeMessage.getMessageId();
+		return "https://t.me/c/%d/%d/%d".formatted(getCleanedGroupId(), threadCompleteId, messageId);
+	}
+
 	private String getMainThreadMessageLink(Update update) {
 		int messageId = update.getMessage().getMessageId();
-		long cleanedGroupId = abs(groupId) % (long) pow(10, (long) log10(abs(groupId)));
-		return "https://t.me/c/%d/%d/%d".formatted(cleanedGroupId, threadMainId, messageId);
+		return "https://t.me/c/%d/%d/%d".formatted(getCleanedGroupId(), threadMainId, messageId);
+	}
+
+	private long getCleanedGroupId() {
+		return abs(groupId) % (long) pow(10, (long) log10(abs(groupId)));
 	}
 }
