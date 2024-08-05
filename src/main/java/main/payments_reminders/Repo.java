@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static main.Tables.PAYMENTS_HOLDS_ON_REMINDERS;
-import static main.tables.PaymentsReminders.PAYMENTS_REMINDERS;
+import static main.Tables.PAYMENTS_REMINDERS;
 import static org.jooq.Records.mapping;
 
 @Slf4j
