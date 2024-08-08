@@ -72,8 +72,8 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 	private void callback(CallbackQuery callbackQuery) {
 		chatWorkerClient.deleteMessages(
 				groupId,
-				Integer.parseInt(callbackQuery.getData()),
-				callbackQuery.getMessage().getMessageId()
+				callbackQuery.getMessage().getMessageId(),
+				Integer.parseInt(callbackQuery.getData())
 		);
 	}
 
