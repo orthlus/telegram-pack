@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import main.common.telegram.Command;
 import main.main_tech.ruvds.RuvdsEmailClient;
-import main.main_tech.wg.WgService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,9 +23,6 @@ public class Telegram implements SpringAdminBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
-		WG_STAT_DIFF("/wg_stat_diff"),
-		WG_STAT_CURRENT("/wg_stat_current"),
-		WG_UPDATE_USERS("/wg_update_users"),
 		GET_CODE("/get_code");
 		final String command;
 	}
@@ -41,7 +37,6 @@ public class Telegram implements SpringAdminBot {
 	private long adminId;
 	@Qualifier("maintechTelegramClient")
 	private final TelegramClient telegramClient;
-	private final WgService wg;
 	private final RuvdsEmailClient ruvdsEmailClient;
 
 	@Override
@@ -63,19 +58,6 @@ public class Telegram implements SpringAdminBot {
 
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
-			case WG_STAT_CURRENT -> {
-				String text = wg.getPrettyCurrent();
-				sendInMonospace(text);
-			}
-			case WG_STAT_DIFF -> {
-				String text = wg.getPrettyDiff();
-				wg.saveCurrentItems();
-				sendInMonospace(text);
-			}
-			case WG_UPDATE_USERS -> {
-				wg.updateUsers();
-				send("Ok");
-			}
 			case GET_CODE -> sendInMonospace(ruvdsEmailClient.getCode());
 		}
 	}
