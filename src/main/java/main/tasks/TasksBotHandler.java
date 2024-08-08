@@ -44,6 +44,7 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 	@Qualifier("tasksTelegramClient")
 	private final TelegramClient telegramClient;
 	private final KeyboardProvider keyboardProvider;
+	private final ChatWorkerClient chatWorkerClient;
 
 	@Override
 	public Set<Long> groupsIds() {
@@ -71,6 +72,11 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 	}
 
 	private void callback(CallbackQuery callbackQuery) {
+		/*chatWorkerClient.deleteMessages(
+				groupId,
+				Integer.parseInt(callbackQuery.getData()),
+				callbackQuery.getMessage().getMessageId()
+		);*/
 		List.of(
 				Integer.parseInt(callbackQuery.getData()),
 				callbackQuery.getMessage().getMessageId()
