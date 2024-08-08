@@ -21,4 +21,14 @@ public class HttpClientConfigurations {
 				.setConnectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
+
+	@Bean
+	public RestTemplate chatWorkerRestTemplate(
+			RestTemplateBuilder builder,
+			@Value("${tasks.worker.url}") String url) {
+		return builder
+				.rootUri(url)
+				.setConnectTimeout(Duration.ofMinutes(2))
+				.build();
+	}
 }
