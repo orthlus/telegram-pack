@@ -8,14 +8,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.util.List;
 import java.util.Set;
 
 import static art.aelaort.TelegramClientHelpers.execute;
@@ -72,20 +70,11 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 	}
 
 	private void callback(CallbackQuery callbackQuery) {
-		/*chatWorkerClient.deleteMessages(
+		chatWorkerClient.deleteMessages(
 				groupId,
 				Integer.parseInt(callbackQuery.getData()),
 				callbackQuery.getMessage().getMessageId()
-		);*/
-		List.of(
-				Integer.parseInt(callbackQuery.getData()),
-				callbackQuery.getMessage().getMessageId()
-		).forEach(messageToDeleteId -> execute(
-				DeleteMessage.builder()
-						.chatId(groupId)
-						.messageId(messageToDeleteId),
-				telegramClient
-		));
+		);
 	}
 
 	private void shortThread(Update update) {
