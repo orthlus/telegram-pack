@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 
 @Configuration
-public class HttpClientConfigurations {
+public class RestTemplateConfiguration {
 	@Bean
 	public RestTemplate wgRestTemplate(
 			RestTemplateBuilder builder,
