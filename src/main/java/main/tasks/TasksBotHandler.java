@@ -78,20 +78,20 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 	}
 
 	private void shortThread(Update update) {
-		log.info("new message in short channel: {}", update.getChannelPost().getText());
+		log.info("new message in short channel: {}", update.getMessage().getText());
 	}
 
 	private void mainThread(Update update) {
 		String messageText = update.getMessage().getText();
 		String taskName = messageText.split("\n")[0];
-		String shortenedTask = "%s: *%s*".formatted(buildTaskId(update), taskName);
+		String shortenedTask = buildShortenedText(update, taskName);
 
 		Message shortMessage = execute(
 				SendMessage.builder()
 						.chatId(groupId)
 						.messageThreadId(threadShortId)
 						.text(shortenedTask)
-						.parseMode("markdown"),
+						.parseMode("html"),
 				telegramClient
 		);
 		Message completeMessage = execute(
@@ -100,7 +100,7 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 						.messageThreadId(threadCompleteId)
 						.text(shortenedTask)
 						.replyMarkup(keyboardProvider.completeTaskButton(shortMessage.getMessageId()))
-						.parseMode("markdown"),
+						.parseMode("html"),
 				telegramClient
 		);
 
@@ -110,18 +110,19 @@ public class TasksBotHandler implements SpringAdminGroupBot {
 						.chatId(groupId)
 						.messageId(shortMessage.getMessageId())
 						.text(newShortenedTaskText)
-						.parseMode("markdown"),
+						.parseMode("html"),
 				telegramClient);
 	}
 
-	private String appendShortenedTask(String oldText, Message completeMessage) {
-		return oldText + "       [del](%s)".formatted(getCompleteThreadMessageLink(completeMessage));
-	}
-
-	private String buildTaskId(Update update) {
+	private String buildShortenedText(Update update, String taskName) {
 		int messageId = update.getMessage().getMessageId();
 		String link = getMainThreadMessageLink(update);
-		return "[#%s](%s)".formatted(messageId, link);
+
+		return "<a href=\"%s\">%s</a>: <b><a href=\"%s\">%s</a></b>".formatted(link, messageId, link, taskName);
+	}
+
+	private String appendShortenedTask(String oldText, Message completeMessage) {
+		return oldText + "       <a href=\"%s\">del</a>".formatted(getCompleteThreadMessageLink(completeMessage));
 	}
 
 	private String getCompleteThreadMessageLink(Message completeMessage) {
