@@ -88,6 +88,7 @@ public class PaymentsTelegram implements SpringAdminBot {
 					try {
 						remindsService.addHoldOnRemind(t.v1, t.v2);
 						send("Ок");
+						delete(update);
 					} catch (RuntimeException e) {
 						send("Что-то пошло не так, попробуйте заново");
 					}
