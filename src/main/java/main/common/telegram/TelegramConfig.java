@@ -15,6 +15,13 @@ import static art.aelaort.TelegramBots.createTelegramInit;
 @Configuration
 public class TelegramConfig {
 	@Bean
+	public TelegramClient billingTelegramClient(@Value("${billing.telegram.bot.token}") String token) {
+		return TelegramClientBuilder.builder()
+				.token(token)
+				.build();
+	}
+
+	@Bean
 	public TelegramClient tasksTelegramClient(@Value("${tasks.telegram.bot.token}") String token) {
 		return TelegramClientBuilder.builder()
 				.token(token)
