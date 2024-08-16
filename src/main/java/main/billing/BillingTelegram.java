@@ -30,7 +30,7 @@ public class BillingTelegram implements SpringAdminBot {
 	}
 
 	@Getter
-	@Value("${debts.telegram.bot.token}")
+	@Value("${billing.telegram.bot.token}")
 	private String botToken;
 	@Getter
 	@Value("${telegram.admin.id}")
@@ -59,7 +59,7 @@ public class BillingTelegram implements SpringAdminBot {
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
 			case START -> send("команды:\n" + String.join("\n", commandsMap.keySet()));
-			case SHOW -> billingService.getAllString();
+			case SHOW -> send(billingService.getAllString());
 		}
 	}
 
@@ -67,6 +67,7 @@ public class BillingTelegram implements SpringAdminBot {
 		execute(SendMessage.builder()
 				.chatId(adminId)
 				.text(text)
+				.parseMode("markdown")
 				.build(), telegramClient);
 	}
 }

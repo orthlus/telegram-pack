@@ -19,4 +19,16 @@ public class RestTemplateConfiguration {
 				.setConnectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
+
+	@Bean
+	public RestTemplate timewebRestTemplate(
+			RestTemplateBuilder builder,
+			@Value("${billing.timeweb.url}") String url,
+			@Value("${billing.timeweb.token}") String token) {
+		return builder
+				.rootUri(url)
+				.defaultHeader("authorization", "Bearer " + token.trim())
+				.setConnectTimeout(Duration.ofMinutes(2))
+				.build();
+	}
 }
