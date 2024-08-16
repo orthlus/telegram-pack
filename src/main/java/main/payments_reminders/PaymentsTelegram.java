@@ -1,5 +1,6 @@
 package main.payments_reminders;
 
+import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
 import art.aelaort.telegram.callback.CallbackType;
 import art.aelaort.telegram.entity.Remind;
@@ -8,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.common.telegram.Command;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

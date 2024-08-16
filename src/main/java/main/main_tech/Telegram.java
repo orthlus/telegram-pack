@@ -1,10 +1,10 @@
 package main.main_tech;
 
+import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import main.common.telegram.Command;
 import main.main_tech.ruvds.RuvdsEmailClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
