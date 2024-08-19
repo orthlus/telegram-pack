@@ -12,12 +12,8 @@ import javax.mail.search.FlagTerm;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
-
-import static java.time.LocalDateTime.now;
-import static main.Main.zone;
 
 @Slf4j
 @Component
@@ -104,12 +100,6 @@ public class RuvdsEmailClient {
 		return Sets.newHashSet(inbox.search(
 				new FlagTerm(new Flags(Flags.Flag.SEEN), false)
 		));
-	}
-
-	private boolean isInLast5Minutes(Date date) {
-		return date.toInstant()
-				.atZone(zone).toLocalDateTime()
-				.isAfter(now(zone).minusMinutes(5));
 	}
 
 	private static class NoNewMessagesException extends RuntimeException {

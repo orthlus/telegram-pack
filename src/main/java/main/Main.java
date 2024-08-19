@@ -11,12 +11,9 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-import java.time.ZoneId;
-
 @SpringBootApplication
 @EnableCaching
 public class Main {
-	public static final ZoneId zone = ZoneId.of("Europe/Moscow");
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Main.class)
 				.web(WebApplicationType.NONE)

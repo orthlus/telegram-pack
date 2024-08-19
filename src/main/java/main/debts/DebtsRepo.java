@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static main.Main.zone;
 import static main.Tables.DEBTS_EXPENSES;
 import static main.Tables.DEBTS_INCOME;
 import static org.jooq.Records.mapping;
@@ -71,7 +70,7 @@ public class DebtsRepo {
 
 	@Cacheable(value = "expenses")
 	public List<Expense> getExpenses() {
-		return getExpenses(LocalDate.now(zone));
+		return getExpenses(LocalDate.now());
 	}
 
 	public List<Expense> getExpenses(LocalDate date) {

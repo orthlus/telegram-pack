@@ -12,7 +12,6 @@ import java.time.LocalDate;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
-import static main.Main.zone;
 
 @Slf4j
 @Component
@@ -22,7 +21,7 @@ public class RemindsService {
 
 	public void addHoldOnRemind(Remind remind, int daysForHold) {
 		int days = abs(daysForHold);
-		LocalDate now = LocalDate.now(zone);
+		LocalDate now = LocalDate.now();
 
 		LocalDate remindEndDate;
 		try {
@@ -46,7 +45,7 @@ public class RemindsService {
 	}
 
 	public void submitRemind(Remind remind) {
-		LocalDate holdEndDate = LocalDate.now(zone).withDayOfMonth(1).plusMonths(1);
+		LocalDate holdEndDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
 		try {
 			repo.addHoldOnRemind(remind, holdEndDate);
 		} catch (DataAccessException e) {

@@ -2,7 +2,6 @@ package main.debts;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import main.Main;
 import main.debts.entity.Expense;
 import main.debts.entity.ExpenseDto;
 import main.debts.entity.Income;
@@ -209,7 +208,7 @@ public class DebtsService {
 	}
 
 	private int calculateSumExpensesForNext3Month() {
-		LocalDate now = LocalDate.now(Main.zone);
+		LocalDate now = LocalDate.now();
 		Set<LocalDate> dates = rangeClosed(1, 3).mapToObj(now::plusMonths).collect(toSet());
 
 		return dates.stream()
