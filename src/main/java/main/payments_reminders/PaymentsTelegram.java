@@ -4,11 +4,13 @@ import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
 import art.aelaort.telegram.callback.CallbackType;
 import art.aelaort.telegram.entity.Remind;
+import art.aelaort.telegram.entity.RemindToSend;
 import art.aelaort.telegram.entity.RemindWithoutId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.payments_reminders.keyboard.KeyboardsProvider;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Map;
@@ -43,6 +47,7 @@ public class PaymentsTelegram implements SpringAdminBot {
 	private final RemindsService remindsService;
 	private final CallbackDataMapper mapper;
 	private final Repo repo;
+	private final KeyboardsProvider keyboards;
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 
 	@AllArgsConstructor
@@ -203,5 +208,21 @@ public class PaymentsTelegram implements SpringAdminBot {
 				.chatId(chatId)
 				.messageId(messageId)
 				.build(), telegramClient);
+	}
+
+
+	public void sendRemind(RemindToSend remind) {
+		String msg = remind.getName();
+		InlineKeyboardMarkup keyboard = keyboards.getRemindButtons(remind);
+		send(msg, keyboard);
+	}
+
+	private void send(String text, ReplyKeyboard keyboard) {
+		SendMessage message = SendMessage.builder()
+				.chatId(adminId)
+				.text(text)
+				.replyMarkup(keyboard)
+				.build();
+		execute(message, telegramClient);
 	}
 }

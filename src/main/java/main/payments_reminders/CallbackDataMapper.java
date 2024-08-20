@@ -23,7 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CallbackDataMapper {
 	private final Repo repo;
-	private ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper;
 	private Map<Integer, CallbackType> typesById = new HashMap<>();
 
 	{
