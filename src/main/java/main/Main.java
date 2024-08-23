@@ -8,11 +8,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 @SpringBootApplication
 @EnableCaching
+@EnableScheduling
 public class Main {
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Main.class)
