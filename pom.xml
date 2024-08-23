@@ -15,7 +15,6 @@
 
         <telegrambots.version>6.7.0</telegrambots.version>
         <jackson.version>2.15.2</jackson.version>
-        <jooq.version>3.17.6</jooq.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -178,7 +177,7 @@
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>${jooq.version}</version>
+                <version>3.19.7</version>
                 <executions>
                     <execution>
                         <id>generate-jooq</id>
