@@ -1,4 +1,4 @@
-package main.billing.models;
+package main.billing.models.timeweb;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

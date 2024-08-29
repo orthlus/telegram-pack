@@ -1,7 +1,7 @@
 package main.billing;
 
 import lombok.RequiredArgsConstructor;
-import main.billing.models.FinancesResponse;
+import main.billing.models.timeweb.FinancesResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@SuppressWarnings("DataFlowIssue")
 @Component
 @RequiredArgsConstructor
 public class BillingService {
