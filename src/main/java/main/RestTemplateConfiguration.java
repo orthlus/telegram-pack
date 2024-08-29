@@ -31,4 +31,16 @@ public class RestTemplateConfiguration {
 				.setConnectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
+
+	@Bean
+	public RestTemplate ig(RestTemplateBuilder restTemplateBuilder,
+						   @Value("${billing.instagram.token}") String igApiToken,
+						   @Value("${billing.instagram.url}") String igApiUrl) {
+		return restTemplateBuilder
+				.rootUri(igApiUrl)
+				.setConnectTimeout(Duration.ofMinutes(5))
+				.setReadTimeout(Duration.ofMinutes(5))
+				.defaultHeader("x-access-key", igApiToken)
+				.build();
+	}
 }

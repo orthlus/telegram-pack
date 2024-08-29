@@ -2,6 +2,7 @@ package main.billing;
 
 import lombok.RequiredArgsConstructor;
 import main.billing.models.timeweb.FinancesResponse;
+import main.billing.models.instagram.Balance;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +16,13 @@ import java.time.LocalDateTime;
 public class BillingService {
 	@Qualifier("timewebRestTemplate")
 	private final RestTemplate timeweb;
+	@Qualifier("ig")
+	private final RestTemplate instagram;
+
+	public String getIntagramString() {
+		Balance balance = instagram.getForObject("/sys/balance", Balance.class);
+		return "Баланс: %.2f %s".formatted(balance.getAmount(), balance.getCurrency());
+	}
 
 	public String getTimewebString() {
 		FinancesResponse response = timeweb.getForObject("/api/v1/account/finances", FinancesResponse.class);
@@ -35,7 +43,9 @@ public class BillingService {
 	public String getAllString() {
 		return """
 				*timeweb:*
+				%s
+				*instagram:*
 				%s"""
-				.formatted(getTimewebString());
+				.formatted(getTimewebString(), getIntagramString());
 	}
 }
