@@ -1,4 +1,4 @@
-package main.billing.models.instagram;
+package main.billing.instagram;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

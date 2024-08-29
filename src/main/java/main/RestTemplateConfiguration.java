@@ -33,9 +33,9 @@ public class RestTemplateConfiguration {
 	}
 
 	@Bean
-	public RestTemplate ig(RestTemplateBuilder restTemplateBuilder,
-						   @Value("${billing.instagram.token}") String igApiToken,
-						   @Value("${billing.instagram.url}") String igApiUrl) {
+	public RestTemplate instagramRestTemplate(RestTemplateBuilder restTemplateBuilder,
+											  @Value("${billing.instagram.token}") String igApiToken,
+											  @Value("${billing.instagram.url}") String igApiUrl) {
 		return restTemplateBuilder
 				.rootUri(igApiUrl)
 				.setConnectTimeout(Duration.ofMinutes(5))
