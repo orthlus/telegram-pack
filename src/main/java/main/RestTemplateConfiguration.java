@@ -1,5 +1,7 @@
 package main;
 
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -8,8 +10,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+@Setter
 @Configuration
+@RequiredArgsConstructor
 public class RestTemplateConfiguration {
+	private final RestTemplateProperties properties;
+
 	@Bean
 	public RestTemplate chatWorkerRestTemplate(
 			RestTemplateBuilder builder,
@@ -21,26 +27,31 @@ public class RestTemplateConfiguration {
 	}
 
 	@Bean
-	public RestTemplate timewebRestTemplate(
-			RestTemplateBuilder builder,
-			@Value("${billing.timeweb.url}") String url,
-			@Value("${billing.timeweb.token}") String token) {
+	public RestTemplate timewebRestTemplate(RestTemplateBuilder builder) {
 		return builder
-				.rootUri(url)
-				.defaultHeader("authorization", "Bearer " + token.trim())
+				.rootUri(properties.getTimewebUrl())
+				.defaultHeader("authorization", "Bearer " + properties.getTimewebToken().trim())
 				.setConnectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
 
 	@Bean
-	public RestTemplate instagramRestTemplate(RestTemplateBuilder restTemplateBuilder,
-											  @Value("${billing.instagram.token}") String igApiToken,
-											  @Value("${billing.instagram.url}") String igApiUrl) {
+	public RestTemplate instagramRestTemplate(RestTemplateBuilder restTemplateBuilder) {
 		return restTemplateBuilder
-				.rootUri(igApiUrl)
+				.rootUri(properties.getInstagramUrl())
 				.setConnectTimeout(Duration.ofMinutes(5))
 				.setReadTimeout(Duration.ofMinutes(5))
-				.defaultHeader("x-access-key", igApiToken)
+				.defaultHeader("x-access-key", properties.getInstagramToken())
+				.build();
+	}
+
+	@Bean
+	public RestTemplate tiktokRestTemplate(RestTemplateBuilder restTemplateBuilder) {
+		return restTemplateBuilder
+				.rootUri(properties.getTiktokUrl())
+				.setConnectTimeout(Duration.ofMinutes(5))
+				.setReadTimeout(Duration.ofMinutes(5))
+				.defaultHeader("authorization", "Bearer " + properties.getTiktokToken())
 				.build();
 	}
 }
