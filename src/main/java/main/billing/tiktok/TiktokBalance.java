@@ -14,7 +14,7 @@ public class TiktokBalance implements BalanceResponse {
 	public String balanceString() {
 		UserInfo userInfo = tiktokRestTemplate.getForObject("/api/v1/tikhub/user/get_user_info", UserInfo.class);
 		if (userInfo.getCode() == 200) {
-			return "Баланс:%.3f USD".formatted(userInfo.getUserData().getBalance());
+			return "Баланс: %.3f USD".formatted(userInfo.getUserData().getBalance());
 		}
 		throw new RuntimeException();
 	}
