@@ -10,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @Setter
 @Configuration
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class RestTemplateConfiguration {
 	public RestTemplate timewebRestTemplate(RestTemplateBuilder builder) {
 		return builder
 				.rootUri(properties.getTimewebUrl())
-				.defaultHeader("authorization", "Bearer " + properties.getTimewebToken().trim())
+				.defaultHeader(AUTHORIZATION, "Bearer " + properties.getTimewebToken().trim())
 				.setConnectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
@@ -51,7 +53,7 @@ public class RestTemplateConfiguration {
 				.rootUri(properties.getTiktokUrl())
 				.setConnectTimeout(Duration.ofMinutes(5))
 				.setReadTimeout(Duration.ofMinutes(5))
-				.defaultHeader("authorization", "Bearer " + properties.getTiktokToken())
+				.defaultHeader(AUTHORIZATION, "Bearer " + properties.getTiktokToken())
 				.build();
 	}
 
