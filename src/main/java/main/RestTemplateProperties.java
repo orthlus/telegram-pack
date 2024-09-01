@@ -16,4 +16,5 @@ public class RestTemplateProperties {
 	private String instagramToken;
 	private String tiktokUrl;
 	private String tiktokToken;
+	private String yandexUrl;
 }

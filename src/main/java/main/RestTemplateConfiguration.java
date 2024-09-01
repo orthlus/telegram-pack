@@ -54,4 +54,13 @@ public class RestTemplateConfiguration {
 				.defaultHeader("authorization", "Bearer " + properties.getTiktokToken())
 				.build();
 	}
+
+	@Bean
+	public RestTemplate yandexRestTemplate(RestTemplateBuilder restTemplateBuilder) {
+		return restTemplateBuilder
+				.rootUri(properties.getYandexUrl())
+				.setConnectTimeout(Duration.ofMinutes(5))
+				.setReadTimeout(Duration.ofMinutes(5))
+				.build();
+	}
 }
