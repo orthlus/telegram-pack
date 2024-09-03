@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+
 @Getter
 @Setter
 @Component
@@ -18,6 +20,7 @@ public class BillingProperties {
 	private String tiktokToken;
 	private String yandexUrl;
 	private YandexIAMS3 yandexIAMS3;
+	private YandexSecrets yandexSecrets;
 
 	@Getter
 	@Setter
@@ -28,5 +31,12 @@ public class BillingProperties {
 		private String key;
 		private String bucket;
 		private String file;
+	}
+
+	@Getter
+	@Setter
+	public static class YandexSecrets {
+		private URI url;
+		private String secret;
 	}
 }

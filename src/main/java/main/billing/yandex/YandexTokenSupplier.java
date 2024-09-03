@@ -1,9 +1,9 @@
 package main.billing.yandex;
 
-import art.aelaort.IAMHelper;
 import art.aelaort.S3Params;
 import lombok.RequiredArgsConstructor;
 import main.BillingProperties;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -18,7 +18,11 @@ public class YandexTokenSupplier {
 	private final BillingProperties billingProperties;
 
 	public String getToken() {
-		yandexRestTemplate.postForObject(IAMHelper.functionUrl, IAMHelper.functionSecretEntity, String.class);
+		yandexRestTemplate.postForObject(
+				billingProperties.getYandexSecrets().getUrl(),
+				new HttpEntity<>(billingProperties.getYandexSecrets().getSecret()),
+				String.class
+		);
 		return readRemoteToken();
 	}
 
