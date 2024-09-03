@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties("billing")
-public class RestTemplateProperties {
+public class BillingProperties {
 	private String timewebUrl;
 	private String timewebToken;
 	private String instagramUrl;

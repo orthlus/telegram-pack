@@ -16,7 +16,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Configuration
 @RequiredArgsConstructor
 public class RestTemplateConfiguration {
-	private final RestTemplateProperties properties;
+	private final BillingProperties properties;
 
 	@Bean
 	public RestTemplate chatWorkerRestTemplate(
