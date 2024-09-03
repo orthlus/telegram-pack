@@ -17,4 +17,16 @@ public class BillingProperties {
 	private String tiktokUrl;
 	private String tiktokToken;
 	private String yandexUrl;
+	private YandexIAMS3 yandexIAMS3;
+
+	@Getter
+	@Setter
+	public static class YandexIAMS3 {
+		private String url;
+		private String region;
+		private String id;
+		private String key;
+		private String bucket;
+		private String file;
+	}
 }
