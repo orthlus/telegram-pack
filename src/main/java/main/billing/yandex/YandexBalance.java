@@ -4,14 +4,11 @@ import art.aelaort.YandexIAMSupplier;
 import lombok.RequiredArgsConstructor;
 import main.billing.BalanceResponse;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +38,8 @@ public class YandexBalance implements BalanceResponse {
 	}
 
 	private HttpEntity<?> entityBearerToken(String token) {
-		return new HttpEntity<>(Map.of(AUTHORIZATION, "Bearer " + token));
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBearerAuth(token);
+		return new HttpEntity<>(headers);
 	}
 }
