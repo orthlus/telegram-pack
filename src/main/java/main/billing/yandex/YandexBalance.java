@@ -17,8 +17,7 @@ public class YandexBalance implements BalanceResponse {
 
 	@Override
 	public String balanceString() {
-		String token = yandexTokenSupplier.getToken();
-		double balance = request(token).getBalance();
+		double balance = request().getBalance();
 		return "Баланс: %.2f руб".formatted(balance);
 	}
 
@@ -27,7 +26,8 @@ public class YandexBalance implements BalanceResponse {
 		return "yandex";
 	}
 
-	private BillingAccounts request(String token) {
+	private BillingAccounts request() {
+		String token = yandexTokenSupplier.getToken();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setBearerAuth(token);
 
