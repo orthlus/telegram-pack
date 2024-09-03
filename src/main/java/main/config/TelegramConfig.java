@@ -1,4 +1,4 @@
-package main;
+package main.config;
 
 import art.aelaort.SpringLongPollingBot;
 import art.aelaort.TelegramClientBuilder;

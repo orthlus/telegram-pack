@@ -1,4 +1,4 @@
-package main;
+package main.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
