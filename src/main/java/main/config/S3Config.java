@@ -2,7 +2,7 @@ package main.config;
 
 import art.aelaort.DefaultS3Params;
 import art.aelaort.S3Params;
-import main.BillingProperties;
+import main.billing.BillingProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

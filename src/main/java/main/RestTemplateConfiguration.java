@@ -2,6 +2,7 @@ package main;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import main.billing.BillingProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

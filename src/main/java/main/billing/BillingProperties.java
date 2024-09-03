@@ -1,4 +1,4 @@
-package main;
+package main.billing;
 
 import lombok.Getter;
 import lombok.Setter;

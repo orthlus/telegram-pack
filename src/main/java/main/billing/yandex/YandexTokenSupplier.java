@@ -2,7 +2,7 @@ package main.billing.yandex;
 
 import art.aelaort.S3Params;
 import lombok.RequiredArgsConstructor;
-import main.BillingProperties;
+import main.billing.BillingProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
