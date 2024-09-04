@@ -54,7 +54,8 @@ public class RestTemplateConfiguration {
 				.rootUri(properties.getTiktokUrl())
 				.setConnectTimeout(Duration.ofMinutes(5))
 				.setReadTimeout(Duration.ofMinutes(5))
-				.defaultHeader(AUTHORIZATION, "Bearer " + properties.getTiktokToken())
+				// TODO wait fix api
+				.defaultHeader(AUTHORIZATION.toLowerCase(), "Bearer " + properties.getTiktokToken())
 				.build();
 	}
 
