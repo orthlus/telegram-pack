@@ -3,19 +3,19 @@ package main.billing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BillingService {
-	private final List<BalanceResponse> balances;
+	private final RestTemplate billingServiceRestTemplate;
 
 	public String getAllString() {
-		return balances.stream()
-				.map(BalanceResponse::text)
-				.collect(Collectors.joining("\n\n"));
+		return billingServiceRestTemplate.getForObject("/billing", String.class);
+	}
+
+	public String getByService(String serviceName) {
+		return billingServiceRestTemplate.getForObject("/billing/" + serviceName, String.class);
 	}
 }
