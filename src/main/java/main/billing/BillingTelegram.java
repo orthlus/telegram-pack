@@ -25,6 +25,7 @@ public class BillingTelegram implements SpringAdminBot {
 	@Getter
 	private enum Commands implements Command {
 		START("/start"),
+		TIMEWEB_SHOW("/timeweb_show"),
 		SHOW("/show");
 		final String command;
 	}
@@ -60,6 +61,7 @@ public class BillingTelegram implements SpringAdminBot {
 		switch (commandsMap.get(messageText)) {
 			case START -> send("команды:\n" + String.join("\n", commandsMap.keySet()));
 			case SHOW -> send(billingService.getAllString());
+			case TIMEWEB_SHOW -> send(billingService.getByService("timeweb"));
 		}
 	}
 
