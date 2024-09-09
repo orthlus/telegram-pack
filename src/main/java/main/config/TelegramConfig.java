@@ -52,6 +52,13 @@ public class TelegramConfig {
 	}
 
 	@Bean
+	public TelegramClient listTelegramClient(@Value("${list.telegram.bot.token}") String token) {
+		return TelegramClientBuilder.builder()
+				.token(token)
+				.build();
+	}
+
+	@Bean
 	@ConfigurationProperties("telegram.list")
 	public TelegramListProperties telegramListProperties() {
 		return new TelegramListProperties();
