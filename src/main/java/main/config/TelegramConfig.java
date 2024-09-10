@@ -60,6 +60,13 @@ public class TelegramConfig {
 	}
 
 	@Bean
+	public TelegramClient bashTelegramClient(@Value("${bash.telegram.bot.token}") String token) {
+		return TelegramClientBuilder.builder()
+				.token(token)
+				.build();
+	}
+
+	@Bean
 	public TelegramInit telegramInit(List<SpringLongPollingBot> bots,
 									 TelegramListProperties telegramListProperties) {
 		return createTelegramInit(bots, telegramListProperties);
