@@ -22,10 +22,35 @@ public class BashBot implements SpringLongPollingBot {
 
 	@Override
 	public void consume(Update update) {
+		if (update.hasMessage() && update.getMessage().hasText()) {
+			String messageText = update.getMessage().getText();
+			if (messageText.startsWith("/")) {
+				send(update, "дай число");
+			} else {
+				try {
+					int rank = Integer.parseInt(messageText);
+					sendByRank(update, rank);
+				} catch (NumberFormatException ignored) {
+				}
+			}
+		}
+	}
+
+	private void sendByRank(Update update, int rank) {
+		String text;
+		try {
+			text = dataService.getByRank(rank);
+		} catch (Exception e) {
+			text = "not found";
+		}
+		send(update, text);
+	}
+
+	private void send(Update update, String text) {
 		execute(
 				SendMessage.builder()
 						.chatId(update.getMessage().getChatId())
-						.text(String.join("\n", dataService.getTop5())),
+						.text(text),
 				bashTelegramClient
 		);
 	}
