@@ -28,8 +28,7 @@ public class DataService {
 	private void init() throws Exception {
 		Quote[] quotes = jacksonObjectMapper.readValue(fileUrl.toURL(), Quote[].class);
 		for (Quote quote : quotes) {
-			Integer rating = quote.getRating();
-			quotesMap.put(rating == null ? 0 : rating, quote.getText());
+			quotesMap.put(quote.getRating(), quote.getText());
 		}
 		log.info("quotes loaded, size - {}", quotes.length);
 	}
