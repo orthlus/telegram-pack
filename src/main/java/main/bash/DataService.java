@@ -22,14 +22,14 @@ public class DataService {
 	private final ObjectMapper jacksonObjectMapper;
 	@Value("${bash.file.url}")
 	private URI fileUrl;
-	private TreeMap<Integer, String> quotesMap;
+	private final TreeMap<Integer, String> quotesMap = new TreeMap<>();
 
 	@PostConstruct
 	private void init() throws Exception {
 		Quote[] quotes = jacksonObjectMapper.readValue(fileUrl.toURL(), Quote[].class);
-		quotesMap = new TreeMap<>();
 		for (Quote quote : quotes) {
-			quotesMap.put(quote.getRating(), quote.getText());
+			Integer rating = quote.getRating();
+			quotesMap.put(rating == null ? 0 : rating, quote.getText());
 		}
 		log.info("quotes loaded, size - {}", quotes.length);
 	}
