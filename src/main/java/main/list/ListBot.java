@@ -39,15 +39,23 @@ public class ListBot implements SpringAdminBot {
 	public void consumeAdmin(Update update) {
 		if (update.hasMessage() && update.getMessage().hasText()) {
 			String[] bots = telegramListRestTemplate.getForObject("/list", String[].class);
-			String text = Stream.of(bots)
-					.filter(bot -> !bot.equals(botNickname))
-					.map(bot -> "@" + bot)
-					.collect(Collectors.joining("\n"));
 
-			execute(SendMessage.builder()
-							.text(text)
-							.chatId(adminId),
-					listTelegramClient);
+			if (bots.length == 0) {
+				send("bots not found");
+			} else {
+				String text = Stream.of(bots)
+						.filter(bot -> !bot.equals(botNickname))
+						.map(bot -> "@" + bot)
+						.collect(Collectors.joining("\n"));
+				send(text);
+			}
 		}
+	}
+
+	private void send(String text) {
+		execute(SendMessage.builder()
+						.text(text)
+						.chatId(adminId),
+				listTelegramClient);
 	}
 }
