@@ -31,6 +31,7 @@ public class BashBot implements SpringLongPollingBot {
 					int rank = Integer.parseInt(messageText);
 					sendByRank(update, rank);
 				} catch (NumberFormatException ignored) {
+					send(update, "нет, дай число");
 				}
 			}
 		}
