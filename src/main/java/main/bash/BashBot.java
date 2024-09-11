@@ -5,8 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import static art.aelaort.TelegramClientHelpers.execute;
@@ -23,28 +26,46 @@ public class BashBot implements SpringLongPollingBot {
 	@Override
 	public void consume(Update update) {
 		if (update.hasMessage() && update.getMessage().hasText()) {
-			String messageText = update.getMessage().getText();
-			if (messageText.startsWith("/")) {
-				send(update, "дай число");
-			} else {
-				try {
-					int rank = Integer.parseInt(messageText);
-					sendByRank(update, rank);
-				} catch (NumberFormatException ignored) {
-					send(update, "нет, дай число");
-				}
+			handleText(update);
+		} else if (update.hasInlineQuery()) {
+			handleInlineQuery(update);
+		}
+	}
+
+	private void handleInlineQuery(Update update) {
+		InlineQuery inlineQuery = update.getInlineQuery();
+		String query = inlineQuery.getQuery();
+		try {
+			int rank = Integer.parseInt(query);
+//			String text = getByRank(rank);
+			/*bashTelegramClient.execute(AnswerInlineQuery.builder()
+					.result(InlineQueryResult)
+					.build());*/
+		} catch (NumberFormatException ignored) {
+		}
+	}
+
+	private void handleText(Update update) {
+		String messageText = update.getMessage().getText();
+		if (messageText.startsWith("/")) {
+			send(update, "дай число");
+		} else {
+			try {
+				int rank = Integer.parseInt(messageText);
+				String text = getByRank(rank);
+				send(update, text);
+			} catch (NumberFormatException ignored) {
+				send(update, "нет, дай число");
 			}
 		}
 	}
 
-	private void sendByRank(Update update, int rank) {
-		String text;
+	private String getByRank(int rank) {
 		try {
-			text = dataService.getByRank(rank);
+			return dataService.getByRank(rank);
 		} catch (Exception e) {
-			text = "not found";
+			return "not found";
 		}
-		send(update, text);
 	}
 
 	private void send(Update update, String text) {
