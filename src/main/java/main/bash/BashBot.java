@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -17,8 +18,8 @@ import static art.aelaort.TelegramClientHelpers.execute;
 @Component
 @RequiredArgsConstructor
 public class BashBot implements SpringLongPollingBot {
-	private final DataService dataService;
 	private final TelegramClient bashTelegramClient;
+	private final RestTemplate bashServiceRestTemplate;
 	@Getter
 	@Value("${bash.telegram.bot.token}")
 	private String botToken;
@@ -62,10 +63,14 @@ public class BashBot implements SpringLongPollingBot {
 
 	private String getByRank(int rank) {
 		try {
-			return dataService.getByRank(rank);
+			return getByRankRequest(rank);
 		} catch (Exception e) {
 			return "not found";
 		}
+	}
+
+	private String getByRankRequest(int rank) {
+		return bashServiceRestTemplate.getForObject("/?rank=" + rank, String.class);
 	}
 
 	private void send(Update update, String text) {
