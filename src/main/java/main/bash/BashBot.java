@@ -49,7 +49,11 @@ public class BashBot implements SpringLongPollingBot {
 	private void handleText(Update update) {
 		String messageText = update.getMessage().getText();
 		if (messageText.startsWith("/")) {
-			send(update, "дай число");
+			if (messageText.equals("/random")) {
+				send(update, getRandom());
+			} else {
+				send(update, "дай число");
+			}
 		} else {
 			try {
 				int rank = Integer.parseInt(messageText);
@@ -59,6 +63,18 @@ public class BashBot implements SpringLongPollingBot {
 				send(update, "нет, дай число");
 			}
 		}
+	}
+
+	private String getRandom() {
+		try {
+			return getRandomRequest();
+		} catch (Exception e) {
+			return "not found";
+		}
+	}
+
+	private String getRandomRequest() {
+		return bashServiceRestTemplate.getForObject("/random", String.class);
 	}
 
 	private String getByRank(int rank) {
