@@ -1,7 +1,6 @@
 package main.bash;
 
 import lombok.RequiredArgsConstructor;
-import main.Sequences;
 import main.tables.Quotes;
 import main.tables.records.QuotesRecord;
 import org.jooq.DSLContext;
@@ -20,8 +19,6 @@ public class BashRepo {
 	}
 
 	public void saveQuotes(List<Quote> quotesList) {
-		dsl.alterSequence(Sequences.QUOTES_ID_SEQ).restart().execute();
-
 		dsl.batchInsert(quotesList.stream()
 						.map(quote -> new QuotesRecord(null, quote.getRating(), quote.getText()))
 						.toList())
