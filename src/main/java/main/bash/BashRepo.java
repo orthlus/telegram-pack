@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import main.tables.Quotes;
 import main.tables.records.QuotesRecord;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,7 +29,9 @@ public class BashRepo {
 	public String getById(int id) {
 		return dsl.select(quotes.QUOTE)
 				.from(quotes)
-				.where(quotes.ID.eq(id))
+				.orderBy(quotes.ID)
+				.limit(DSL.inline(1))
+				.offset(DSL.inline(id - 1))
 				.fetchOne(quotes.QUOTE);
 	}
 
