@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -44,7 +45,7 @@ public class DataService {
 			return "нужен положительный номер!";
 		}
 		try {
-			return repo.getById(rank);
+			return Objects.requireNonNull(repo.getById(rank));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return "столько нету";
 		}
