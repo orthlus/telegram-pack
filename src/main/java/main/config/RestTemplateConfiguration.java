@@ -36,16 +36,6 @@ public class RestTemplateConfiguration {
 	}
 
 	@Bean
-	public RestTemplate bashServiceRestTemplate(
-			RestTemplateBuilder builder,
-			@Value("${bash.service.url}") String url) {
-		return builder
-				.rootUri(url)
-				.setConnectTimeout(Duration.ofMinutes(2))
-				.build();
-	}
-
-	@Bean
 	public RestTemplate telegramListRestTemplate(RestTemplateBuilder builder, TelegramListProperties properties) {
 		return builder
 				.rootUri(properties.getUrl())
