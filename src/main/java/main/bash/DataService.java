@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -38,6 +39,10 @@ public class DataService {
 
 		size = repo.getCount();
 		log.info("bash - data size: {}", size);
+	}
+
+	public Set<String> search(String query) {
+		return repo.search(query);
 	}
 
 	public String searchOne(String query) {

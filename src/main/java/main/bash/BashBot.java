@@ -3,14 +3,21 @@ package main.bash;
 import art.aelaort.SpringLongPollingBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
-import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static art.aelaort.TelegramClientHelpers.execute;
 
@@ -35,14 +42,36 @@ public class BashBot implements SpringLongPollingBot {
 	private void handleInlineQuery(Update update) {
 		InlineQuery inlineQuery = update.getInlineQuery();
 		String query = inlineQuery.getQuery();
+		String inlineQueryId = inlineQuery.getId();
+
+		Set<String> searchResult;
 		try {
 			int rank = Integer.parseInt(query);
-//			String text = getByRank(rank);
-			/*bashTelegramClient.execute(AnswerInlineQuery.builder()
-					.result(InlineQueryResult)
-					.build());*/
+			searchResult = Set.of(getByRank(rank));
 		} catch (NumberFormatException ignored) {
+			searchResult = search(query);
 		}
+
+		List<InlineQueryResultArticle> resultArticles = searchResult.stream()
+				.map(quote -> new InlineQueryResultArticle(
+						UUID.randomUUID().toString(),
+						title(quote),
+						new InputTextMessageContent(quote)
+				))
+				.toList();
+
+		try {
+			bashTelegramClient.execute(AnswerInlineQuery.builder()
+					.results(resultArticles)
+					.inlineQueryId(inlineQueryId)
+					.build());
+		} catch (TelegramApiException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private String title(String quote) {
+		return quote.replaceAll("\n", " ");
 	}
 
 	private void handleText(Update update) {
@@ -61,6 +90,14 @@ public class BashBot implements SpringLongPollingBot {
 			} catch (NumberFormatException ignored) {
 				send(update, searchOne(messageText));
 			}
+		}
+	}
+
+	private Set<String> search(String query) {
+		try {
+			return dataService.search(query);
+		} catch (Exception e) {
+			return Set.of("not found");
 		}
 	}
 
