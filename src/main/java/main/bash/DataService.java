@@ -40,6 +40,10 @@ public class DataService {
 		log.info("bash - data size: {}", size);
 	}
 
+	public String searchOne(String query) {
+		return repo.search(query).iterator().next();
+	}
+
 	public String getByRank(int rank) {
 		if (rank < 1) {
 			return "нужен положительный номер!";

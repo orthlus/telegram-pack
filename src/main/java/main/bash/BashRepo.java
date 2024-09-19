@@ -8,12 +8,22 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class BashRepo {
 	private final DSLContext dsl;
 	private final Quotes quotes = Quotes.QUOTES;
+
+	public Set<String> search(String query) {
+		return dsl.select(quotes.QUOTE)
+				.from(quotes)
+				.where("{0} %> {1}", quotes.QUOTE, query)
+				.orderBy(quotes.RATING.desc())
+				.limit(50)
+				.fetchSet(quotes.QUOTE);
+	}
 
 	public boolean dataExists() {
 		return dsl.fetchExists(quotes);

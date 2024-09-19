@@ -51,7 +51,7 @@ public class BashBot implements SpringLongPollingBot {
 			if (messageText.equals("/random")) {
 				send(update, getRandom());
 			} else {
-				send(update, "дай число");
+				send(update, "дай число или запрос");
 			}
 		} else {
 			try {
@@ -59,8 +59,16 @@ public class BashBot implements SpringLongPollingBot {
 				String text = getByRank(rank);
 				send(update, text);
 			} catch (NumberFormatException ignored) {
-				send(update, "нет, дай число");
+				send(update, searchOne(messageText));
 			}
+		}
+	}
+
+	private String searchOne(String query) {
+		try {
+			return dataService.searchOne(query);
+		} catch (Exception e) {
+			return "not found";
 		}
 	}
 
