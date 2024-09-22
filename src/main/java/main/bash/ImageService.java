@@ -28,7 +28,7 @@ public class ImageService {
 	@Value("${bash.image.prepared.bottom.url}")
 	private URI preparedImageBottomUrl;
 
-	private final Font font = new Font("Segoe UI", Font.PLAIN, 16);
+	private final Font font = new Font("sans-serif", Font.PLAIN, 16);
 	private final Color textColor = new Color(25, 23, 23);
 	private BufferedImage topImage;
 	private BufferedImage bottomImage;
@@ -44,7 +44,7 @@ public class ImageService {
 	}
 
 	private InputStream createTextImageFile(String text) {
-		int wrapLength = 65;
+		int wrapLength = 60;
 		String wrapped = wrap(text, wrapLength);
 
 		BufferedImage content = createTextImage(wrapped).getBufferedImage();
