@@ -3,18 +3,21 @@ package main.bash;
 import art.aelaort.SpringLongPollingBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,9 +29,12 @@ import static art.aelaort.TelegramClientHelpers.execute;
 public class BashBot implements SpringLongPollingBot {
 	private final TelegramClient bashTelegramClient;
 	private final DataService dataService;
+	private final ImageService imageService;
 	@Getter
 	@Value("${bash.telegram.bot.token}")
 	private String botToken;
+	@Value("${telegram.admin.id}")
+	private long adminId;
 
 	@Override
 	public void consume(Update update) {
@@ -78,7 +84,13 @@ public class BashBot implements SpringLongPollingBot {
 		String messageText = update.getMessage().getText();
 		if (messageText.startsWith("/")) {
 			if (messageText.equals("/random")) {
-				send(update, getRandom());
+				if (update.getMessage().getChat().getId() == adminId) {
+					String text = getRandom();
+					send(update, text);
+					sendPhoto(update, imageService.buildQuotePhoto(text));
+				} else {
+					send(update, getRandom());
+				}
 			} else {
 				send(update, "дай число или запрос");
 			}
@@ -123,6 +135,15 @@ public class BashBot implements SpringLongPollingBot {
 		} catch (Exception e) {
 			return "not found";
 		}
+	}
+
+	private void sendPhoto(Update update, InputStream photo) {
+		Message message = execute(
+				SendPhoto.builder()
+						.chatId(update.getMessage().getChatId())
+						.photo(new InputFile(photo, UUID.randomUUID().toString())),
+				bashTelegramClient
+		);
 	}
 
 	private void send(Update update, String text) {
