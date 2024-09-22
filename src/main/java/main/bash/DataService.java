@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.bash.exceptions.QuoteNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -49,18 +50,18 @@ public class DataService {
 		return repo.search(query).iterator().next();
 	}
 
-	public String getByRank(int rank) {
+	public QuoteFile getByRank(int rank) {
 		if (rank < 1) {
-			return "нужен положительный номер!";
+			throw new QuoteNotFoundException("нужен положительный номер!");
 		}
 		try {
 			return Objects.requireNonNull(repo.getById(rank));
 		} catch (ArrayIndexOutOfBoundsException e) {
-			return "столько нету";
+			throw new QuoteNotFoundException("столько нету");
 		}
 	}
 
-	public String getRandom() {
+	public QuoteFile getRandom() {
 		return getByRank(random.nextInt(1, size));
 	}
 

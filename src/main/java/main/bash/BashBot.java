@@ -3,17 +3,16 @@ package main.bash;
 import art.aelaort.SpringLongPollingBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import main.bash.exceptions.QuoteNotFoundException;
+import main.bash.models.BashPhoto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -30,6 +29,7 @@ public class BashBot implements SpringLongPollingBot {
 	private final TelegramClient bashTelegramClient;
 	private final DataService dataService;
 	private final ImageService imageService;
+	private final TelegramPhotoService telegramPhotoService;
 	@Getter
 	@Value("${bash.telegram.bot.token}")
 	private String botToken;
@@ -83,25 +83,32 @@ public class BashBot implements SpringLongPollingBot {
 	private void handleText(Update update) {
 		String messageText = update.getMessage().getText();
 		if (messageText.startsWith("/")) {
-			if (messageText.equals("/random")) {
-				if (update.getMessage().getChat().getId() == adminId) {
-					String text = getRandom();
-					send(update, text);
-					sendPhoto(update, imageService.buildQuotePhoto(text));
-				} else {
-					send(update, getRandom());
-				}
+			handleCommand(update, messageText);
+		} else {
+			handleText(update, messageText);
+		}
+	}
+
+	private void handleText(Update update, String messageText) {
+		try {
+			int rank = Integer.parseInt(messageText);
+			String text = getByRank(rank);
+			send(update, text);
+		} catch (NumberFormatException ignored) {
+			send(update, searchOne(messageText));
+		}
+	}
+
+	private void handleCommand(Update update, String messageText) {
+		if (messageText.equals("/random")) {
+			if (update.getMessage().getChat().getId() == adminId) {
+				BashPhoto randomPhoto = getRandomPhoto();
+				telegramPhotoService.sendPhoto(update, randomPhoto);
 			} else {
-				send(update, "дай число или запрос");
+				send(update, getRandom());
 			}
 		} else {
-			try {
-				int rank = Integer.parseInt(messageText);
-				String text = getByRank(rank);
-				send(update, text);
-			} catch (NumberFormatException ignored) {
-				send(update, searchOne(messageText));
-			}
+			send(update, "дай число или запрос");
 		}
 	}
 
@@ -123,7 +130,7 @@ public class BashBot implements SpringLongPollingBot {
 
 	private String getRandom() {
 		try {
-			return dataService.getRandom();
+			return dataService.getRandom().quote();
 		} catch (Exception e) {
 			return "not found";
 		}
@@ -131,19 +138,28 @@ public class BashBot implements SpringLongPollingBot {
 
 	private String getByRank(int rank) {
 		try {
-			return dataService.getByRank(rank);
+			return dataService.getByRank(rank).quote();
+		} catch (QuoteNotFoundException e) {
+			return e.getMessage();
 		} catch (Exception e) {
 			return "not found";
 		}
 	}
 
-	private void sendPhoto(Update update, InputStream photo) {
-		Message message = execute(
-				SendPhoto.builder()
-						.chatId(update.getMessage().getChatId())
-						.photo(new InputFile(photo, UUID.randomUUID().toString())),
-				bashTelegramClient
-		);
+	private BashPhoto getRandomPhoto() {
+		QuoteFile quoteFile = dataService.getRandom();
+		if (quoteFile.fileId() != null) {
+			return BashPhoto.builder()
+					.quoteId(quoteFile.quoteId())
+					.fileId(quoteFile.fileId())
+					.build();
+		} else {
+			InputStream photoIS = imageService.buildQuotePhoto(quoteFile.quote());
+			return BashPhoto.builder()
+					.quoteId(quoteFile.quoteId())
+					.photoBytes(photoIS)
+					.build();
+		}
 	}
 
 	private void send(Update update, String text) {

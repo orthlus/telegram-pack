@@ -10,11 +10,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
+import static org.jooq.Records.mapping;
+
 @Component
 @RequiredArgsConstructor
 public class BashRepo {
 	private final DSLContext dsl;
 	private final Quotes quotes = Quotes.QUOTES;
+
+	public void addFileId(Integer quoteId, String fileId) {
+		dsl.update(quotes)
+				.set(quotes.TELEGRAM_FILE_ID, fileId)
+				.where(quotes.ID.eq(quoteId))
+				.execute();
+	}
 
 	public Set<String> search(String query) {
 		return dsl.select(quotes.QUOTE)
@@ -31,18 +40,18 @@ public class BashRepo {
 
 	public void saveQuotes(List<Quote> quotesList) {
 		dsl.batchInsert(quotesList.stream()
-						.map(quote -> new QuotesRecord(null, quote.getRating(), quote.getText()))
+						.map(quote -> new QuotesRecord(null, quote.getRating(), quote.getText(), null))
 						.toList())
 				.execute();
 	}
 
-	public String getById(int id) {
-		return dsl.select(quotes.QUOTE)
+	public QuoteFile getById(int id) {
+		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID)
 				.from(quotes)
 				.orderBy(quotes.ID)
 				.limit(DSL.inline(1))
 				.offset(DSL.inline(id - 1))
-				.fetchOne(quotes.QUOTE);
+				.fetchOne(mapping(QuoteFile::new));
 	}
 
 	public int getCount() {
