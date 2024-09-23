@@ -44,7 +44,7 @@ public class ImageService {
 	}
 
 	private InputStream createTextImageFile(String text) {
-		int wrapLength = 48;
+		int wrapLength = 43;
 		String wrapped = wrap(text, wrapLength);
 
 		BufferedImage content = createTextImage(wrapped).getBufferedImage();
