@@ -68,7 +68,7 @@ public class BashBot implements SpringLongPollingBot {
 		List<InlineQueryResultCachedPhoto> resultArticles = searchResult.stream()
 				.map(quoteFile -> new InlineQueryResultCachedPhoto(
 						UUID.randomUUID().toString(),
-						telegramPhotoService.generatePhotoFileId(bashPhotoProvider.getByQuoteFile(quoteFile))
+						telegramPhotoService.getPhotoFileId(bashPhotoProvider.getByQuoteFile(quoteFile))
 				))
 				.toList();
 

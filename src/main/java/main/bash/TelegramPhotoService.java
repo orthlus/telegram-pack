@@ -29,6 +29,8 @@ public class TelegramPhotoService {
 	private final BashRepo bashRepo;
 	@Value("${bash.tmp.chat.id}")
 	private long bashTmpChatId;
+	@Value("${telegram.admin.id}")
+	private long adminId;
 
 	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 	public void saveFileIds() {
@@ -42,7 +44,7 @@ public class TelegramPhotoService {
 	public void sendPhoto(Update update, BashPhoto bashPhoto) {
 		String photoFileId;
 		if (bashPhoto.getFileId() == null) {
-			photoFileId = generatePhotoFileId(bashPhoto);
+			photoFileId = getPhotoFileId(bashPhoto);
 			fileIdsByQuoteIdToSave.put(bashPhoto.getQuoteId(), photoFileId);
 			log.info("photo file_id add to queue: quoteid: {}, file_id: {}", bashPhoto.getQuoteId(), photoFileId);
 		} else {
@@ -51,9 +53,15 @@ public class TelegramPhotoService {
 		sendPhotoByFileId(update, photoFileId);
 	}
 
-	public String generatePhotoFileId(BashPhoto bashPhoto) {
-		Message message = sendPhotoByInputStream(bashPhoto.getPhotoBytes());
-		return getPhotoFileId(message);
+	public String getPhotoFileId(BashPhoto bashPhoto) {
+		if (bashPhoto.getFileId() == null) {
+			Message message = sendPhotoByInputStream(bashPhoto.getPhotoBytes());
+			String photoFileId = getPhotoFileId(message);
+			fileIdsByQuoteIdToSave.put(bashPhoto.getQuoteId(), photoFileId);
+			return photoFileId;
+		} else {
+			return bashPhoto.getFileId();
+		}
 	}
 
 	private void sendPhotoByFileId(Update update, String fileId) {
@@ -68,7 +76,7 @@ public class TelegramPhotoService {
 	private Message sendPhotoByInputStream(InputStream photo) {
 		return execute(
 				SendPhoto.builder()
-						.chatId(bashTmpChatId)
+						.chatId(adminId)
 						.photo(new InputFile(photo, UUID.randomUUID().toString())),
 				bashTelegramClient
 		);
