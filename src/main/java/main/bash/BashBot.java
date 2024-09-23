@@ -107,6 +107,9 @@ public class BashBot implements SpringLongPollingBot {
 			} else {
 				send(update, getRandom());
 			}
+		} else if (messageText.equals("/flush")) {
+			telegramPhotoService.saveFileIds();
+			send(update, "ok");
 		} else {
 			send(update, "дай число или запрос");
 		}

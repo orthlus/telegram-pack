@@ -46,9 +46,6 @@ public class TelegramPhotoService {
 			String photoFileId = getPhotoFileId(message);
 			fileIdsByQuoteIdToSave.put(bashPhoto.getQuoteId(), photoFileId);
 			log.info("photo file_id add to queue: quoteid: {}, file_id: {}", bashPhoto.getQuoteId(), photoFileId);
-
-			// TODO delete
-			saveFileIds();
 		}
 	}
 
