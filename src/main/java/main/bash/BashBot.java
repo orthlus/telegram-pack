@@ -39,7 +39,12 @@ public class BashBot implements SpringLongPollingBot {
 	@Override
 	public void consume(Update update) {
 		if (update.hasMessage() && update.getMessage().hasText()) {
-			handleText(update);
+			String messageText = update.getMessage().getText();
+			if (messageText.startsWith("/")) {
+				handleCommand(update, messageText);
+			} else {
+				handleText(update, messageText);
+			}
 		} else if (update.hasInlineQuery()) {
 			handleInlineQuery(update);
 		}
@@ -78,15 +83,6 @@ public class BashBot implements SpringLongPollingBot {
 
 	private String title(String quote) {
 		return quote.replaceAll("\n", " ");
-	}
-
-	private void handleText(Update update) {
-		String messageText = update.getMessage().getText();
-		if (messageText.startsWith("/")) {
-			handleCommand(update, messageText);
-		} else {
-			handleText(update, messageText);
-		}
 	}
 
 	private void handleText(Update update, String messageText) {
