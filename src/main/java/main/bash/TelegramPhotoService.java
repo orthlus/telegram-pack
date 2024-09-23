@@ -40,16 +40,20 @@ public class TelegramPhotoService {
 	}
 
 	public void sendPhoto(Update update, BashPhoto bashPhoto) {
-		if (bashPhoto.getFileId() != null) {
-			sendPhotoByFileId(update, bashPhoto.getFileId());
-			log.info("photo send by fileid: {}", bashPhoto);
-		} else {
-			Message message = sendPhotoByInputStream(bashPhoto.getPhotoBytes());
-			log.info("photo send with bytes: {}", bashPhoto);
-			String photoFileId = getPhotoFileId(message);
+		String photoFileId;
+		if (bashPhoto.getFileId() == null) {
+			photoFileId = generatePhotoFileId(bashPhoto);
 			fileIdsByQuoteIdToSave.put(bashPhoto.getQuoteId(), photoFileId);
 			log.info("photo file_id add to queue: quoteid: {}, file_id: {}", bashPhoto.getQuoteId(), photoFileId);
+		} else {
+			photoFileId = bashPhoto.getFileId();
 		}
+		sendPhotoByFileId(update, photoFileId);
+	}
+
+	public String generatePhotoFileId(BashPhoto bashPhoto) {
+		Message message = sendPhotoByInputStream(bashPhoto.getPhotoBytes());
+		return getPhotoFileId(message);
 	}
 
 	private void sendPhotoByFileId(Update update, String fileId) {

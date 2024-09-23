@@ -11,12 +11,10 @@ import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
-import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
-import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.cached.InlineQueryResultCachedPhoto;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -55,19 +53,22 @@ public class BashBot implements SpringLongPollingBot {
 		String query = inlineQuery.getQuery();
 		String inlineQueryId = inlineQuery.getId();
 
-		Set<String> searchResult;
+		Set<QuoteFile> searchResult;
 		try {
 			int rank = Integer.parseInt(query);
 			searchResult = Set.of(getByRank(rank));
 		} catch (NumberFormatException ignored) {
 			searchResult = search(query);
+		} catch (QuoteNotFoundException e) {
+			send(update, e.getMessage());
+			return;
 		}
 
-		List<InlineQueryResultArticle> resultArticles = searchResult.stream()
-				.map(quote -> new InlineQueryResultArticle(
+
+		List<InlineQueryResultCachedPhoto> resultArticles = searchResult.stream()
+				.map(quoteFile -> new InlineQueryResultCachedPhoto(
 						UUID.randomUUID().toString(),
-						title(quote),
-						new InputTextMessageContent(quote)
+						telegramPhotoService.generatePhotoFileId(bashPhotoProvider.getByQuoteFile(quoteFile))
 				))
 				.toList();
 
@@ -81,10 +82,6 @@ public class BashBot implements SpringLongPollingBot {
 		}
 	}
 
-	private String title(String quote) {
-		return quote.replaceAll("\n", " ");
-	}
-
 	private void handleText(Update update, String messageText) {
 		try {
 			int rank = Integer.parseInt(messageText);
@@ -92,11 +89,13 @@ public class BashBot implements SpringLongPollingBot {
 				BashPhoto bashPhoto = getPhotoByRank(rank);
 				telegramPhotoService.sendPhoto(update, bashPhoto);
 			} else {
-				String text = getByRank(rank);
+				String text = getByRank(rank).quote();
 				send(update, text);
 			}
 		} catch (NumberFormatException ignored) {
 			send(update, searchOne(messageText));
+		} catch (QuoteNotFoundException e) {
+			send(update, e.getMessage());
 		}
 	}
 
@@ -116,11 +115,11 @@ public class BashBot implements SpringLongPollingBot {
 		}
 	}
 
-	private Set<String> search(String query) {
+	private Set<QuoteFile> search(String query) {
 		try {
 			return dataService.search(query);
 		} catch (Exception e) {
-			return Set.of("not found");
+			return Set.of();
 		}
 	}
 
@@ -140,14 +139,8 @@ public class BashBot implements SpringLongPollingBot {
 		}
 	}
 
-	private String getByRank(int rank) {
-		try {
-			return dataService.getByRank(rank).quote();
-		} catch (QuoteNotFoundException e) {
-			return e.getMessage();
-		} catch (Exception e) {
-			return "not found";
-		}
+	private QuoteFile getByRank(int rank) {
+		return dataService.getByRank(rank);
 	}
 
 	private BashPhoto getPhotoByRank(int rank) {

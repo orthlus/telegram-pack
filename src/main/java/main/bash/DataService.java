@@ -42,12 +42,12 @@ public class DataService {
 		log.info("bash - data size: {}", size);
 	}
 
-	public Set<String> search(String query) {
+	public Set<QuoteFile> search(String query) {
 		return repo.search(query);
 	}
 
 	public String searchOne(String query) {
-		return repo.search(query).iterator().next();
+		return repo.search(query).iterator().next().quote();
 	}
 
 	public QuoteFile getByRank(int rank) {

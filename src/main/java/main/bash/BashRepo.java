@@ -25,13 +25,13 @@ public class BashRepo {
 				.execute();
 	}
 
-	public Set<String> search(String query) {
-		return dsl.select(quotes.QUOTE)
+	public Set<QuoteFile> search(String query) {
+		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
 				.limit(50)
-				.fetchSet(quotes.QUOTE);
+				.fetchSet(mapping(QuoteFile::new));
 	}
 
 	public boolean dataExists() {
