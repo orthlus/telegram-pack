@@ -28,7 +28,7 @@ public class ImageService {
 	@Value("${bash.image.prepared.bottom.url}")
 	private URI preparedImageBottomUrl;
 
-	private final Font font = new Font("sans-serif", Font.PLAIN, 16);
+	private final Font font = new Font("sans-serif", Font.PLAIN, 14);
 	private final Color textColor = new Color(25, 23, 23);
 	private BufferedImage topImage;
 	private BufferedImage bottomImage;
@@ -44,7 +44,7 @@ public class ImageService {
 	}
 
 	private InputStream createTextImageFile(String text) {
-		int wrapLength = 60;
+		int wrapLength = 48;
 		String wrapped = wrap(text, wrapLength);
 
 		BufferedImage content = createTextImage(wrapped).getBufferedImage();
@@ -64,7 +64,7 @@ public class ImageService {
 	}
 
 	private ImagePlus createTextImage(String text) {
-		ImagePlus image = createImageBox(600, getHeightByText(text));
+		ImagePlus image = createImageBox(400, getHeightByText(text));
 		fillBackground(image);
 		fillText(image, text);
 		return image;
