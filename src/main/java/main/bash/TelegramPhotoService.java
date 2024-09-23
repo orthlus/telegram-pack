@@ -53,7 +53,7 @@ public class TelegramPhotoService {
 		execute(
 				SendPhoto.builder()
 						.chatId(update.getMessage().getChatId())
-						.caption(fileId),
+						.photo(new InputFile(fileId)),
 				bashTelegramClient
 		);
 	}

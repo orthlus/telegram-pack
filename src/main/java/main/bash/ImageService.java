@@ -72,7 +72,7 @@ public class ImageService {
 
 	private int getHeightByText(String text) {
 		long countLines = text.chars().filter(ch -> ch == '\n').count() + 1;
-		return (int) (countLines * 22) + 15;
+		return (int) (countLines * 20) + 15;
 	}
 
 	private ImagePlus createImageBox(int width, int height) {
