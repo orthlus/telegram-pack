@@ -28,8 +28,8 @@ import static art.aelaort.TelegramClientHelpers.execute;
 public class BashBot implements SpringLongPollingBot {
 	private final TelegramClient bashTelegramClient;
 	private final DataService dataService;
-	private final ImageService imageService;
 	private final TelegramPhotoService telegramPhotoService;
+	private final BashPhotoProvider bashPhotoProvider;
 	@Getter
 	@Value("${bash.telegram.bot.token}")
 	private String botToken;
@@ -92,8 +92,13 @@ public class BashBot implements SpringLongPollingBot {
 	private void handleText(Update update, String messageText) {
 		try {
 			int rank = Integer.parseInt(messageText);
-			String text = getByRank(rank);
-			send(update, text);
+			if (update.getMessage().getChat().getId() == adminId) {
+				BashPhoto bashPhoto = getPhotoByRank(rank);
+				telegramPhotoService.sendPhoto(update, bashPhoto);
+			} else {
+				String text = getByRank(rank);
+				send(update, text);
+			}
 		} catch (NumberFormatException ignored) {
 			send(update, searchOne(messageText));
 		}
@@ -149,20 +154,14 @@ public class BashBot implements SpringLongPollingBot {
 		}
 	}
 
+	private BashPhoto getPhotoByRank(int rank) {
+		QuoteFile quoteFile = dataService.getByRank(rank);
+		return bashPhotoProvider.getByQuoteFile(quoteFile);
+	}
+
 	private BashPhoto getRandomPhoto() {
 		QuoteFile quoteFile = dataService.getRandom();
-		if (quoteFile.fileId() != null) {
-			return BashPhoto.builder()
-					.quoteId(quoteFile.quoteId())
-					.fileId(quoteFile.fileId())
-					.build();
-		} else {
-			InputStream photoIS = imageService.buildQuotePhoto(quoteFile.quote());
-			return BashPhoto.builder()
-					.quoteId(quoteFile.quoteId())
-					.photoBytes(photoIS)
-					.build();
-		}
+		return bashPhotoProvider.getByQuoteFile(quoteFile);
 	}
 
 	private void send(Update update, String text) {

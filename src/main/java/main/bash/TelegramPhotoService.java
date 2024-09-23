@@ -49,7 +49,7 @@ public class TelegramPhotoService {
 		}
 	}
 
-	public void sendPhotoByFileId(Update update, String fileId) {
+	private void sendPhotoByFileId(Update update, String fileId) {
 		execute(
 				SendPhoto.builder()
 						.chatId(update.getMessage().getChatId())
@@ -58,7 +58,7 @@ public class TelegramPhotoService {
 		);
 	}
 
-	public Message sendPhotoByInputStream(Update update, InputStream photo) {
+	private Message sendPhotoByInputStream(Update update, InputStream photo) {
 		return execute(
 				SendPhoto.builder()
 						.chatId(update.getMessage().getChatId())
