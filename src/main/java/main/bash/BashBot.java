@@ -85,13 +85,8 @@ public class BashBot implements SpringLongPollingBot {
 	private void handleText(Update update, String messageText) {
 		try {
 			int rank = Integer.parseInt(messageText);
-			if (update.getMessage().getChat().getId() == adminId) {
-				BashPhoto bashPhoto = getPhotoByRank(rank);
-				telegramPhotoService.sendPhoto(update, bashPhoto);
-			} else {
-				String text = getByRank(rank).quote();
-				send(update, text);
-			}
+			BashPhoto bashPhoto = getPhotoByRank(rank);
+			telegramPhotoService.sendPhoto(update, bashPhoto);
 		} catch (NumberFormatException ignored) {
 			send(update, searchOne(messageText));
 		} catch (QuoteNotFoundException e) {
@@ -101,12 +96,8 @@ public class BashBot implements SpringLongPollingBot {
 
 	private void handleCommand(Update update, String messageText) {
 		if (messageText.equals("/random")) {
-			if (update.getMessage().getChat().getId() == adminId) {
-				BashPhoto randomPhoto = getRandomPhoto();
-				telegramPhotoService.sendPhoto(update, randomPhoto);
-			} else {
-				send(update, getRandom());
-			}
+			BashPhoto randomPhoto = getRandomPhoto();
+			telegramPhotoService.sendPhoto(update, randomPhoto);
 		} else if (messageText.equals("/flush")) {
 			telegramPhotoService.saveFileIds();
 			send(update, "ok");
