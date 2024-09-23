@@ -3,6 +3,7 @@ package main.bash;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.bash.models.BashPhoto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -26,6 +27,8 @@ public class TelegramPhotoService {
 	private final TelegramClient bashTelegramClient;
 	private final Map<Integer, String> fileIdsByQuoteIdToSave = new ConcurrentHashMap<>();
 	private final BashRepo bashRepo;
+	@Value("${bash.tmp.chat.id}")
+	private long bashTmpChatId;
 
 	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 	public void saveFileIds() {
@@ -41,7 +44,7 @@ public class TelegramPhotoService {
 			sendPhotoByFileId(update, bashPhoto.getFileId());
 			log.info("photo send by fileid: {}", bashPhoto);
 		} else {
-			Message message = sendPhotoByInputStream(update, bashPhoto.getPhotoBytes());
+			Message message = sendPhotoByInputStream(bashPhoto.getPhotoBytes());
 			log.info("photo send with bytes: {}", bashPhoto);
 			String photoFileId = getPhotoFileId(message);
 			fileIdsByQuoteIdToSave.put(bashPhoto.getQuoteId(), photoFileId);
@@ -58,10 +61,10 @@ public class TelegramPhotoService {
 		);
 	}
 
-	private Message sendPhotoByInputStream(Update update, InputStream photo) {
+	private Message sendPhotoByInputStream(InputStream photo) {
 		return execute(
 				SendPhoto.builder()
-						.chatId(update.getMessage().getChatId())
+						.chatId(bashTmpChatId)
 						.photo(new InputFile(photo, UUID.randomUUID().toString())),
 				bashTelegramClient
 		);
