@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,26 +18,38 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 public class ImageService {
-	@Value("${bash.image.prepared.top.url}")
-	private URI preparedImageTopUrl;
 	@Value("${bash.image.prepared.bottom.url}")
 	private URI preparedImageBottomUrl;
 
-	private final Font font = new Font("sans-serif", Font.PLAIN, 14);
+	private final Font textFont = new Font("sans-serif", Font.PLAIN, 14);
 	private final Color textColor = new Color(25, 23, 23);
-	private BufferedImage topImage;
-	private BufferedImage bottomImage;
+
+	private final Font topIdFont = new Font("sans-serif", Font.BOLD, 12);
+	private final Color topIdColor = new Color(111, 155, 0);
+
+	private final Font topDateFont = new Font("sans-serif", Font.PLAIN, 12);
+	private final Color topDateColor = new Color(136, 128, 145);
+
+	private final Font ratingFont = new Font("sans-serif", Font.PLAIN, 12);
+	private final Color ratingColor = Color.BLACK;
+
+	private ImagePlus bottomImage;
 
 	@PostConstruct
 	private void init() throws IOException {
-		topImage = ImageIO.read(preparedImageTopUrl.toURL());
-		bottomImage = ImageIO.read(preparedImageBottomUrl.toURL());
+		byte[] bytes = new RestTemplate().getForObject(preparedImageBottomUrl, byte[].class);
+		String path = "/tmp/" + UUID.randomUUID();
+		Files.write(Path.of(path), bytes);
+		bottomImage = IJ.openImage(path);
 	}
 
 	public InputStream buildQuotePhoto(String text) {
@@ -48,7 +61,9 @@ public class ImageService {
 		String wrapped = wrap(text, wrapLength);
 
 		BufferedImage content = createTextImage(wrapped).getBufferedImage();
-		return mergeImages(topImage, bottomImage, content);
+		BufferedImage top = createTopImage(123, "02.07.2009 в 23:37").getBufferedImage();
+		BufferedImage bottom = createBottomImage(300245).getBufferedImage();
+		return mergeImages(top, bottom, content);
 	}
 
 	private String wrap(String text, int wrapLength) {
@@ -63,10 +78,24 @@ public class ImageService {
 				.collect(Collectors.joining("\n"));
 	}
 
+	private ImagePlus createBottomImage(int rating) {
+		ImagePlus image = bottomImage.duplicate();
+		fillTextCenter(image, String.valueOf(rating), 208, 49, ratingFont, ratingColor);
+		return image;
+	}
+
+	private ImagePlus createTopImage(int id, String date) {
+		ImagePlus image = createImageBox(400, 50);
+		fillBackground(image);
+		fillText(image, date, 266, 33, topDateFont, topDateColor);
+		fillText(image, "#" + id, 24, 34, topIdFont, topIdColor);
+		return image;
+	}
+
 	private ImagePlus createTextImage(String text) {
 		ImagePlus image = createImageBox(400, getHeightByText(text));
 		fillBackground(image);
-		fillText(image, text);
+		fillText(image, text, 25, 25, textFont, textColor);
 		return image;
 	}
 
@@ -85,14 +114,22 @@ public class ImageService {
 		ip.fill();
 	}
 
-	private void fillText(ImagePlus image, String text) {
+	private void fillText(ImagePlus image, String text, int x, int y, Font font, Color textColor) {
 		ImageProcessor ip = image.getProcessor();
 		ip.setColor(textColor);
 		ip.setFont(font);
 		ip.setAntialiasedText(true);
-		ip.drawString(text, 25, 25);
+		ip.drawString(text, x, y);
 	}
 
+	private void fillTextCenter(ImagePlus image, String text, int x, int y, Font font, Color textColor) {
+		ImageProcessor ip = image.getProcessor();
+		ip.setColor(textColor);
+		ip.setFont(font);
+		ip.setAntialiasedText(true);
+		ip.setJustification(ImageProcessor.CENTER_JUSTIFY);
+		ip.drawString(text, x, y);
+	}
 
 	private InputStream mergeImages(BufferedImage header, BufferedImage footer, BufferedImage imageContent) {
 		BufferedImage result = mergeImages(mergeImages(header, imageContent), footer);
