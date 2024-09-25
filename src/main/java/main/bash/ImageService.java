@@ -94,7 +94,7 @@ public class ImageService {
 	private ImagePlus createTopImage(int id, String date) {
 		ImagePlus image = createImageBox(400, 50);
 		fillBackground(image);
-		fillText(image, date, 266, 33, topDateFont, topDateColor);
+		fillText(image, date, 312, 33, topDateFont, topDateColor);
 		fillText(image, "#" + id, 24, 34, topIdFont, topIdColor);
 		return image;
 	}

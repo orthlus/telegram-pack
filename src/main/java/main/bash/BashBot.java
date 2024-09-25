@@ -166,11 +166,11 @@ public class BashBot implements SpringLongPollingBot {
 	}
 
 	private void sendQuotePhoto(Update update, QuoteFile quoteFile) {
-//		InputStream inputStream = getInputStream(quoteFile);
-//		sendPhotoByInputStream(update, inputStream);
+		InputStream inputStream = getInputStream(quoteFile);
+		sendPhotoByInputStream(update, inputStream);
 
-		String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
-		sendPhotoByUrlOrFileId(update, fileUrl);
+//		String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
+//		sendPhotoByUrlOrFileId(update, fileUrl);
 	}
 
 	private InputStream getInputStream(QuoteFile quoteFile) {
