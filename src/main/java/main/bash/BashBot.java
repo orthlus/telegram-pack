@@ -92,8 +92,7 @@ public class BashBot implements SpringLongPollingBot {
 		try {
 			int rank = Integer.parseInt(messageText);
 			QuoteFile quoteFile = dataService.getByRank(rank);
-			String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
-			sendPhotoByUrlOrFileId(update, fileUrl);
+			sendQuotePhoto(update, quoteFile);
 		} catch (NumberFormatException ignored) {
 			searchOneAndSend(update, messageText);
 		} catch (QuoteNotFoundException e) {
@@ -104,8 +103,7 @@ public class BashBot implements SpringLongPollingBot {
 	private void handleCommand(Update update, String messageText) {
 		if (messageText.equals("/random")) {
 			QuoteFile quoteFile = dataService.getRandom();
-			String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
-			sendPhotoByUrlOrFileId(update, fileUrl);
+			sendQuotePhoto(update, quoteFile);
 		} else if (messageText.equals("/flush")) {
 			telegramPhotoService.saveFileIds();
 			send(update, "ok");
@@ -148,10 +146,7 @@ public class BashBot implements SpringLongPollingBot {
 
 	private void searchOneAndSend(Update update, String messageText) {
 		Optional<QuoteFile> result = searchOne(messageText);
-		if (result.isPresent()) {
-			String fileUrl = telegramPhotoService.getFileUrl(result.get());
-			sendPhotoByUrlOrFileId(update, fileUrl);
-		}
+		result.ifPresent(quoteFile -> sendQuotePhoto(update, quoteFile));
 	}
 
 	private Set<QuoteFile> search(String query) {
@@ -168,6 +163,14 @@ public class BashBot implements SpringLongPollingBot {
 		} catch (Exception e) {
 			return Optional.empty();
 		}
+	}
+
+	private void sendQuotePhoto(Update update, QuoteFile quoteFile) {
+//		InputStream inputStream = getInputStream(quoteFile);
+//		sendPhotoByInputStream(update, inputStream);
+
+		String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
+		sendPhotoByUrlOrFileId(update, fileUrl);
 	}
 
 	private InputStream getInputStream(QuoteFile quoteFile) {

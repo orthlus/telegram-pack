@@ -40,7 +40,10 @@ public class BashRepo {
 	}
 
 	public Set<QuoteFile> getQuotesWithNullFileUrlTopN(int n) {
-		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
+		return dsl.select(quotes.ID,
+						quotes.QUOTE,
+						quotes.TELEGRAM_FILE_ID,
+						quotes.FILE_URL_ID)
 				.from(quotes)
 				.where(quotes.FILE_URL_ID.isNull())
 				.orderBy(quotes.ID)
@@ -54,7 +57,10 @@ public class BashRepo {
 	}
 
 	public Set<QuoteFile> getQuotesWithNullFileIdTop500() {
-		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
+		return dsl.select(quotes.ID,
+						quotes.QUOTE,
+						quotes.TELEGRAM_FILE_ID,
+						quotes.FILE_URL_ID)
 				.from(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull())
 				.orderBy(quotes.ID)
@@ -75,7 +81,10 @@ public class BashRepo {
 	}
 
 	public Set<QuoteFile> search(String query) {
-		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
+		return dsl.select(quotes.ID,
+						quotes.QUOTE,
+						quotes.TELEGRAM_FILE_ID,
+						quotes.FILE_URL_ID)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
@@ -102,7 +111,10 @@ public class BashRepo {
 	}
 
 	public QuoteFile getById(int id) {
-		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
+		return dsl.select(quotes.ID,
+						quotes.QUOTE,
+						quotes.TELEGRAM_FILE_ID,
+						quotes.FILE_URL_ID)
 				.from(quotes)
 				.orderBy(quotes.ID)
 				.limit(DSL.inline(1))
