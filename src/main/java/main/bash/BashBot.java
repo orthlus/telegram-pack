@@ -15,6 +15,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultPhoto;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.cached.InlineQueryResultCachedPhoto;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -71,20 +73,32 @@ public class BashBot implements SpringLongPollingBot {
 			return;
 		}
 
-		List<InlineQueryResultCachedPhoto> resultArticles = searchResult.stream()
-				.map(quoteFile -> new InlineQueryResultCachedPhoto(
-						UUID.randomUUID().toString(),
-						quoteFile.fileId()
-				))
-				.toList();
-
 		try {
 			bashTelegramClient.execute(AnswerInlineQuery.builder()
-					.results(resultArticles)
+					.results(searchResult.stream()
+							.map(this::getPhotoQueryResult)
+							.filter(Objects::nonNull)
+							.toList())
 					.inlineQueryId(inlineQueryId)
 					.build());
 		} catch (TelegramApiException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private InlineQueryResult getPhotoQueryResult(QuoteFile quoteFile) {
+		if (quoteFile.fileId() != null) {
+			return new InlineQueryResultCachedPhoto(
+					UUID.randomUUID().toString(),
+					quoteFile.fileId()
+			);
+		} else if (quoteFile.fileUrlId() != null) {
+			return new InlineQueryResultPhoto(
+					UUID.randomUUID().toString(),
+					telegramPhotoService.getFileUrl(quoteFile)
+			);
+		} else {
+			return null;
 		}
 	}
 
