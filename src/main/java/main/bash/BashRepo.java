@@ -1,6 +1,7 @@
 package main.bash;
 
 import lombok.RequiredArgsConstructor;
+import main.bash.models.QuoteFileUrlId;
 import main.tables.Quotes;
 import main.tables.records.QuotesRecord;
 import org.jooq.DSLContext;
@@ -17,6 +18,17 @@ import static org.jooq.Records.mapping;
 public class BashRepo {
 	private final DSLContext dsl;
 	private final Quotes quotes = Quotes.QUOTES;
+
+	public void addFileUrlIds(List<QuoteFileUrlId> quoteFileUrlIds) {
+		dsl.transaction(trx -> {
+			for (QuoteFileUrlId quoteFileUrlId : quoteFileUrlIds) {
+				trx.dsl().update(quotes)
+						.set(quotes.FILE_URL_ID, quoteFileUrlId.fileUrlId())
+						.where(quotes.ID.eq(quoteFileUrlId.quoteId()))
+						.execute();
+			}
+		});
+	}
 
 	public void addFileUrlId(Integer quoteId, String fileUrlId) {
 		dsl.update(quotes)

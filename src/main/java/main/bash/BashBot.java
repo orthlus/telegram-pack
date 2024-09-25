@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.bash.exceptions.QuoteNotFoundException;
+import main.bash.models.QuoteFileUrlId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
@@ -115,8 +116,8 @@ public class BashBot implements SpringLongPollingBot {
 	}
 
 	private void upload(Update update, String messageText) {
+		log.info("bash upload started: {}", messageText);
 		send(update, "started upload, not uploaded - " + bashRepo.hasNoFileUrlIdCount());
-		int counter = 0;
 
 		Set<QuoteFile> quotes;
 		if (messageText.equals("/upload")) {
@@ -126,14 +127,22 @@ public class BashBot implements SpringLongPollingBot {
 			quotes = bashRepo.getQuotesWithNullFileUrlTopN(n);
 		}
 
+		int counter = 0;
+		List<QuoteFileUrlId> quoteFileUrlIds = new ArrayList<>(quotes.size());
 		for (QuoteFile quote : quotes) {
 			InputStream inputStream = getInputStream(quote);
 			String id = UUID.randomUUID() + ".png";
 			bashS3.uploadFile(inputStream, id);
-			bashRepo.addFileUrlId(quote.quoteId(), id);
+
+			quoteFileUrlIds.add(new QuoteFileUrlId(quote.quoteId(), id));
+
 			counter++;
 		}
+
+		bashRepo.addFileUrlIds(quoteFileUrlIds);
+
 		send(update, "quote file_url_id uploaded: " + counter);
+		log.info("bash upload finish: {}", counter);
 	}
 
 	private void searchOneAndSend(Update update, String messageText) {
