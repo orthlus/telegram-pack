@@ -20,7 +20,11 @@ public class Quote {
 
 	@JsonProperty
 	public void setDate(String date) {
-		this.date = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm"));
+		if (date.contains(" ")) {
+			this.date = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy'T' H:mm"));
+		} else {
+			this.date = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm"));
+		}
 	}
 
 	@JsonProperty
