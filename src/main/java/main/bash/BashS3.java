@@ -22,7 +22,7 @@ public class BashS3 {
 	public void uploadFile(InputStream is, String id) {
 		try (S3Client client = client(bashS3Params)) {
 			client.putObject(builder -> builder
-							.key("files/" + id)
+							.key("bashbot-images/" + id)
 							.bucket(bucket)
 							.build(),
 					RequestBody.fromBytes(is.readAllBytes()));
