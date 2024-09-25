@@ -108,28 +108,32 @@ public class BashBot implements SpringLongPollingBot {
 			telegramPhotoService.saveFileIds();
 			send(update, "ok");
 		} else if (messageText.startsWith("/upload")) {
-			send(update, "started upload, not uploaded - " + bashRepo.hasNoFileUrlIdCount());
-			int counter = 0;
-
-			Set<QuoteFile> quotes;
-			if (messageText.equals("/upload")) {
-				quotes = bashRepo.getQuotesWithNullFileUrlTopN(500);
-			} else {
-				int n = Integer.parseInt(messageText.split(" ")[1]);
-				quotes = bashRepo.getQuotesWithNullFileUrlTopN(n);
-			}
-
-			for (QuoteFile quote : quotes) {
-				InputStream inputStream = getInputStream(quote);
-				String id = UUID.randomUUID() + ".png";
-				bashS3.uploadFile(inputStream, id);
-				bashRepo.addFileUrlId(quote.quoteId(), id);
-				counter++;
-			}
-			send(update, "quote file_url_id uploaded: " + counter);
+			upload(update, messageText);
 		} else {
 			send(update, "дай число или запрос");
 		}
+	}
+
+	private void upload(Update update, String messageText) {
+		send(update, "started upload, not uploaded - " + bashRepo.hasNoFileUrlIdCount());
+		int counter = 0;
+
+		Set<QuoteFile> quotes;
+		if (messageText.equals("/upload")) {
+			quotes = bashRepo.getQuotesWithNullFileUrlTopN(500);
+		} else {
+			int n = Integer.parseInt(messageText.split(" ")[1]);
+			quotes = bashRepo.getQuotesWithNullFileUrlTopN(n);
+		}
+
+		for (QuoteFile quote : quotes) {
+			InputStream inputStream = getInputStream(quote);
+			String id = UUID.randomUUID() + ".png";
+			bashS3.uploadFile(inputStream, id);
+			bashRepo.addFileUrlId(quote.quoteId(), id);
+			counter++;
+		}
+		send(update, "quote file_url_id uploaded: " + counter);
 	}
 
 	private void searchOneAndSend(Update update, String messageText) {
