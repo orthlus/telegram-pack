@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import static org.springframework.web.util.HtmlUtils.htmlUnescape;
 
 @Getter
@@ -11,6 +14,14 @@ import static org.springframework.web.util.HtmlUtils.htmlUnescape;
 public class Quote {
 	private String text;
 	private Integer rating;
+	private LocalDate date;
+	@JsonProperty
+	private Integer id;
+
+	@JsonProperty
+	public void setDate(String date) {
+		this.date = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm"));
+	}
 
 	@JsonProperty
 	public void setRating(Integer rating) {

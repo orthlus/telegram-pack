@@ -75,7 +75,14 @@ public class BashRepo {
 
 	public void saveQuotes(List<Quote> quotesList) {
 		dsl.batchInsert(quotesList.stream()
-						.map(quote -> new QuotesRecord(null, quote.getRating(), quote.getText(), null, null))
+						.map(quote -> new QuotesRecord(null,
+								quote.getRating(),
+								quote.getText(),
+								null,
+								null,
+								null,
+								quote.getId(),
+								quote.getDate()))
 						.toList())
 				.execute();
 	}
