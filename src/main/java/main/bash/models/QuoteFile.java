@@ -1,4 +1,14 @@
 package main.bash.models;
 
-public record QuoteFile(Integer quoteId, String quote, String fileId, String fileUrlId) {
+import java.time.LocalDate;
+
+public record QuoteFile(
+		Integer quoteId,
+		String quote,
+		String fileId,
+		String fileUrlId,
+		Integer quoteOriginalId,
+		LocalDate quoteDate,
+		Boolean fileHasActualValues
+) {
 }

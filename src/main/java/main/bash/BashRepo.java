@@ -43,7 +43,10 @@ public class BashRepo {
 		return dsl.select(quotes.ID,
 						quotes.QUOTE,
 						quotes.TELEGRAM_FILE_ID,
-						quotes.FILE_URL_ID)
+						quotes.FILE_URL_ID,
+						quotes.QUOTE_ID,
+						quotes.QUOTE_DATE,
+						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.where(quotes.FILE_URL_ID.isNull())
 				.orderBy(quotes.ID)
@@ -60,7 +63,10 @@ public class BashRepo {
 		return dsl.select(quotes.ID,
 						quotes.QUOTE,
 						quotes.TELEGRAM_FILE_ID,
-						quotes.FILE_URL_ID)
+						quotes.FILE_URL_ID,
+						quotes.QUOTE_ID,
+						quotes.QUOTE_DATE,
+						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull())
 				.orderBy(quotes.ID)
@@ -84,7 +90,10 @@ public class BashRepo {
 		return dsl.select(quotes.ID,
 						quotes.QUOTE,
 						quotes.TELEGRAM_FILE_ID,
-						quotes.FILE_URL_ID)
+						quotes.FILE_URL_ID,
+						quotes.QUOTE_ID,
+						quotes.QUOTE_DATE,
+						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
@@ -114,7 +123,10 @@ public class BashRepo {
 		return dsl.select(quotes.ID,
 						quotes.QUOTE,
 						quotes.TELEGRAM_FILE_ID,
-						quotes.FILE_URL_ID)
+						quotes.FILE_URL_ID,
+						quotes.QUOTE_ID,
+						quotes.QUOTE_DATE,
+						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.orderBy(quotes.ID)
 				.limit(DSL.inline(1))
