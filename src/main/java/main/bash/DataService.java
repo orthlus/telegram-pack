@@ -5,6 +5,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.bash.exceptions.QuoteNotFoundException;
+import main.bash.models.Quote;
+import main.bash.models.QuoteFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.bash.exceptions.QuoteNotFoundException;
+import main.bash.models.QuoteFile;
 import main.bash.models.QuoteFileUrlId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

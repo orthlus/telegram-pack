@@ -1,6 +1,8 @@
 package main.bash;
 
 import lombok.RequiredArgsConstructor;
+import main.bash.models.Quote;
+import main.bash.models.QuoteFile;
 import main.bash.models.QuoteFileUrlId;
 import main.tables.Quotes;
 import main.tables.records.QuotesRecord;
