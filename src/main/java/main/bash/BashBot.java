@@ -174,7 +174,7 @@ public class BashBot implements SpringLongPollingBot {
 	}
 
 	private InputStream getInputStream(QuoteFile quoteFile) {
-		return imageService.buildQuotePhoto(quoteFile.quote());
+		return imageService.buildQuotePhoto(quoteFile);
 	}
 
 	private Message sendPhotoByInputStream(Update update, InputStream photo) {

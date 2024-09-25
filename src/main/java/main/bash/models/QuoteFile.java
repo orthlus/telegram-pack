@@ -9,6 +9,7 @@ public record QuoteFile(
 		String fileUrlId,
 		Integer quoteOriginalId,
 		LocalDate quoteDate,
+		Integer quoteRating,
 		Boolean fileHasActualValues
 ) {
 }

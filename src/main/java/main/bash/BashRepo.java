@@ -46,6 +46,7 @@ public class BashRepo {
 						quotes.FILE_URL_ID,
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
+						quotes.RATING,
 						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.where(quotes.FILE_URL_ID.isNull())
@@ -66,6 +67,7 @@ public class BashRepo {
 						quotes.FILE_URL_ID,
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
+						quotes.RATING,
 						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull())
@@ -93,6 +95,7 @@ public class BashRepo {
 						quotes.FILE_URL_ID,
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
+						quotes.RATING,
 						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
@@ -126,6 +129,7 @@ public class BashRepo {
 						quotes.FILE_URL_ID,
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
+						quotes.RATING,
 						quotes.FILE_HAS_ACTUAL_VALUES)
 				.from(quotes)
 				.orderBy(quotes.ID)

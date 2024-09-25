@@ -5,6 +5,7 @@ import ij.ImagePlus;
 import ij.process.ImageProcessor;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import main.bash.models.QuoteFile;
 import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,6 +44,8 @@ public class ImageService {
 	private final Font ratingFont = new Font("sans-serif", Font.PLAIN, 12);
 	private final Color ratingColor = Color.BLACK;
 
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
 	private ImagePlus bottomImage;
 
 	@PostConstruct
@@ -52,17 +56,20 @@ public class ImageService {
 		bottomImage = IJ.openImage(path);
 	}
 
-	public InputStream buildQuotePhoto(String text) {
-		return createTextImageFile(text);
+	public InputStream buildQuotePhoto(QuoteFile quoteFile) {
+		return createTextImageFile(quoteFile.quote(),
+				quoteFile.quoteOriginalId(),
+				quoteFile.quoteDate().format(dateTimeFormatter),
+				quoteFile.quoteRating());
 	}
 
-	private InputStream createTextImageFile(String text) {
+	private InputStream createTextImageFile(String text, int id, String date, int rating) {
 		int wrapLength = 43;
 		String wrapped = wrap(text, wrapLength);
 
 		BufferedImage content = createTextImage(wrapped).getBufferedImage();
-		BufferedImage top = createTopImage(123, "02.07.2009 в 23:37").getBufferedImage();
-		BufferedImage bottom = createBottomImage(300245).getBufferedImage();
+		BufferedImage top = createTopImage(id, date).getBufferedImage();
+		BufferedImage bottom = createBottomImage(rating).getBufferedImage();
 		return mergeImages(top, bottom, content);
 	}
 
