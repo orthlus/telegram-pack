@@ -18,6 +18,41 @@ public class BashRepo {
 	private final DSLContext dsl;
 	private final Quotes quotes = Quotes.QUOTES;
 
+	public void addFileUrlId(Integer quoteId, String fileUrlId) {
+		dsl.update(quotes)
+				.set(quotes.FILE_URL_ID, fileUrlId)
+				.where(quotes.ID.eq(quoteId))
+				.execute();
+	}
+
+	public Set<QuoteFile> getQuotesWithNullFileUrlTopN(int n) {
+		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
+				.from(quotes)
+				.where(quotes.FILE_URL_ID.isNull())
+				.orderBy(quotes.ID)
+				.limit(n)
+				.fetchSet(mapping(QuoteFile::new));
+	}
+
+	public int hasNoFileUrlIdCount() {
+		return dsl.fetchCount(dsl.selectFrom(quotes)
+				.where(quotes.FILE_URL_ID.isNull()));
+	}
+
+	public Set<QuoteFile> getQuotesWithNullFileIdTop500() {
+		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
+				.from(quotes)
+				.where(quotes.TELEGRAM_FILE_ID.isNull())
+				.orderBy(quotes.ID)
+				.limit(500)
+				.fetchSet(mapping(QuoteFile::new));
+	}
+
+	public int hasNoFileIdCount() {
+		return dsl.fetchCount(dsl.selectFrom(quotes)
+				.where(quotes.TELEGRAM_FILE_ID.isNull()));
+	}
+
 	public void addFileId(Integer quoteId, String fileId) {
 		dsl.update(quotes)
 				.set(quotes.TELEGRAM_FILE_ID, fileId)
@@ -26,11 +61,11 @@ public class BashRepo {
 	}
 
 	public Set<QuoteFile> search(String query) {
-		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID)
+		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
-				.limit(50)
+				.limit(20)
 				.fetchSet(mapping(QuoteFile::new));
 	}
 
@@ -40,13 +75,13 @@ public class BashRepo {
 
 	public void saveQuotes(List<Quote> quotesList) {
 		dsl.batchInsert(quotesList.stream()
-						.map(quote -> new QuotesRecord(null, quote.getRating(), quote.getText(), null))
+						.map(quote -> new QuotesRecord(null, quote.getRating(), quote.getText(), null, null))
 						.toList())
 				.execute();
 	}
 
 	public QuoteFile getById(int id) {
-		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID)
+		return dsl.select(quotes.ID, quotes.QUOTE, quotes.TELEGRAM_FILE_ID, quotes.FILE_URL_ID)
 				.from(quotes)
 				.orderBy(quotes.ID)
 				.limit(DSL.inline(1))

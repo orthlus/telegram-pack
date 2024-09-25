@@ -46,8 +46,8 @@ public class DataService {
 		return repo.search(query);
 	}
 
-	public String searchOne(String query) {
-		return repo.search(query).iterator().next().quote();
+	public QuoteFile searchOne(String query) {
+		return repo.search(query).iterator().next();
 	}
 
 	public QuoteFile getByRank(int rank) {
