@@ -157,7 +157,7 @@ public class ImageService {
 		return combined;
 	}
 
-	private InputStream getPNGInputStream(BufferedImage image) {
+	public InputStream getPNGInputStream(BufferedImage image) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ImageIO.write(image, "PNG", baos);
@@ -165,5 +165,13 @@ public class ImageService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+		BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics2D = resizedImage.createGraphics();
+		graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+		graphics2D.dispose();
+		return resizedImage;
 	}
 }
