@@ -1,5 +1,6 @@
 package main.bash;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.bash.models.QuoteFile;
@@ -24,6 +25,9 @@ public class TelegramPhotoService {
 	private long adminId;
 	@Value("${bash.external.link.prefix}")
 	private String externalLinkPrefix;
+	@Getter
+	@Value("${bash.thumbnail.link}")
+	private String thumbnailLink;
 
 	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 	public void saveFileIds() {

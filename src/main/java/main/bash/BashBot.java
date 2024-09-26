@@ -89,15 +89,16 @@ public class BashBot implements SpringLongPollingBot {
 
 	private InlineQueryResult getPhotoQueryResult(QuoteFile quoteFile) {
 		if (quoteFile.fileId() != null) {
-			return new InlineQueryResultCachedPhoto(
-					UUID.randomUUID().toString(),
-					quoteFile.fileId()
-			);
+			return InlineQueryResultCachedPhoto.builder()
+					.id(UUID.randomUUID().toString())
+					.photoFileId(quoteFile.fileId())
+					.build();
 		} else if (quoteFile.fileUrlId() != null) {
-			return new InlineQueryResultPhoto(
-					UUID.randomUUID().toString(),
-					telegramPhotoService.getFileUrl(quoteFile)
-			);
+			return InlineQueryResultPhoto.builder()
+					.id(UUID.randomUUID().toString())
+					.photoUrl(telegramPhotoService.getFileUrl(quoteFile))
+					.thumbnailUrl(telegramPhotoService.getThumbnailLink())
+					.build();
 		} else {
 			return null;
 		}
