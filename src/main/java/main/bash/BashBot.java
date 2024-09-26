@@ -128,11 +128,39 @@ public class BashBot implements SpringLongPollingBot {
 		} else if (messageText.equals("/flush")) {
 			telegramPhotoService.saveFileIds();
 			send(update, "ok");
+		} else if (messageText.startsWith("/upload_thumb")) {
+			uploadThumb(update, messageText);
 		} else if (messageText.startsWith("/upload")) {
 			upload(update, messageText);
 		} else {
 			send(update, "дай число или запрос");
 		}
+	}
+
+	private void uploadThumb(Update update, String messageText) {
+		log.info("bash upload_thumb started: {}", messageText);
+		send(update, "started upload_thumb, not uploaded - " + bashRepo.notExistsThumbFileUrlIdCount());
+
+		Set<QuoteFile> quotes;
+		if (messageText.equals("/upload_thumb")) {
+			quotes = bashRepo.getQuotesWithFalseThumbFileExistsTopN(500);
+		} else {
+			int n = Integer.parseInt(messageText.split(" ")[1]);
+			quotes = bashRepo.getQuotesWithFalseThumbFileExistsTopN(n);
+		}
+
+		int counter = 0;
+		List<Integer> quoteIds = new ArrayList<>(quotes.size());
+		for (QuoteFile quote : quotes) {
+			telegramPhotoService.buildAndUploadThumbnail(quote);
+			quoteIds.add(quote.quoteId());
+			counter++;
+		}
+
+		bashRepo.setThumbFileExistsByQuoteIds(quoteIds, true);
+
+		send(update, "quote thumb files uploaded: " + counter);
+		log.info("bash upload_thumb finish: {}", counter);
 	}
 
 	private void upload(Update update, String messageText) {

@@ -22,6 +22,34 @@ public class BashRepo {
 	private final DSLContext dsl;
 	private final Quotes quotes = Quotes.QUOTES;
 
+	public void setThumbFileExistsByQuoteIds(List<Integer> quoteIds, boolean value) {
+		dsl.update(quotes)
+				.set(quotes.THUMB_FILE_EXISTS, value)
+				.where(quotes.ID.in(quoteIds))
+				.execute();
+	}
+
+	public Set<QuoteFile> getQuotesWithFalseThumbFileExistsTopN(int n) {
+		return dsl.select(quotes.ID,
+						quotes.QUOTE,
+						quotes.TELEGRAM_FILE_ID,
+						quotes.FILE_URL_ID,
+						quotes.QUOTE_ID,
+						quotes.QUOTE_DATE,
+						quotes.RATING,
+						quotes.THUMB_FILE_EXISTS)
+				.from(quotes)
+				.where(quotes.THUMB_FILE_EXISTS.eq(false))
+				.orderBy(quotes.ID)
+				.limit(n)
+				.fetchSet(mapping(QuoteFile::new));
+	}
+
+	public int notExistsThumbFileUrlIdCount() {
+		return dsl.fetchCount(dsl.selectFrom(quotes)
+				.where(quotes.THUMB_FILE_EXISTS.eq(false)));
+	}
+
 	public void addFileUrlIds(List<QuoteFileUrlId> quoteFileUrlIds) {
 		dsl.transaction(trx -> {
 			for (QuoteFileUrlId quoteFileUrlId : quoteFileUrlIds) {
@@ -48,7 +76,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.THUMB_FILE_URL_ID)
+						quotes.THUMB_FILE_EXISTS)
 				.from(quotes)
 				.where(quotes.FILE_URL_ID.isNull())
 				.orderBy(quotes.ID)
@@ -69,7 +97,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.THUMB_FILE_URL_ID)
+						quotes.THUMB_FILE_EXISTS)
 				.from(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull())
 				.orderBy(quotes.ID)
@@ -108,7 +136,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.THUMB_FILE_URL_ID)
+						quotes.THUMB_FILE_EXISTS)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
@@ -142,7 +170,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.THUMB_FILE_URL_ID)
+						quotes.THUMB_FILE_EXISTS)
 				.from(quotes)
 				.orderBy(quotes.ID)
 				.limit(DSL.inline(1))
