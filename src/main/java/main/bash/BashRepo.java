@@ -48,7 +48,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.FILE_HAS_ACTUAL_VALUES)
+						quotes.THUMB_FILE_URL_ID)
 				.from(quotes)
 				.where(quotes.FILE_URL_ID.isNull())
 				.orderBy(quotes.ID)
@@ -69,7 +69,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.FILE_HAS_ACTUAL_VALUES)
+						quotes.THUMB_FILE_URL_ID)
 				.from(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull())
 				.orderBy(quotes.ID)
@@ -108,7 +108,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.FILE_HAS_ACTUAL_VALUES)
+						quotes.THUMB_FILE_URL_ID)
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
@@ -127,9 +127,9 @@ public class BashRepo {
 								quote.getText(),
 								null,
 								null,
-								null,
 								quote.getId(),
-								quote.getDate()))
+								quote.getDate(),
+								null))
 						.toList())
 				.execute();
 	}
@@ -142,7 +142,7 @@ public class BashRepo {
 						quotes.QUOTE_ID,
 						quotes.QUOTE_DATE,
 						quotes.RATING,
-						quotes.FILE_HAS_ACTUAL_VALUES)
+						quotes.THUMB_FILE_URL_ID)
 				.from(quotes)
 				.orderBy(quotes.ID)
 				.limit(DSL.inline(1))

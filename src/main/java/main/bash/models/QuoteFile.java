@@ -10,6 +10,6 @@ public record QuoteFile(
 		Integer quoteOriginalId,
 		LocalDate quoteDate,
 		Integer quoteRating,
-		Boolean fileHasActualValues
+		String thumbFileUrlId
 ) {
 }
