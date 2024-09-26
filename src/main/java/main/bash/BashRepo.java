@@ -3,6 +3,7 @@ package main.bash;
 import lombok.RequiredArgsConstructor;
 import main.bash.models.Quote;
 import main.bash.models.QuoteFile;
+import main.bash.models.QuoteFileId;
 import main.bash.models.QuoteFileUrlId;
 import main.tables.Quotes;
 import main.tables.records.QuotesRecord;
@@ -79,6 +80,17 @@ public class BashRepo {
 	public int hasNoFileIdCount() {
 		return dsl.fetchCount(dsl.selectFrom(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull()));
+	}
+
+	public void addFileIds(List<QuoteFileId> quoteFileIds) {
+		dsl.transaction(trx -> {
+			for (QuoteFileId quoteFileId : quoteFileIds) {
+				dsl.update(quotes)
+						.set(quotes.TELEGRAM_FILE_ID, quoteFileId.fileId())
+						.where(quotes.ID.eq(quoteFileId.quoteId()))
+						.execute();
+			}
+		});
 	}
 
 	public void addFileId(Integer quoteId, String fileId) {

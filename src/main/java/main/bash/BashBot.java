@@ -184,7 +184,8 @@ public class BashBot implements SpringLongPollingBot {
 //		sendPhotoByInputStream(update, inputStream);
 
 		String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
-		sendPhotoByUrlOrFileId(update, fileUrl);
+		Message message = sendPhotoByUrlOrFileId(update, fileUrl);
+		telegramPhotoService.saveFileId(quoteFile, message);
 	}
 
 	private InputStream getInputStream(QuoteFile quoteFile) {
@@ -200,8 +201,8 @@ public class BashBot implements SpringLongPollingBot {
 		);
 	}
 
-	private void sendPhotoByUrlOrFileId(Update update, String urlOrFileId) {
-		execute(
+	private Message sendPhotoByUrlOrFileId(Update update, String urlOrFileId) {
+		return execute(
 				SendPhoto.builder()
 						.chatId(update.getMessage().getChatId())
 						.photo(new InputFile(urlOrFileId)),
