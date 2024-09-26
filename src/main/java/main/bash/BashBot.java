@@ -98,7 +98,7 @@ public class BashBot implements SpringLongPollingBot {
 			return InlineQueryResultPhoto.builder()
 					.id(UUID.randomUUID().toString())
 					.photoUrl(fileUrl)
-					.thumbnailUrl(telegramPhotoService.getThumbnailLink(fileUrl, quoteFile))
+					.thumbnailUrl(telegramPhotoService.getThumbnailLink(quoteFile))
 					.build();
 		} else {
 			return null;

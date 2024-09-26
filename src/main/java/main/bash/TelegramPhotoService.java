@@ -1,6 +1,5 @@
 package main.bash;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.bash.models.QuoteFile;
@@ -69,17 +68,14 @@ public class TelegramPhotoService {
 				.getFileId();
 	}
 
-	public String getThumbnailLink(String fileUrl, QuoteFile quoteFile) {
-		try {
-			BufferedImage image = ImageIO.read(URI.create(fileUrl).toURL());
-			BufferedImage resizedImage = imageService.resizeImage(image, 150, 150);
-			InputStream inputStream = imageService.getPNGInputStream(resizedImage);
-			String id = "thumbs/" + quoteFile.fileUrlId();
-			bashS3.uploadFile(inputStream, id);
+	public String getThumbnailLink(QuoteFile quoteFile) {
+		return externalLinkPrefix + "thumbs/" + quoteFile.fileUrlId();
+	}
 
-			return externalLinkPrefix + id;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public void buildAndUploadThumbnail(QuoteFile quoteFile) {
+		BufferedImage srcImage = imageService.buildQuotePhotoBufferedImage(quoteFile);
+		InputStream inputStream = imageService.generateThumbnail(srcImage);
+		String id = "thumbs/" + quoteFile.fileUrlId();
+		bashS3.uploadFile(inputStream, id);
 	}
 }
