@@ -48,10 +48,6 @@ public class DataService {
 		return repo.search(query);
 	}
 
-	public QuoteFile searchOne(String query) {
-		return repo.search(query).iterator().next();
-	}
-
 	public QuoteFile getByRank(int rank) {
 		if (rank < 1) {
 			throw new QuoteNotFoundException("нужен положительный номер!");

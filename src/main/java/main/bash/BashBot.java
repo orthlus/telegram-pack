@@ -109,7 +109,7 @@ public class BashBot implements SpringLongPollingBot {
 			QuoteFile quoteFile = dataService.getByRank(rank);
 			sendQuotePhoto(update, quoteFile);
 		} catch (NumberFormatException ignored) {
-			searchOneAndSend(update, messageText);
+			searchFiveAndSend(update, messageText);
 		} catch (QuoteNotFoundException e) {
 			send(update, e.getMessage());
 		}
@@ -163,9 +163,11 @@ public class BashBot implements SpringLongPollingBot {
 		log.info("bash upload finish: {}", counter);
 	}
 
-	private void searchOneAndSend(Update update, String messageText) {
-		Optional<QuoteFile> result = searchOne(messageText);
-		result.ifPresent(quoteFile -> sendQuotePhoto(update, quoteFile));
+	private void searchFiveAndSend(Update update, String messageText) {
+		search(messageText)
+				.stream()
+				.limit(5)
+				.forEach(quoteFile -> sendQuotePhoto(update, quoteFile));
 	}
 
 	private Set<QuoteFile> search(String query) {
@@ -173,14 +175,6 @@ public class BashBot implements SpringLongPollingBot {
 			return dataService.search(query);
 		} catch (Exception e) {
 			return Set.of();
-		}
-	}
-
-	private Optional<QuoteFile> searchOne(String query) {
-		try {
-			return Optional.ofNullable(dataService.searchOne(query));
-		} catch (Exception e) {
-			return Optional.empty();
 		}
 	}
 
