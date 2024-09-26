@@ -85,7 +85,7 @@ public class BashRepo {
 	public void addFileIds(List<QuoteFileId> quoteFileIds) {
 		dsl.transaction(trx -> {
 			for (QuoteFileId quoteFileId : quoteFileIds) {
-				dsl.update(quotes)
+				trx.dsl().update(quotes)
 						.set(quotes.TELEGRAM_FILE_ID, quoteFileId.fileId())
 						.where(quotes.ID.eq(quoteFileId.quoteId()))
 						.execute();
