@@ -24,6 +24,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static art.aelaort.TelegramClientHelpers.execute;
 
@@ -118,6 +119,10 @@ public class BashBot implements SpringLongPollingBot {
 		if (messageText.equals("/random")) {
 			QuoteFile quoteFile = dataService.getRandom();
 			sendQuotePhoto(update, quoteFile);
+		} else if (messageText.equals("/random_10")) {
+			IntStream.range(0, 10)
+					.mapToObj(i -> dataService.getRandom())
+					.forEach(quoteFile -> sendQuotePhoto(update, quoteFile));
 		} else if (messageText.equals("/flush")) {
 			telegramPhotoService.saveFileIds();
 			send(update, "ok");
