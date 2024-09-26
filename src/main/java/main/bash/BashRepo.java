@@ -112,7 +112,7 @@ public class BashRepo {
 				.from(quotes)
 				.where("{0} %> {1}", quotes.QUOTE, query)
 				.orderBy(quotes.RATING.desc())
-				.limit(20)
+				.limit(10)
 				.fetchSet(mapping(QuoteFile::new));
 	}
 
