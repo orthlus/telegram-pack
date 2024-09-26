@@ -7,17 +7,19 @@ import main.bash.models.QuoteFileId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import static art.aelaort.TelegramClientHelpers.execute;
 
 @Slf4j
 @Component
@@ -27,10 +29,31 @@ public class TelegramPhotoService {
 	private final BashRepo bashRepo;
 	private final ImageService imageService;
 	private final BashS3 bashS3;
+	private final TelegramClient bashTelegramClient;
 	@Value("${telegram.admin.id}")
 	private long adminId;
 	@Value("${bash.external.link.prefix}")
 	private String externalLinkPrefix;
+	@Value("${bash.tech.chat.id}")
+	private long techChatId;
+
+	@Scheduled(fixedDelay = 5, timeUnit = TimeUnit.MINUTES)
+	public void gettingTelegramFilesIds() {
+		List<QuoteFileId> toSave = bashRepo.getQuotesWithNullFileIdTopN(10)
+				.stream()
+				.map(this::getQuoteFileId)
+				.toList();
+		bashRepo.addFileIds(toSave);
+		log.info("bash - saved files ids: {}", toSave.size());
+	}
+
+	private QuoteFileId getQuoteFileId(QuoteFile quote) {
+		Message message = execute(SendPhoto.builder()
+						.chatId(techChatId)
+						.photo(new InputFile(getFileUrl(quote))),
+				bashTelegramClient);
+		return new QuoteFileId(quote.quoteId(), getPhotoFileId(message));
+	}
 
 	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 	public void saveFileIds() {

@@ -89,7 +89,7 @@ public class BashRepo {
 				.where(quotes.FILE_URL_ID.isNull()));
 	}
 
-	public Set<QuoteFile> getQuotesWithNullFileIdTop500() {
+	public Set<QuoteFile> getQuotesWithNullFileIdTopN(int n) {
 		return dsl.select(quotes.ID,
 						quotes.QUOTE,
 						quotes.TELEGRAM_FILE_ID,
@@ -101,7 +101,7 @@ public class BashRepo {
 				.from(quotes)
 				.where(quotes.TELEGRAM_FILE_ID.isNull())
 				.orderBy(quotes.ID)
-				.limit(500)
+				.limit(n)
 				.fetchSet(mapping(QuoteFile::new));
 	}
 
