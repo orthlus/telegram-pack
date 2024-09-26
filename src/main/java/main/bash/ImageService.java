@@ -57,13 +57,17 @@ public class ImageService {
 	}
 
 	public InputStream buildQuotePhoto(QuoteFile quoteFile) {
+		return getPNGInputStream(buildQuotePhotoBufferedImage(quoteFile));
+	}
+
+	public BufferedImage buildQuotePhotoBufferedImage(QuoteFile quoteFile) {
 		return createTextImageFile(quoteFile.quote(),
 				quoteFile.quoteOriginalId(),
 				quoteFile.quoteDate().format(dateTimeFormatter),
 				quoteFile.quoteRating());
 	}
 
-	private InputStream createTextImageFile(String text, int id, String date, int rating) {
+	private BufferedImage createTextImageFile(String text, int id, String date, int rating) {
 		int wrapLength = 43;
 		String wrapped = wrap(text, wrapLength);
 
@@ -138,10 +142,8 @@ public class ImageService {
 		ip.drawString(text, x, y);
 	}
 
-	private InputStream mergeImages(BufferedImage header, BufferedImage footer, BufferedImage imageContent) {
-		BufferedImage result = mergeImages(mergeImages(header, imageContent), footer);
-
-		return getPNGInputStream(result);
+	private BufferedImage mergeImages(BufferedImage header, BufferedImage footer, BufferedImage imageContent) {
+		return mergeImages(mergeImages(header, imageContent), footer);
 	}
 
 	private BufferedImage mergeImages(BufferedImage top, BufferedImage bottom) {
