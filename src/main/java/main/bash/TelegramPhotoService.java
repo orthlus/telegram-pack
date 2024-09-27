@@ -37,9 +37,9 @@ public class TelegramPhotoService {
 	@Value("${bash.tech.chat.id}")
 	private long techChatId;
 
-	@Scheduled(fixedDelay = 5, timeUnit = TimeUnit.MINUTES)
+	@Scheduled(fixedDelay = 2, timeUnit = TimeUnit.MINUTES)
 	public void gettingTelegramFilesIds() {
-		List<QuoteFileId> toSave = bashRepo.getQuotesWithNullFileIdTopN(10)
+		List<QuoteFileId> toSave = bashRepo.getQuotesWithNullFileIdTopN(20)
 				.stream()
 				.map(this::getQuoteFileId)
 				.toList();
