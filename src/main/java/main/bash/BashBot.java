@@ -212,9 +212,16 @@ public class BashBot implements SpringLongPollingBot {
 //		InputStream inputStream = getInputStream(quoteFile);
 //		sendPhotoByInputStream(update, inputStream);
 
-		String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
-		Message message = sendPhotoByUrlOrFileId(update, fileUrl);
-		telegramPhotoService.saveFileId(quoteFile, message);
+		if (quoteFile.fileId() != null) {
+			sendPhotoByUrlOrFileId(update, quoteFile.fileId());
+		} else if (quoteFile.fileUrlId() != null) {
+			String fileUrl = telegramPhotoService.getFileUrl(quoteFile);
+			Message message = sendPhotoByUrlOrFileId(update, fileUrl);
+			telegramPhotoService.saveFileId(quoteFile, message);
+			log.info("bash photo sent by url, quoteId: {}", quoteFile.quoteId());
+		} else {
+			log.error("error send bash photo, not found file_id or file_url: {}", quoteFile);
+		}
 	}
 
 	private InputStream getInputStream(QuoteFile quoteFile) {
