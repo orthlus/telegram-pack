@@ -1,9 +1,11 @@
 package main.list;
 
+import art.aelaort.BotName;
 import art.aelaort.SpringAdminBot;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -12,11 +14,13 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static art.aelaort.TelegramClientHelpers.execute;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ListBot implements SpringAdminBot {
@@ -38,22 +42,31 @@ public class ListBot implements SpringAdminBot {
 	@Override
 	public void consumeAdmin(Update update) {
 		if (update.hasMessage() && update.getMessage().hasText()) {
-			String[] bots = telegramListRestTemplate.getForObject("/list", String[].class);
+			BotName[] arr = telegramListRestTemplate.getForObject("/bots", BotName[].class);
+			List<BotName> bots = Stream.of(arr).toList();
 
-			if (bots.length == 0) {
+			if (bots.isEmpty()) {
 				send("bots not found");
 			} else {
-				String text = Stream.of(bots)
-						.filter(bot -> !bot.equals(botNickname))
-						.map(bot -> "@" + bot)
-						.collect(Collectors.joining("\n"));
+				String text = bots.stream()
+						.filter(botName -> !botName.nickname().equals(botNickname))
+						.map(ListBot::buildName)
+						.collect(Collectors.joining("\n\n"));
 				send(text);
 			}
 		}
 	}
 
+	private static String buildName(BotName botName) {
+		if (botName.name() == null) {
+			return "@" + botName.nickname();
+		}
+		return "<a href=\"https://t.me/%s\">%s</a>".formatted(botName.nickname(), botName.name());
+	}
+
 	private void send(String text) {
 		execute(SendMessage.builder()
+						.parseMode("html")
 						.text(text)
 						.chatId(adminId),
 				listTelegramClient);
