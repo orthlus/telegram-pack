@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,17 +43,26 @@ public class ListBot implements SpringAdminBot {
 	@Override
 	public void consumeAdmin(Update update) {
 		if (update.hasMessage() && update.getMessage().hasText()) {
-			BotName[] arr = telegramListRestTemplate.getForObject("/bots", BotName[].class);
-			List<BotName> bots = Stream.of(arr).toList();
-
-			if (bots.isEmpty()) {
-				send("bots not found");
+			if (update.getMessage().getText().startsWith("/add")) {
+				String[] split = update.getMessage().getText().split(" ");
+				String nickname = split[1];
+				String name = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+				String url = "/bots/%s?name={name}".formatted(nickname);
+				telegramListRestTemplate.patchForObject(url, null, String.class, name);
+				send("to %s set name '%s'".formatted(nickname, name));
 			} else {
-				String text = bots.stream()
-						.filter(botName -> !botName.nickname().equals(botNickname))
-						.map(ListBot::buildName)
-						.collect(Collectors.joining("\n\n"));
-				send(text);
+				BotName[] arr = telegramListRestTemplate.getForObject("/bots", BotName[].class);
+				List<BotName> bots = Stream.of(arr).toList();
+
+				if (bots.isEmpty()) {
+					send("bots not found");
+				} else {
+					String text = bots.stream()
+							.filter(botName -> !botName.nickname().equals(botNickname))
+							.map(ListBot::buildName)
+							.collect(Collectors.joining("\n\n"));
+					send(text);
+				}
 			}
 		}
 	}
