@@ -7,6 +7,7 @@ import main.bash.models.QuoteFileId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -36,6 +37,15 @@ public class TelegramPhotoService {
 	private String externalLinkPrefix;
 	@Value("${bash.tech.chat.id}")
 	private long techChatId;
+
+	@Scheduled(fixedRate = 2, timeUnit = TimeUnit.HOURS)
+	public void logStatus() {
+		int count = bashRepo.hasNoFileIdCount();
+		execute(SendMessage.builder()
+						.chatId(adminId)
+						.text("bash quotes without file_id: " + count),
+				bashTelegramClient);
+	}
 
 	@Scheduled(fixedDelay = 2, timeUnit = TimeUnit.MINUTES)
 	public void gettingTelegramFilesIds() {
