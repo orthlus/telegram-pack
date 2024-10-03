@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -52,17 +53,23 @@ public class TelegramPhotoService {
 		List<QuoteFileId> toSave = bashRepo.getQuotesWithNullFileIdTopN(20)
 				.stream()
 				.map(this::getQuoteFileId)
+				.filter(Objects::nonNull)
 				.toList();
 		bashRepo.addFileIds(toSave);
 		log.info("bash - saved files ids: {}", toSave.size());
 	}
 
 	private QuoteFileId getQuoteFileId(QuoteFile quote) {
-		Message message = execute(SendPhoto.builder()
-						.chatId(techChatId)
-						.photo(new InputFile(getFileUrl(quote))),
-				bashTelegramClient);
-		return new QuoteFileId(quote.quoteId(), getPhotoFileId(message));
+		try {
+			Message message = execute(SendPhoto.builder()
+							.chatId(techChatId)
+							.photo(new InputFile(getFileUrl(quote))),
+					bashTelegramClient);
+			return new QuoteFileId(quote.quoteId(), getPhotoFileId(message));
+		} catch (Exception e) {
+			log.error("error bash getQuoteFileId", e);
+			return null;
+		}
 	}
 
 	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
