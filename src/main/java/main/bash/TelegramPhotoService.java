@@ -48,7 +48,7 @@ public class TelegramPhotoService {
 				bashTelegramClient);
 	}
 
-	@Scheduled(fixedDelay = 2, timeUnit = TimeUnit.MINUTES, initialDelay = 2)
+	@Scheduled(fixedDelay = 3, timeUnit = TimeUnit.MINUTES, initialDelay = 2)
 	public void gettingTelegramFilesIds() {
 		List<QuoteFileId> toSave = bashRepo.getQuotesWithNullFileIdTopN(20)
 				.stream()
