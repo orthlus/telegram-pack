@@ -39,7 +39,7 @@ public class TelegramPhotoService {
 	@Value("${bash.tech.chat.id}")
 	private long techChatId;
 
-	@Scheduled(fixedRate = 2, timeUnit = TimeUnit.HOURS)
+//	@Scheduled(fixedRate = 2, timeUnit = TimeUnit.HOURS)
 	public void logStatus() {
 		int count = bashRepo.hasNoFileIdCount();
 		execute(SendMessage.builder()
@@ -48,7 +48,7 @@ public class TelegramPhotoService {
 				bashTelegramClient);
 	}
 
-	@Scheduled(fixedDelay = 3, timeUnit = TimeUnit.MINUTES, initialDelay = 2)
+//	@Scheduled(fixedDelay = 3, timeUnit = TimeUnit.MINUTES, initialDelay = 2)
 	public void gettingTelegramFilesIds() {
 		List<QuoteFileId> toSave = bashRepo.getQuotesWithNullFileIdTopN(20)
 				.stream()
@@ -72,7 +72,7 @@ public class TelegramPhotoService {
 		}
 	}
 
-	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
+//	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 	public void saveFileIds() {
 		List<QuoteFileId> toSave = fileIdsByQuoteIdToSave.entrySet()
 				.stream()
