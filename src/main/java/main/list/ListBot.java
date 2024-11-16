@@ -45,11 +45,16 @@ public class ListBot implements SpringAdminBot {
 		if (update.hasMessage() && update.getMessage().hasText()) {
 			if (update.getMessage().getText().startsWith("/add")) {
 				String[] split = update.getMessage().getText().split(" ");
-				String nickname = split[1];
-				String name = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
-				String url = "/bots/%s?name={name}".formatted(nickname);
-				telegramListRestTemplate.patchForObject(url, null, String.class, name);
-				send("to %s set name '%s'".formatted(nickname, name));
+
+				if (split.length < 2) {
+					send("format - /add PASTE_NAME\ntry again");
+				} else {
+					String nickname = split[1];
+					String name = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+					String url = "/bots/%s?name={name}".formatted(nickname);
+					telegramListRestTemplate.patchForObject(url, null, String.class, name);
+					send("to %s set name '%s'".formatted(nickname, name));
+				}
 			} else {
 				BotName[] arr = telegramListRestTemplate.getForObject("/bots", BotName[].class);
 				List<BotName> bots = Stream.of(arr).toList();
