@@ -42,4 +42,16 @@ public class RestTemplateConfiguration {
 				.basicAuthentication(properties.getUser(), properties.getPassword())
 				.build();
 	}
+
+	@Bean
+	public RestTemplate dockerRegistryRestTemplate(RestTemplateBuilder builder,
+												   @Value("${main_tech.registry.url}") String url) {
+		return builder.rootUri(url).build();
+	}
+
+	@Bean
+	public RestTemplate iamRestTemplate(RestTemplateBuilder restTemplateBuilder,
+										@Value("${iam.url}") String url) {
+		return restTemplateBuilder.rootUri(url).build();
+	}
 }
