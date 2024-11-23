@@ -46,10 +46,11 @@ public class RuvdsEmailClient {
 	}
 
 	public String getCode() {
-		try {
-			Message message = getLastNewRuvdsMessage(buildStore());
+		try (Folder inbox = getInbox(buildStore())) {
+			Message message = getLastNewRuvdsMessage(inbox);
+			String code = getCode(message);
 			message.setFlag(Flags.Flag.SEEN, true);
-			return getCode(message);
+			return code;
 		} catch (BuildEmailStoreException | MessagingException | IOException e) {
 			log.error("Error getting ruvds code", e);
 			return "Ошибка получения кода";
@@ -69,8 +70,8 @@ public class RuvdsEmailClient {
 		return body.split(pattern)[1].split(pattern2)[0];
 	}
 
-	private Message getLastNewRuvdsMessage(Store store) throws MessagingException {
-		return getUnreadMessagesFromInbox(store).stream()
+	private Message getLastNewRuvdsMessage(Folder inbox) throws MessagingException {
+		return getUnreadMessagesFromInbox(inbox).stream()
 				.filter(message -> {
 					try {
 						String from = ((InternetAddress) message.getFrom()[0]).getAddress();
@@ -89,16 +90,17 @@ public class RuvdsEmailClient {
 				.orElseThrow(NoNewMessagesException::new);
 	}
 
-	private Set<Message> getUnreadMessagesFromInbox(Store store) throws MessagingException {
-		try (Folder inbox = store.getFolder("INBOX")) {
-
-			if (inbox.getUnreadMessageCount() == 0) {
-				throw new NoNewMessagesException();
-			}
-			inbox.open(Folder.READ_WRITE);
-
-			return getUnreadMessages(inbox);
+	private Set<Message> getUnreadMessagesFromInbox(Folder inbox) throws MessagingException {
+		if (inbox.getUnreadMessageCount() == 0) {
+			throw new NoNewMessagesException();
 		}
+		inbox.open(Folder.READ_WRITE);
+
+		return getUnreadMessages(inbox);
+	}
+
+	private Folder getInbox(Store store) throws MessagingException {
+		return store.getFolder("INBOX");
 	}
 
 	private Set<Message> getUnreadMessages(Folder inbox) throws MessagingException {
