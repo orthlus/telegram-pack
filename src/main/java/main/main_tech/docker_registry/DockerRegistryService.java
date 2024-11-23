@@ -48,9 +48,9 @@ public class DockerRegistryService {
 	private List<String> getNotLatestIds(Images images) {
 		return images.getImages()
 				.stream()
-				.filter(image -> image.getTags() != null)
-				.filter(image -> !image.getTags().isEmpty())
-				.filter(image -> !image.getTags().get(0).equals("latest"))
+				.filter(image -> image.getTags() == null
+								 || image.getTags().isEmpty()
+								 || !image.getTags().contains("latest"))
 				.map(Images.Image::getId)
 				.toList();
 	}
