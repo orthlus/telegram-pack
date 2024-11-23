@@ -95,7 +95,7 @@ public class RuvdsEmailClient {
 			if (inbox.getUnreadMessageCount() == 0) {
 				throw new NoNewMessagesException();
 			}
-			inbox.open(Folder.READ_ONLY);
+			inbox.open(Folder.READ_WRITE);
 
 			return getUnreadMessages(inbox);
 		}
