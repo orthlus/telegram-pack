@@ -26,15 +26,15 @@ public class DebtsTelegram implements SpringAdminBot {
 	@AllArgsConstructor
 	@Getter
 	private enum Commands implements Command {
-		START("/start"),
-		ADD_INCOME("/add_income"),
-		DELETE_INCOME("/delete_income"),
-		ADD_EXPENSE("/add_expense"),
-		DELETE_EXPENSE("/delete_expense"),
-		INCOMES("/incomes"),
 		EXPENSES("/expenses"),
+		ADD_EXPENSE("/add_expense"),
+		INCOMES("/incomes"),
+		ADD_INCOME("/add_income"),
 		EXPENSES_DETAILS("/expenses_details"),
-		EXPENSES_FOR_DATE("/expenses_for_date");
+		EXPENSES_FOR_DATE("/expenses_for_date"),
+		DELETE_INCOME("/delete_income"),
+		DELETE_EXPENSE("/delete_expense"),
+		START("/start");
 		final String command;
 	}
 
