@@ -2,7 +2,6 @@ package main.billing;
 
 import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,13 +20,10 @@ import static art.aelaort.TelegramClientHelpers.execute;
 public class BillingTelegram implements SpringAdminBot {
 	private final BillingService billingService;
 
-	@AllArgsConstructor
-	@Getter
 	private enum Commands implements Command {
-		START("/start"),
-		TIMEWEB_SHOW("/timeweb_show"),
-		SHOW("/show");
-		final String command;
+		START,
+		SHOW,
+		TIMEWEB_SHOW,
 	}
 
 	@Getter

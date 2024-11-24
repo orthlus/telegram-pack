@@ -23,19 +23,16 @@ import static main.debts.UserState.*;
 @Component
 @RequiredArgsConstructor
 public class DebtsTelegram implements SpringAdminBot {
-	@AllArgsConstructor
-	@Getter
 	private enum Commands implements Command {
-		EXPENSES("/expenses"),
-		ADD_EXPENSE("/add_expense"),
-		INCOMES("/incomes"),
-		ADD_INCOME("/add_income"),
-		EXPENSES_DETAILS("/expenses_details"),
-		EXPENSES_FOR_DATE("/expenses_for_date"),
-		DELETE_INCOME("/delete_income"),
-		DELETE_EXPENSE("/delete_expense"),
-		START("/start");
-		final String command;
+		EXPENSES,
+		ADD_EXPENSE,
+		INCOMES,
+		ADD_INCOME,
+		EXPENSES_DETAILS,
+		EXPENSES_FOR_DATE,
+		DELETE_INCOME,
+		DELETE_EXPENSE,
+		START,
 	}
 
 	@Getter

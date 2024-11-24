@@ -6,7 +6,6 @@ import art.aelaort.telegram.callback.CallbackType;
 import art.aelaort.telegram.entity.Remind;
 import art.aelaort.telegram.entity.RemindToSend;
 import art.aelaort.telegram.entity.RemindWithoutId;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,14 +49,11 @@ public class PaymentsTelegram implements SpringAdminBot {
 	private final KeyboardsProvider keyboards;
 	private final AtomicReference<UserState> state = new AtomicReference<>(NOTHING_WAIT);
 
-	@AllArgsConstructor
-	@Getter
 	private enum Commands implements Command {
-		START("/start"),
-		LIST("/list"),
-		NEW_REMIND("/new_remind"),
-		DELETE_REMIND("/delete_remind");
-		final String command;
+		START,
+		LIST,
+		NEW_REMIND,
+		DELETE_REMIND,
 	}
 
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
@@ -103,9 +99,9 @@ public class PaymentsTelegram implements SpringAdminBot {
 			}
 			case SUBMIT_PAYMENT -> {
 				Optional<Remind> remindOp = mapper.getRemindFromCallback(callbackQuery);
-				if (remindOp.isEmpty())
+				if (remindOp.isEmpty()) {
 					send("Что-то пошло не так, попробуйте заново");
-				else {
+				} else {
 					remindsService.submitRemind(remindOp.get());
 					delete(update);
 					send("%s - завершено".formatted(remindOp.get().getName()));

@@ -2,7 +2,6 @@ package main.main_tech;
 
 import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import main.main_tech.docker_registry.DockerRegistryService;
@@ -23,12 +22,9 @@ import static art.aelaort.TelegramClientHelpers.execute;
 public class Telegram implements SpringAdminBot {
 	private final DockerRegistryService dockerRegistryService;
 
-	@AllArgsConstructor
-	@Getter
 	private enum Commands implements Command {
-		GET_CODE("/get_code"),
-		DOCKER_CLEAN("/docker_clean");
-		final String command;
+		GET_CODE,
+		DOCKER_CLEAN,
 	}
 
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
