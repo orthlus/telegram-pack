@@ -153,7 +153,6 @@ public class DebtsTelegram implements SpringAdminBot {
 				sendInCode(text);
 			}
 			case EXPENSES_DETAILS -> {
-				service.clearExpensesCache();
 				String text = service.getExpensesDetailsText();
 				sendInCode(text);
 			}

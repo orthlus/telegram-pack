@@ -47,10 +47,6 @@ public class DebtsService {
 		return "%s\n==========\nИтого: %d".formatted(list, sum);
 	}
 
-	public void clearExpensesCache() {
-		repo.clearExpensesCache();
-	}
-
 	public String getExpensesDetailsText() {
 		List<Expense> expenses = repo.getExpenses();
 		return calculateExpensesByDefault(expenses);
