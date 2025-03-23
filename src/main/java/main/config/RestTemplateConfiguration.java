@@ -21,7 +21,7 @@ public class RestTemplateConfiguration {
 			@Value("${tasks.worker.url}") String url) {
 		return builder
 				.rootUri(url)
-				.setConnectTimeout(Duration.ofMinutes(2))
+				.connectTimeout(Duration.ofMinutes(2))
 				.build();
 	}
 
