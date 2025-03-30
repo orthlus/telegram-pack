@@ -16,16 +16,6 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class RestTemplateConfiguration {
 	@Bean
-	public RestTemplate chatWorkerRestTemplate(
-			RestTemplateBuilder builder,
-			@Value("${tasks.worker.url}") String url) {
-		return builder
-				.rootUri(url)
-				.connectTimeout(Duration.ofMinutes(2))
-				.build();
-	}
-
-	@Bean
 	public RestTemplate telegramListRestTemplate(RestTemplateBuilder builder, TelegramListProperties properties) {
 		return builder
 				.rootUri(properties.getUrl())
