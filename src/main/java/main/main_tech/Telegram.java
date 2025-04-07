@@ -4,7 +4,6 @@ import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import main.main_tech.docker_registry.DockerRegistryService;
 import main.main_tech.ruvds.RuvdsEmailClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +19,8 @@ import static art.aelaort.TelegramClientHelpers.execute;
 @Component
 @RequiredArgsConstructor
 public class Telegram implements SpringAdminBot {
-	private final DockerRegistryService dockerRegistryService;
-
 	private enum Commands implements Command {
 		GET_CODE,
-		DOCKER_CLEAN,
 	}
 
 	private final Map<String, Commands> commandsMap = Command.buildMap(Commands.class);
@@ -59,10 +55,6 @@ public class Telegram implements SpringAdminBot {
 	private void handleCommand(String messageText) {
 		switch (commandsMap.get(messageText)) {
 			case GET_CODE -> sendInMonospace(ruvdsEmailClient.getCode());
-			case DOCKER_CLEAN -> {
-				int i = dockerRegistryService.cleanNotLatest();
-				send("ok, cleaned - " + i);
-			}
 		}
 	}
 
