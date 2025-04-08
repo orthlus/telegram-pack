@@ -1,6 +1,6 @@
 package main.config;
 
-import art.aelaort.TelegramListProperties;
+import art.aelaort.DefaultValues;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -13,10 +13,11 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class RestTemplateConfiguration {
 	@Bean
-	public RestTemplate telegramListRestTemplate(RestTemplateBuilder builder, TelegramListProperties properties) {
+	public RestTemplate telegramListRestTemplate(RestTemplateBuilder builder) {
+		DefaultValues defaultValues = new DefaultValues();
 		return builder
-				.rootUri(properties.getUrl())
-				.basicAuthentication(properties.getUser(), properties.getPassword())
+				.rootUri(defaultValues.getUrl())
+				.basicAuthentication(defaultValues.getUser(), defaultValues.getPassword())
 				.build();
 	}
 }
