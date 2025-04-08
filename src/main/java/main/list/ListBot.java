@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.GetMe;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Arrays;
@@ -38,6 +40,13 @@ public class ListBot implements SpringAdminBot {
 	@PostConstruct
 	private void init() throws Exception {
 		botNickname = listTelegramClient.execute(new GetMe()).getUserName();
+
+		SetMyCommands setMyCommands = SetMyCommands.builder()
+				.command(new BotCommand("start", "start"))
+				.command(new BotCommand("add", "add"))
+				.command(new BotCommand("delete", "delete"))
+				.build();
+		listTelegramClient.execute(setMyCommands);
 	}
 
 	@Override
@@ -46,7 +55,7 @@ public class ListBot implements SpringAdminBot {
 			if (update.getMessage().getText().startsWith("/add")) {
 				String[] split = update.getMessage().getText().split(" ");
 
-				if (split.length < 2) {
+				if (split.length < 3) {
 					send("format - /add NICKNAME NAME\ntry again");
 				} else {
 					String nickname = split[1];
@@ -54,6 +63,17 @@ public class ListBot implements SpringAdminBot {
 					String url = "/bots/%s?name={name}".formatted(nickname);
 					telegramListRestTemplate.patchForObject(url, null, String.class, name);
 					send("to %s set name '%s'".formatted(nickname, name));
+				}
+			} else if (update.getMessage().getText().startsWith("/delete")) {
+				String[] split = update.getMessage().getText().split(" ");
+
+				if (split.length < 2) {
+					send("format - /delete NICKNAME\ntry again");
+				} else {
+					String nickname = split[1];
+					String url = "/bots/%s".formatted(nickname);
+					telegramListRestTemplate.delete(url);
+					send("bot %s deleted".formatted(nickname));
 				}
 			} else {
 				BotName[] arr = telegramListRestTemplate.getForObject("/bots", BotName[].class);
