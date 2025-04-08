@@ -47,7 +47,7 @@ public class ListBot implements SpringAdminBot {
 				String[] split = update.getMessage().getText().split(" ");
 
 				if (split.length < 2) {
-					send("format - /add PASTE_NAME\ntry again");
+					send("format - /add NICKNAME NAME\ntry again");
 				} else {
 					String nickname = split[1];
 					String name = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
