@@ -66,11 +66,6 @@
             <artifactId>spring-aspects</artifactId>
         </dependency>
         <dependency>
-            <groupId>art.aelaort</groupId>
-            <artifactId>aelaort-telegram-models</artifactId>
-            <version>4.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>

@@ -1,10 +1,10 @@
 package art.aelaort.payments_reminders.keyboard;
 
-import art.aelaort.telegram.callback.CallbackType;
-import art.aelaort.telegram.callback.models.RemindCallback;
-import art.aelaort.telegram.callback.models.RemindDaysCallback;
-import art.aelaort.telegram.callback.models.SomeCallback;
-import art.aelaort.telegram.entity.RemindToSend;
+import art.aelaort.dto.callback.CallbackType;
+import art.aelaort.dto.callback.models.RemindCallback;
+import art.aelaort.dto.callback.models.RemindDaysCallback;
+import art.aelaort.dto.callback.models.SomeCallback;
+import art.aelaort.dto.entity.RemindToSend;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -2,10 +2,10 @@ package art.aelaort.payments_reminders;
 
 import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
-import art.aelaort.telegram.callback.CallbackType;
-import art.aelaort.telegram.entity.Remind;
-import art.aelaort.telegram.entity.RemindToSend;
-import art.aelaort.telegram.entity.RemindWithoutId;
+import art.aelaort.dto.callback.CallbackType;
+import art.aelaort.dto.entity.Remind;
+import art.aelaort.dto.entity.RemindToSend;
+import art.aelaort.dto.entity.RemindWithoutId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

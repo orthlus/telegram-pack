@@ -1,6 +1,6 @@
 package art.aelaort.payments_reminders;
 
-import art.aelaort.telegram.entity.RemindToSend;
+import art.aelaort.dto.entity.RemindToSend;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;

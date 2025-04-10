@@ -1,8 +1,8 @@
 package art.aelaort.payments_reminders.keyboard;
 
 import art.aelaort.TelegramKeyboard;
-import art.aelaort.telegram.callback.models.CallbackData;
-import art.aelaort.telegram.entity.RemindToSend;
+import art.aelaort.dto.callback.models.CallbackData;
+import art.aelaort.dto.entity.RemindToSend;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import static art.aelaort.telegram.callback.CallbackType.HOLD_ON_PAYMENT_SELECT_DAYS;
-import static art.aelaort.telegram.callback.CallbackType.SUBMIT_PAYMENT;
+import static art.aelaort.dto.callback.CallbackType.HOLD_ON_PAYMENT_SELECT_DAYS;
+import static art.aelaort.dto.callback.CallbackType.SUBMIT_PAYMENT;
 
 @Slf4j
 @Component
