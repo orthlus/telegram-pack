@@ -5,20 +5,32 @@ import art.aelaort.telegram.callback.models.RemindCallback;
 import art.aelaort.telegram.callback.models.RemindDaysCallback;
 import art.aelaort.telegram.callback.models.SomeCallback;
 import art.aelaort.telegram.entity.RemindToSend;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface CallbackTypeMapper {
-	@Mapping(target = "typeId", source = "callbackType.id")
-	@Mapping(target = "remindId", source = "remind.id")
-	RemindCallback map(CallbackType callbackType, RemindToSend remind);
+@Component
+public class CallbackTypeMapper {
+	public RemindCallback map(CallbackType callbackType, RemindToSend remind) {
+		if (callbackType == null && remind == null) {
+			return null;
+		}
+		int typeId = callbackType != null ? callbackType.getId() : 0;
+		long remindId = remind != null ? remind.getId() : 0L;
+		return new RemindCallback(typeId, remindId);
+	}
 
-	@Mapping(target = "typeId", source = "callbackType.id")
-	@Mapping(target = "remindId", source = "remind.id")
-	@Mapping(target = "days", source = "numberDays")
-	RemindDaysCallback map(CallbackType callbackType, RemindToSend remind, int numberDays);
+	public RemindDaysCallback map(CallbackType callbackType, RemindToSend remind, int numberDays) {
+		if (callbackType == null && remind == null) {
+			return null;
+		}
+		int typeId = callbackType != null ? callbackType.getId() : 0;
+		long remindId = remind != null ? remind.getId() : 0L;
+		return new RemindDaysCallback(typeId, remindId, numberDays);
+	}
 
-	@Mapping(target = "typeId", source = "id")
-	SomeCallback map(CallbackType callbackType);
+	public SomeCallback map(CallbackType callbackType) {
+		if (callbackType == null) {
+			return null;
+		}
+		return new SomeCallback(callbackType.getId());
+	}
 }
