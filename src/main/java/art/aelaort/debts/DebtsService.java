@@ -1,11 +1,11 @@
-package main.debts;
+package art.aelaort.debts;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import main.debts.entity.Expense;
-import main.debts.entity.ExpenseDto;
-import main.debts.entity.Income;
-import main.debts.entity.IncomeDto;
+import art.aelaort.debts.entity.Expense;
+import art.aelaort.debts.entity.ExpenseDto;
+import art.aelaort.debts.entity.Income;
+import art.aelaort.debts.entity.IncomeDto;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

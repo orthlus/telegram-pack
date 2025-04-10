@@ -1,4 +1,4 @@
-package main.payments_reminders.keyboard;
+package art.aelaort.payments_reminders.keyboard;
 
 import art.aelaort.telegram.callback.CallbackType;
 import art.aelaort.telegram.callback.models.RemindCallback;

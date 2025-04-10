@@ -1,4 +1,4 @@
-package main.payments_reminders;
+package art.aelaort.payments_reminders;
 
 import art.aelaort.Command;
 import art.aelaort.SpringAdminBot;
@@ -9,7 +9,7 @@ import art.aelaort.telegram.entity.RemindWithoutId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.payments_reminders.keyboard.KeyboardsProvider;
+import art.aelaort.payments_reminders.keyboard.KeyboardsProvider;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static art.aelaort.TelegramClientHelpers.execute;
 import static java.lang.Long.parseLong;
-import static main.payments_reminders.UserState.*;
+import static art.aelaort.payments_reminders.UserState.*;
 
 @Slf4j
 @Component

@@ -1,4 +1,4 @@
-package main.debts.entity;
+package art.aelaort.debts.entity;
 
 public record Income(int id, int amount, int day) {
 	@Override

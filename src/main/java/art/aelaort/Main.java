@@ -1,4 +1,4 @@
-package main;
+package art.aelaort;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;

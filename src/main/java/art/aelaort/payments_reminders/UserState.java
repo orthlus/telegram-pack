@@ -1,4 +1,4 @@
-package main.payments_reminders;
+package art.aelaort.payments_reminders;
 
 public enum UserState {
 	NOTHING_WAIT,

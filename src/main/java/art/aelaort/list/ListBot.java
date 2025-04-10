@@ -1,4 +1,4 @@
-package main.list;
+package art.aelaort.list;
 
 import art.aelaort.BotName;
 import art.aelaort.SpringAdminBot;

@@ -1,4 +1,4 @@
-package main.config;
+package art.aelaort.config;
 
 import art.aelaort.DefaultValues;
 import lombok.RequiredArgsConstructor;

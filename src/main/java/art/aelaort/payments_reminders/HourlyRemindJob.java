@@ -1,4 +1,4 @@
-package main.payments_reminders;
+package art.aelaort.payments_reminders;
 
 import art.aelaort.telegram.entity.RemindToSend;
 import lombok.RequiredArgsConstructor;

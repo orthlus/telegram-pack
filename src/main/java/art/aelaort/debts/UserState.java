@@ -1,4 +1,4 @@
-package main.debts;
+package art.aelaort.debts;
 
 public enum UserState {
 	NOTHING_WAIT,

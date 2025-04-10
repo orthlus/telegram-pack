@@ -1,4 +1,4 @@
-package main.debts.entity;
+package art.aelaort.debts.entity;
 
 import java.time.LocalDate;
 import java.util.Objects;
