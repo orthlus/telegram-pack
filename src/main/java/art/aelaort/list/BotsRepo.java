@@ -29,7 +29,7 @@ public class BotsRepo {
 
 	public void updateBotNameByNickName(String nickname, String name) {
 		db.update(bl)
-				.set(bl.NICKNAME, name)
+				.set(bl.NAME, name)
 				.where(bl.NICKNAME.eq(nickname))
 				.execute();
 	}
