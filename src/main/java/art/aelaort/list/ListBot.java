@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,9 +16,8 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static art.aelaort.TelegramClientHelpers.execute;
 
@@ -27,8 +25,8 @@ import static art.aelaort.TelegramClientHelpers.execute;
 @Component
 @RequiredArgsConstructor
 public class ListBot implements SpringAdminBot {
-	private final RestTemplate telegramListRestTemplate;
 	private final TelegramClient listTelegramClient;
+	private final BotsRepo botsRepo;
 	@Getter
 	@Value("${list.telegram.bot.token}")
 	private String botToken;
@@ -51,6 +49,15 @@ public class ListBot implements SpringAdminBot {
 
 	@Override
 	public void consumeAdmin(Update update) {
+		try {
+			consumeAdmin0(update);
+		} catch (Exception e) {
+			log.error("list bot - some error", e);
+			send("list bot - some error: " + e.getMessage());
+		}
+	}
+
+	private void consumeAdmin0(Update update) {
 		if (update.hasMessage() && update.getMessage().hasText()) {
 			if (update.getMessage().getText().startsWith("/add")) {
 				String[] split = update.getMessage().getText().split(" ");
@@ -60,8 +67,7 @@ public class ListBot implements SpringAdminBot {
 				} else {
 					String nickname = split[1];
 					String name = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
-					String url = "/bots/%s?name={name}".formatted(nickname);
-					telegramListRestTemplate.patchForObject(url, null, String.class, name);
+					botsRepo.updateBotNameByNickName(nickname, name);
 					send("to %s set name '%s'".formatted(nickname, name));
 				}
 			} else if (update.getMessage().getText().startsWith("/delete")) {
@@ -71,14 +77,11 @@ public class ListBot implements SpringAdminBot {
 					send("format - /delete NICKNAME\ntry again");
 				} else {
 					String nickname = split[1];
-					String url = "/bots/%s".formatted(nickname);
-					telegramListRestTemplate.delete(url);
+					botsRepo.deleteBotByNickname(nickname);
 					send("bot %s deleted".formatted(nickname));
 				}
 			} else {
-				BotName[] arr = telegramListRestTemplate.getForObject("/bots", BotName[].class);
-				List<BotName> bots = Stream.of(arr).toList();
-
+				Set<BotName> bots = botsRepo.getNames();
 				if (bots.isEmpty()) {
 					send("bots not found");
 				} else {
