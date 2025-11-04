@@ -13,7 +13,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 @SpringBootApplication
-@EnableCaching
 @EnableScheduling
 public class Main {
 	public static void main(String[] args) {

@@ -10,8 +10,6 @@ import main.tables.PaymentsReminders;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -92,7 +90,6 @@ public class Repo {
 
 	}
 
-	@Cacheable("reminds")
 	public Remind getRemindById(long id) {
 		return db.select(
 						pr.ID,
@@ -105,7 +102,6 @@ public class Repo {
 				.fetchOne(mapping(Remind::new));
 	}
 
-	@CacheEvict(value = "reminds")
 	public void deleteRemind(long id) {
 		db.delete(phor)
 				.where(phor.REMIND_ID.eq(id))
