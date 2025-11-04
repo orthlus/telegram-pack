@@ -20,6 +20,7 @@ public class Remind {
 		if (name.contains("оплатить")) sings += "💰";
 		String oName = name
 				.replace("счетчики", "")
+				.replace("передать", "")
 				.replace("оплатить", "")
 				.replaceAll(" +", " ")
 				.trim();

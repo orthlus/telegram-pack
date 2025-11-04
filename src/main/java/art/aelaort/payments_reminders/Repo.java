@@ -85,6 +85,7 @@ public class Repo {
 						pr.END_DAY_OF_MONTH,
 						pr.HOUR_OF_DAY_TO_FIRE)
 				.from(pr)
+				.where(pr.IS_DELETE.eq(false))
 				.orderBy(pr.START_DAY_OF_MONTH)
 				.fetchSet(mapping(Remind::new));
 
@@ -98,7 +99,7 @@ public class Repo {
 						pr.END_DAY_OF_MONTH,
 						pr.HOUR_OF_DAY_TO_FIRE)
 				.from(pr)
-				.where(pr.ID.eq(id))
+				.where(pr.ID.eq(id).and(pr.IS_DELETE.eq(false)))
 				.fetchOne(mapping(Remind::new));
 	}
 
@@ -106,7 +107,8 @@ public class Repo {
 		db.delete(phor)
 				.where(phor.REMIND_ID.eq(id))
 				.execute();
-		db.delete(pr)
+		db.update(pr)
+				.set(pr.IS_DELETE, true)
 				.where(pr.ID.eq(id))
 				.execute();
 	}
@@ -118,6 +120,7 @@ public class Repo {
 		Condition endDayEq = pr.END_DAY_OF_MONTH.greaterOrEqual(extract(now, DatePart.DAY));
 		Condition timeEq = pr.HOUR_OF_DAY_TO_FIRE.eq(extract(now, DatePart.HOUR));
 		Condition holdDateEq = phor.HOLD_END_DT.lessOrEqual(now.toLocalDate());
+		Condition notDeleted = pr.IS_DELETE.eq(false);
 
 		return db.select(pr.ID, pr.REMIND_NAME)
 				.from(pr)
@@ -126,7 +129,8 @@ public class Repo {
 				.where(startDayEq
 						.and(endDayEq)
 						.and(timeEq)
-						.and(coalesce(holdDateEq, true)))
+						.and(coalesce(holdDateEq, true))
+						.and(notDeleted))
 				.fetch(mapping(RemindToSend::new));
 	}
 }
