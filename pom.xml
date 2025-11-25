@@ -72,7 +72,7 @@
         <dependency>
             <groupId>art.aelaort</groupId>
             <artifactId>aelaort-telegrambots</artifactId>
-            <version>14.0</version>
+            <version>17.0</version>
         </dependency>
     </dependencies>
 
