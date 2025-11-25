@@ -1,8 +1,8 @@
 package art.aelaort.payments_reminders.keyboard;
 
-import art.aelaort.TelegramKeyboard;
 import art.aelaort.dto.callback.models.CallbackData;
 import art.aelaort.dto.entity.RemindToSend;
+import art.aelaort.telegram.TelegramKeyboard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

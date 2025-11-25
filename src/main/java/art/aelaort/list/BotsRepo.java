@@ -1,6 +1,6 @@
 package art.aelaort.list;
 
-import art.aelaort.BotName;
+import art.aelaort.telegram.BotName;
 import lombok.RequiredArgsConstructor;
 import main.tables.BotsList;
 import org.jooq.DSLContext;

@@ -1,7 +1,7 @@
 package art.aelaort.list;
 
-import art.aelaort.BotName;
-import art.aelaort.SpringAdminBot;
+import art.aelaort.telegram.BotName;
+import art.aelaort.telegram.SimpleAdminBot;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +19,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static art.aelaort.TelegramClientHelpers.execute;
+import static art.aelaort.telegram.client.TelegramClientHelpers.execute;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ListBot implements SpringAdminBot {
+public class ListBot implements SimpleAdminBot {
 	private final TelegramClient listTelegramClient;
 	private final BotsRepo botsRepo;
 	@Getter

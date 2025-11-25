@@ -1,7 +1,7 @@
 package art.aelaort.debts;
 
-import art.aelaort.Command;
-import art.aelaort.SpringAdminBot;
+import art.aelaort.telegram.Command;
+import art.aelaort.telegram.SimpleAdminBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +15,13 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static art.aelaort.TelegramClientHelpers.execute;
 import static art.aelaort.debts.UserState.*;
+import static art.aelaort.telegram.client.TelegramClientHelpers.execute;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DebtsTelegram implements SpringAdminBot {
+public class DebtsTelegram implements SimpleAdminBot {
 	private enum Commands implements Command {
 		EXPENSES,
 		ADD_EXPENSE,

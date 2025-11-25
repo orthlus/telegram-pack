@@ -1,15 +1,15 @@
 package art.aelaort.payments_reminders;
 
-import art.aelaort.Command;
-import art.aelaort.SpringAdminBot;
 import art.aelaort.dto.callback.CallbackType;
 import art.aelaort.dto.entity.Remind;
 import art.aelaort.dto.entity.RemindToSend;
 import art.aelaort.dto.entity.RemindWithoutId;
+import art.aelaort.payments_reminders.keyboard.KeyboardsProvider;
+import art.aelaort.telegram.Command;
+import art.aelaort.telegram.SimpleAdminBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import art.aelaort.payments_reminders.keyboard.KeyboardsProvider;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,14 +27,14 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static art.aelaort.TelegramClientHelpers.execute;
-import static java.lang.Long.parseLong;
 import static art.aelaort.payments_reminders.UserState.*;
+import static art.aelaort.telegram.client.TelegramClientHelpers.execute;
+import static java.lang.Long.parseLong;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PaymentsTelegram implements SpringAdminBot {
+public class PaymentsTelegram implements SimpleAdminBot {
 	@Getter
 	@Value("${payments.telegram.bot.token}")
 	private String botToken;
