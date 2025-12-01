@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.5.8</version>
     </parent>
 
     <dependencies>
@@ -28,7 +28,6 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.5</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -72,7 +71,7 @@
         <dependency>
             <groupId>art.aelaort</groupId>
             <artifactId>aelaort-telegrambots</artifactId>
-            <version>18.0</version>
+            <version>19.0</version>
         </dependency>
     </dependencies>
 
